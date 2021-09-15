@@ -16,15 +16,15 @@ int SENSOR::inside_code[] = {INSIDE_BWF, INSIDE_BWF};
 SENSOR::SENSOR(int pin_, bool missingSignalIsOut_){
     pin = pin_;
     missingSignalIsOut = missingSignalIsOut_;
+    pulseHistoryPos = 0;
 }
 
 void SENSOR::setup() {
 }
 
 void SENSOR::handleInterrupt() {
-     //bool needOneMoreRun = false;
   unsigned long now = micros();
-  char buf[40];
+  
 
   // Calculate the time since last pulse
   int time_since_pulse = int(now - last_pulse);
@@ -58,7 +58,8 @@ void SENSOR::handleInterrupt() {
 
   }
   
-
+  pulseHistoryPos = pulseHistoryPos++ % PULSE_HISTORY_COUNT;
+  pulsehistory[pulseHistoryPos] = pulse_length;
 
   // Store the received code for debug output
   // arr[arr_count++] = pulse_length;

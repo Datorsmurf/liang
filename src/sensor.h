@@ -1,6 +1,7 @@
 #ifndef _SENSOR_H_
 #define _SENSOR_H_
 
+#define PULSE_HISTORY_COUNT 10
 
 class SENSOR { 
     public:
@@ -24,7 +25,8 @@ class SENSOR {
         int signel_status;
         int pulse_count_inside;
         int pulse_count_outside;
-
+        int pulsehistory[PULSE_HISTORY_COUNT];
+        int pulseHistoryPos;
 };
 
 #endif

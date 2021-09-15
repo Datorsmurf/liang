@@ -19,12 +19,12 @@
 #define BATTERY_EMPTY_MV      10400
 
 //NiMH
-#define BATTERY_FULL_MV        14500
-#define BATTERY_EMPTY_MV       11500
+//#define BATTERY_FULL_MV        14500
+//#define BATTERY_EMPTY_MV       11500
 
 //LEAD ACID
-#define BATTERY_FULL_MV    13300
-#define BATTERY_EMPTY_MV   12000
+//#define BATTERY_FULL_MV    13300
+//#define BATTERY_EMPTY_MV   12000
 
 // Running average sample size
 #define FILTER        200
