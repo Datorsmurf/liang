@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name = 'viewport' content = 'width = device-width, initial-scale = 1.0, maximum-scale = 1.0, user-scalable=0'>
+<title>Liang</title>
+<style>
+body { background-color: #D0D0D0; font-family: Arial, Helvetica, Sans-Serif; Color: black; }
+
+.container {
+  height: 100%;
+}
+
+.navbutton {
+  user-select: none;
+} 
+.log {
+  height: 100px;
+  border: 2px solid black;
+  /*position: absolute;*/
+  vertical-align: bottom;
+  display: contents;
+}
+
+.log-content {
+  margin-top: 5px;
+  border: 2px solid black;
+  /*position: absolute;*/
+  vertical-align: bottom;
+  height: 800px;
+  overflow: scroll;
+}
+
+.log-row {
+  margin: 0px;
+}
+
+
+</style>
+<script type='text/javascript'>
+var websock;
+function start()
+{
+/*  if (websock) {
+    websock.close();
+  }*/
+
+  websock = new WebSocket('ws://' + window.location.hostname + ':81/');
+  websock.onopen = function(evt) { console.log('websock open'); };
+  websock.onclose = function(e) {
+    console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
+    websock = undefined;
+    setTimeout(function() {
+      start();
+    }, 1000);
+  };
+
+  websock.onerror = function(err) {
+    console.error('Socket encountered error: ', err.message, 'Closing socket');
+    websock.close();
+  };  
+  websock.onmessage = function(evt) {
+    var e = document.getElementById('log');
+
+    /*blockDiv = document.createElement("div");*/
+    textSpan = document.createElement("p");
+    textSpan.className = 'log-row';
+    textSpan.append(evt.data);  // see note about browser compatibility
+    /*blockDiv.append(textSpan);*/
+    e.appendChild(textSpan);
+    e.scrollTop = e.scrollHeight;
+  };
+}
+function buttonclick(e)
+{
+  websock.send(e.id);
+}
+
+function sendCommand(component, value) {
+  /*if (!websock) {
+    start();
+  }*/
+  let msg = `${component}_${value}`;
+  console.log(msg);
+  websock.send(msg);
+}
+
+</script>
+</head>
+<body onload='javascript:start();'>
+  <div class='container'> 
+    <h1>Liang</h1>
+    <div id='ledstatus'><b>Mode</b></div>
+    <button class='navbutton' type='button' onmousedown='sendCommand("mode","idle")'       ontouchstart='sendCommand("mode","idle")'>Idle</button>
+    <button class='navbutton' type='button' onmousedown='sendCommand("mode","mow")'      ontouchstart='sendCommand("mode","mow")'>Mow</button>
+    <button class='navbutton' type='button' onmousedown='sendCommand("mode","once")'     ontouchstart='sendCommand("mode","once")'>Mow once</button>
+    <button class='navbutton' type='button' onmousedown='sendCommand("mode","charge")'      ontouchstart='sendCommand("mode","charge")'>Charge</button>
+    <br />
+    <div class='log'>
+      <div><b>Log</b></div>
+      <div class='log-content' id='log'>
+      </div>
+      <div style="clear:both"></div>
+    </div>
+  </div>
+</body>
+</html>
