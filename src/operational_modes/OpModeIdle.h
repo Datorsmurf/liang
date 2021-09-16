@@ -1,14 +1,14 @@
-#ifndef _OPMODEMOW_H_
-#define _OPMODEMOW_H_
+#ifndef _OPMODEIDLE_H_
+#define _OPMODEIDLE_H_
 
 #include "operationalmode.h"
 #include "Controller.h"
 #include "Logger.h"
 
-class OpModeMow : public OPERATIONALMODE { 
+class OpModeIdle : public OPERATIONALMODE { 
     public:
-        OpModeMow(Controller *controller_, LOGGER *logger_);
-        void start();
+        OpModeIdle(Controller *controller_, LOGGER *logger_);
+        int start();
         int loop();
         int id();
     private:

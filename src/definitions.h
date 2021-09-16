@@ -21,4 +21,14 @@
 #define LEFT_SENSOR_PIN 15
 #define RIGHT_SENSOR_PIN 16
 
+#define BATTERY_SENSOR_PIN 17
+#define BATTERY_CHARGE_PIN 18
+
+#define BUMPER_PIN 18
+
+
+#define CUTTER_SPEED 100
+
+#define TILT_ANGLE 55;
+
 #endif

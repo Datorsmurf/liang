@@ -35,15 +35,7 @@
 
 class BATTERY {
   public:
-    BATTERY(int type, int sensepin, int dockpin);
-
-    int getBatteryType();
-
-    void setFullyChargedLevel(int level);
-    int getFullyChargedLevel();
-
-    void setDepletedLevel(int level);
-    int getDepletedLevel();
+    BATTERY(int sensepin, int dockpin);
 
     bool mustCharge();
     bool isBeingCharged();
@@ -52,14 +44,13 @@ class BATTERY {
     int getVoltage();
     void resetVoltage();
     void updateVoltage();
-    unsigned long readBatteryAndCalcValue();
 
   private:
-    int batType;
+    unsigned long readBatteryAndCalcValue();
     int batSensePin;
     int batDockPin;
-    int fullyChargedLevel = BATTERY_FULL_MV;
-    int depletedLevel = BATTERY_EMPTY_MV;
+    int fullyChargedLevel;
+    int depletedLevel;
     float averageVoltage;
 };
 

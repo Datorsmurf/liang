@@ -12,6 +12,8 @@ class GYRO {
         GYRO(LOGGER *logger_, int interruptPin_);
         void setup();
         void loop();
+        int getHeading();
+        int getTilt();
         void dmpDataReady();
     private:
         LOGGER *logger;

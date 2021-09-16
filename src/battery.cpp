@@ -12,46 +12,13 @@
 #include "battery.h"
 #include "definitions.h"
 
-BATTERY::BATTERY(int type, int sensepin, int dockpin) {
-  batType = type;
+BATTERY::BATTERY(int sensepin, int dockpin) {
   batSensePin = sensepin;
   batDockPin = dockpin;
 
-  // Battery types are defined in Definition.h
-  // LIION
-  // NIMH
-  // LEAD_ACID
-
-    fullyChargedLevel = BATTERY_FULL_MV;
-    depletedLevel = BATTERY_EMPTY_MV;
-
+  fullyChargedLevel = BATTERY_FULL_MV;
+  depletedLevel = BATTERY_EMPTY_MV;
 }
-
-
-int BATTERY::getBatteryType() {
-  return batType;
-}
-
-
-// Set the voltage at which battery is considered fully charged (mV)
-void BATTERY::setFullyChargedLevel(int level) {
-  fullyChargedLevel = level;
-}
-
-int BATTERY::getFullyChargedLevel() {
-  return fullyChargedLevel;
-}
-
-
-// Set the voltage at which battery is considered depleted (mV)
-void BATTERY::setDepletedLevel(int level) {
-  depletedLevel = level;
-}
-
-int BATTERY::getDepletedLevel() {
-  return depletedLevel;
-}
-
 
 bool BATTERY::mustCharge() {
   return (averageVoltage < depletedLevel);

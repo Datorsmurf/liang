@@ -193,6 +193,13 @@ void GYRO::loop() {
             Serial.write(teapotPacket, 14);
             teapotPacket[11]++; // packetCount, loops at 0xFF on purpose
         #endif
-
     }
+}
+
+int GYRO::getHeading() {
+    return 0;
+}
+
+int GYRO::getTilt() {
+    return 0;
 }
