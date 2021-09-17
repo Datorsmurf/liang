@@ -1,6 +1,10 @@
 #ifndef _DEFINITIONS_H_
 #define _DEFINITIONS_H_
 
+#include "functional"
+typedef std::function<void(int newMode)> ModeSelectEvent;
+
+
 // BWF Code for inside and outside
 #define INSIDE_BWF          86
 #define OUTSIDE_BWF         5

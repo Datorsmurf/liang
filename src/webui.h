@@ -4,11 +4,11 @@
 #include <WebSocketsServer.h>
 #include <webserver.h>
 #include "Logger.h"
+#include "definitions.h"
 
 
 class WEBUI { 
     public:
-    typedef std::function<void(int newMode)> ModeSelectEvent;
 
         WEBUI(WebServer* server_, WebSocketsServer* webSocketServer_, LOGGER* logger_, ModeSelectEvent modeSelectEvent_);
         void setup();

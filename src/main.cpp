@@ -12,6 +12,7 @@
 #include "operational_modes/operationalmode.h"
 #include "operational_modes/OpModeCharge.h"
 #include "operational_modes/OpModeMow.h"
+#include "operational_modes/OpModeMowOnce.h"
 #include "operational_modes/OpModeIdle.h"
 
 #include "behaviors/behavior.h"
@@ -34,10 +35,11 @@
 #include "gyro.h"
 
 
-
 int expectedMode = 0;
 int expectedBehavior = 0;
 int manualMode = -1;
+
+TaskHandle_t gyroTask;
 
 MowerModel mowerModel;
 
@@ -64,10 +66,12 @@ Controller controller(&leftMotor, &rightMotor, &cutterMotor, &gyro, &bumper);
 
 OpModeCharge opModeCharge(&controller, &logger, &battery);
 OpModeMow opModeMow(&controller, &logger, &battery);
+OpModeMowOnce opModeMowOnce(&controller, &logger, &battery);
 OpModeIdle opModeIdle(&controller, &logger);
 
 OPERATIONALMODE* availableOpModes[] = { 
   &opModeMow,
+  &opModeMowOnce,
   &opModeCharge,
   &opModeIdle,
 };
@@ -79,7 +83,7 @@ FollowBWF followBWF(&controller, &logger, &battery);
 GoAround goAround(&controller, &logger, &battery);
 Idle idle(&controller, &logger, &battery);
 Launch launch(&controller, &logger, &battery);
-LookForBWF lookForBwf(&controller, &logger, &battery);
+LookForBWF lookForBwf(&controller, &logger, &battery, *setManualMode, currentMode);
 Mow mow(&controller, &logger, &battery);
 
 BEHAVIOR* currentBehavior;
@@ -93,13 +97,6 @@ BEHAVIOR* availableBehaviors[] = {
   &mow
 };
 
-int status;
-
-float filter = 0.3;
-float xAccOffset;
-float deadZone = 0.02;
-
-
 void handleInterruptLeft() {
   leftSensor.handleInterrupt();
 }
@@ -110,6 +107,16 @@ void handleInterruptRight() {
 
 void handleInterruptGyro() {
   gyro.dmpDataReady();
+}
+
+void pollGyro(void * parameter) {
+  gyro.setup();
+  while (true)
+  {
+    gyro.loop();
+    delay(2);
+  }
+  
 }
 
 
@@ -133,8 +140,8 @@ void setup() {
 
   uh.setup();
   webUi.setup();
-  gyro.setup();
-  attachInterrupt(MPU_INTERRUPT_PIN, handleInterruptGyro, RISING);
+
+ attachInterrupt(MPU_INTERRUPT_PIN, handleInterruptGyro, RISING);
 
   leftSensor.setup();
   attachInterrupt(LEFT_SENSOR_PIN, handleInterruptLeft, RISING);
@@ -145,6 +152,8 @@ void setup() {
   expectedMode = currentMode->id();
   expectedBehavior = currentMode->start();
 
+  xTaskCreatePinnedToCore(pollGyro, "GyroPollTask", 4096, NULL, 5, &gyroTask, 0);
+
   delay(1000);
 }
 
@@ -152,14 +161,15 @@ void setup() {
 
 unsigned long lastPrint= 0;
 
+void pollJobs(void * parameter) {
 
+}
 
 void loop() {
 
 
 
   //Handle
-  gyro.loop();
   uh.handle();
   webUi.handle();
   webSocket.loop();
@@ -203,7 +213,6 @@ void loop() {
     if (!foundIt) {
       logger.log("Could not locate OpMode with id:" + String(expectedMode), true);
     }
-
   }
 
 

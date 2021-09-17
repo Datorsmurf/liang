@@ -54,62 +54,8 @@ void WEBUI::webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t
         } else if (strstr(pl, "_charge") != NULL) {
           modeSelectEvent(3);
         } 
-
-        //char* modestring = malloc(1);
-//            modeSelectEvent(1);
       }
-    //   else if (strcmp(MSG_PIPE_STOP, pl) == 0) {
-    //     chuteAngle = turnToAngle(138, &chuteServo);
-    //   }
-    //   else if (strcmp(MSG_PIPE_RIGHT, pl) == 0) {
-    //     chuteAngle = turnToAngle(125, &chuteServo);
-    //   }
-    //   else if (strcmp(MSG_MOTOR_START, pl) == 0) {
-    //     leftMotor.setSpeed(speed, 500);
-    //     rightMotor.setSpeed(speed, 500);
-    //   }
-    //   else if (strcmp(MSG_MOTOR_STOP, pl) == 0) {
-    //     leftMotor.setSpeed(0, 0);
-    //     rightMotor.setSpeed(0, 0);
-    //   }
-    //   else if (strcmp(MSG_MOTOR_BACK, pl) == 0) {
-    //     leftMotor.setSpeed(-speed, speedActionTime);
-    //     rightMotor.setSpeed(-speed, speedActionTime);
-    //   }
-    //   else if (strcmp(MSG_MOTOR_TURNLEFT, pl) == 0) {
-    //     leftMotor.setSpeed(speed * turnFactor, speedActionTime);
-    //     rightMotor.setSpeed(speed, speedActionTime);
-    //   }
-    //   else if (strcmp(MSG_MOTOR_TURNRIGHT, pl) == 0) {
-    //     leftMotor.setSpeed(speed , speedActionTime);
-    //     rightMotor.setSpeed(speed * turnFactor, speedActionTime);
-    //   }
-    //   else if (strcmp(MSG_MOTOR_SPEEDUP, pl) == 0) {
-    //     setSpeed(speed + 10);
-    //   }
-    //   else if (strcmp(MSG_MOTOR_SPEEDDOWN, pl) == 0) {
-    //     setSpeed(speed -10);
-    //   }
-    //   else if (strcmp(MSG_SNOW_TOGGLE, pl) == 0) {
-    //     if (snowMotor.getSpeed() == 0) {
-    //       snowMotor.setSpeed(255, 400);
-    //     } else {
-    //       snowMotor.setSpeed(0, 400);
-    //     }
-        
-    //   }
 
-    //   else if (strcmp(MSG_WEIGHT_TOGGLE, pl) == 0) {
-    //     toggleWeight();
-    //   }
-    //   else if (strcmp(MSG_DEBUG, pl) == 0) {
-    //     runDebug = !runDebug;
-    //   }
-    //   else {
-    //     Serial.println("Unknown command");
-    //   }
-      // send data to all connected clients
-      //webSocket.broadcastTXT(payload, length);
       break;
     case WStype_BIN:
       Serial.printf("[%u] get binary length: %u\r\n", num, length);
