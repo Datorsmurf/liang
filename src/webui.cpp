@@ -2,7 +2,7 @@
 #include "webui.h"
 #include "WebSocketsServer.h"
 #include "Logger.h"
-
+#include "operational_modes/operationalmode.h"
 
 WEBUI::WEBUI(AsyncWebServer* server_, AsyncWebSocket* webSocketServer_, LOGGER* logger_, ModeSelectEvent modeSelectEvent_){
     webSocketServer = webSocketServer_;
@@ -77,6 +77,7 @@ if(type == WS_EVT_CONNECT){
     Serial.printf("ws[%s][%u] connect\n", server->url(), client->id());
     client->printf("Hello Client %u :)", client->id());
     client->ping();
+    logger->sendLogHistory(client->id());
   } else if(type == WS_EVT_DISCONNECT){
     Serial.printf("ws[%s][%u] disconnect\n", server->url(), client->id());
   } else if(type == WS_EVT_ERROR){
@@ -102,9 +103,21 @@ if(type == WS_EVT_CONNECT){
         }
       }
       Serial.printf("%s\n",msg.c_str());
+      
 
-      if(info->opcode == WS_TEXT)
-        client->text("I got your text message");
+      if(info->opcode == WS_TEXT) {
+        if (msg.indexOf("mode_") == 0 ) {
+          if (msg.indexOf("_idle") > 0) {
+            modeSelectEvent(OP_MODE_IDLE);
+          } else if (msg.indexOf("_mow") > 0) {
+            modeSelectEvent(OP_MODE_MOW);
+          } else if (msg.indexOf("_once") > 0) {
+            modeSelectEvent(OP_MODE_MOW_ONCE);
+          } else if (msg.indexOf("_charge") > 0) {
+            modeSelectEvent(OP_MODE_CHARGE);
+          } 
+        }
+      }
       else
         client->binary("I got your binary message");
     } else {
@@ -193,6 +206,5 @@ void WEBUI::setup() {
     //webSocketServer->onEvent(std::bind(&WEBUI::webSocketEvent, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
 }
 void WEBUI::handle() {
-//    server->handleClient();
   webSocketServer->cleanupClients();
 }

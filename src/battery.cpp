@@ -25,6 +25,7 @@ bool BATTERY::mustCharge() {
 }
 
 bool BATTERY::isBeingCharged() {
+  return true;
   return digitalRead(batDockPin);
 }
 

@@ -11,8 +11,12 @@
 
 class OPERATIONALMODE { 
     public:
+    //Do what's needed for the mode and return the Id for the bahavior to start off with
     virtual int start();
+
     virtual int loop();
+
+    //The... trumroll... Id
     virtual int id();
 };
 

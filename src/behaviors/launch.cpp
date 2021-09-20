@@ -12,27 +12,16 @@ Launch::Launch(Controller *controller_, LOGGER *logger_, BATTERY *battery_) {
 }
 
 void Launch::start() {
-    logger->log("Start MOW", true);
+    logger->log("Start Launch", true);
+    controller->StopCutter();
+    controller->StopMovement();
 }
 
 int Launch::loop() {
-    if (battery->mustCharge()) {
-        return BEHAVIOR_LOOK_FOR_BWF;
-    }
+    controller->Move(-100);
+    controller->Turn(90);
 
-    if (controller->IsBumped()) {
-        controller->Action_EvadeObsticle();
-    }
-
-    if (controller->IsTilted()) {
-        controller->Action_EvadeObsticle();
-    }
-
-    
-    controller->RunCutter(CUTTER_SPEED);
-    controller->Run(100, 100, 300);
-
-    return id();
+    return BEHAVIOR_MOW;
 }
 
 int Launch::id() {

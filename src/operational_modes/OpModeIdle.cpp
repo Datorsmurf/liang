@@ -9,9 +9,7 @@ OpModeIdle::OpModeIdle(Controller *controller_, LOGGER *logger_) {
     logger = logger_;
 }
 int OpModeIdle::start() {
-    logger->log("Start OpModeMow", true);
-    controller->StopCutter();
-    controller->StopMovement();
+    logger->log("Start OpModeIdle. Yawn no lawn...", true);
     return BEHAVIOR_IDLE;
 }
 

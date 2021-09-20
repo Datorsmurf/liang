@@ -188,7 +188,7 @@ void loop() {
       if (availableOpModes[i]->id() == expectedMode) {
         foundIt = true;
         currentMode = availableOpModes[i];
-        currentMode->start();
+        expectedBehavior = currentMode->start();
         break;
       }
     }
@@ -221,15 +221,13 @@ void loop() {
   expectedBehavior = currentBehavior->loop();
 
 
-  
-
   if (millis()- lastPrint > 10000) {
     
     lastPrint = millis();
-    logger.log("Log timing test...", false);
-    logger.log("Log timing test...", false);
-    logger.log("Log timing test...", false);
-    logger.log("Log timing test...", false);
-    logger.log("Time: " + String(trunc(millis() - lastPrint),0), false);
+    // logger.log("Log timing test...", false);
+    // logger.log("Log timing test...", false);
+    // logger.log("Log timing test...", false);
+    // logger.log("Log timing test...", false);
+    // logger.log("Time: " + String(trunc(millis() - lastPrint),0), false);
   }
 }
