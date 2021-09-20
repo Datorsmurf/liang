@@ -2,7 +2,7 @@
 #define _LOGGER_H_
 
 #include <Arduino.h>
-#include <WebSocketsServer.h>
+#include <ESPAsyncWebServer.h>
 
 struct LogEvent {
     unsigned long millis;
@@ -13,14 +13,14 @@ struct LogEvent {
 
 class LOGGER { 
     public:
-        LOGGER(WebSocketsServer* webSocketServer_);
+        LOGGER(AsyncWebSocket* webSocketServer_);
         void log(String msg, bool keepInHistory);
         void sendLogHistory(int clientId);
 
     private:
         
 
-        WebSocketsServer* webSocketServer;
+        AsyncWebSocket* webSocketServer;
         LogEvent eventBuffer[LOG_BUFFER_SIZE];
         int bufferPos;
         bool bufferIsLooped = false;

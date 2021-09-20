@@ -26,7 +26,7 @@ class SENSOR {
         int pulse_count_inside;
         int pulse_count_outside;
         int pulsehistory[PULSE_HISTORY_COUNT];
-        int pulseHistoryPos;
+        int pulseHistoryPos = 0;
 };
 
 #endif

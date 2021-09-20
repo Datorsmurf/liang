@@ -2,10 +2,10 @@
 
 #include <math.h>
 #include "ArduinoOTA.h"
-#include "WebSocketsServer.h"
 #include "updatehandler.h"
 #include "WiFi.h"
-#include "WebServer.h"
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
 #include "webui.h"
 #include "SPIFFS.h"
 
@@ -39,7 +39,7 @@ int expectedMode = 0;
 int expectedBehavior = 0;
 int manualMode = -1;
 
-TaskHandle_t gyroTask;
+TaskHandle_t pollTask;
 
 MowerModel mowerModel;
 
@@ -47,11 +47,11 @@ void setManualMode(int manualMode_) {
   manualMode = manualMode_;
 }
 
-WebSocketsServer webSocket = WebSocketsServer(81);
+AsyncWebServer webServer(80);
+AsyncWebSocket webSocket("/ws");
 LOGGER logger(&webSocket);
-UPDATEHANDLER uh(&logger);
-WebServer webServer(80);
 WEBUI webUi(&webServer, &webSocket, &logger, *setManualMode);
+UPDATEHANDLER uh(&logger);
 GYRO gyro(&logger, MPU_INTERRUPT_PIN);
 SENSOR leftSensor(LEFT_SENSOR_PIN, false);
 SENSOR rightSensor(LEFT_SENSOR_PIN, false);
@@ -60,7 +60,7 @@ BUMPER bumper(BUMPER_PIN);
 
 MOTOR leftMotor(LEFT_MOTOR_PWM_PIN, LEFT_MOTOR_DIRECTION_PIN, LEFT_MOTOR_PWM_CHANNEL, &logger);
 MOTOR rightMotor(RIGHT_MOTOR_PWM_PIN, RIGHT_MOTOR_DIRECTION_PIN, RIGHT_MOTOR_PWM_CHANNEL, &logger);
-MOTOR cutterMotor(CUTTER_MOTOR_PWM_PIN, CUTTER_MOTOR_PWM_CHANNEL, &logger);
+MOTOR cutterMotor(CUTTER_MOTOR_PWM_PIN, -1, CUTTER_MOTOR_PWM_CHANNEL, &logger);
 
 Controller controller(&leftMotor, &rightMotor, &cutterMotor, &gyro, &bumper);
 
@@ -80,7 +80,7 @@ OPERATIONALMODE* currentMode = availableOpModes[0];
 
 Charge charge(&controller, &logger, &battery);
 FollowBWF followBWF(&controller, &logger, &battery);
-GoAround goAround(&controller, &logger, &battery);
+GoAround goAround(&controller, &logger, &battery, &leftSensor, &rightSensor);
 Idle idle(&controller, &logger, &battery);
 Launch launch(&controller, &logger, &battery);
 LookForBWF lookForBwf(&controller, &logger, &battery, *setManualMode, currentMode);
@@ -109,14 +109,14 @@ void handleInterruptGyro() {
   gyro.dmpDataReady();
 }
 
-void pollGyro(void * parameter) {
+void pollPollables(void * parameter) {
   gyro.setup();
   while (true)
   {
     gyro.loop();
+    battery.updateVoltage();
     delay(2);
   }
-  
 }
 
 
@@ -149,10 +149,15 @@ void setup() {
   rightSensor.setup();
   attachInterrupt(RIGHT_SENSOR_PIN, handleInterruptRight, RISING);
 
+  leftMotor.setup();
+  rightMotor.setup();
+  cutterMotor.setup();
+
   expectedMode = currentMode->id();
   expectedBehavior = currentMode->start();
+  currentBehavior = availableBehaviors[0]; //Just something
 
-  xTaskCreatePinnedToCore(pollGyro, "GyroPollTask", 4096, NULL, 5, &gyroTask, 0);
+  //xTaskCreatePinnedToCore(pollPollables, "pollTask", 4096, NULL, 5, &pollTask, 0);
 
   delay(1000);
 }
@@ -166,18 +171,14 @@ void pollJobs(void * parameter) {
 }
 
 void loop() {
-
-
-
   //Handle
   uh.handle();
   webUi.handle();
-  webSocket.loop();
-
   if (manualMode >= 0) {
     expectedMode = manualMode;
     manualMode = -1;
   }
+
 
   if (expectedMode != currentMode->id()) {
     int c = sizeof(availableOpModes) / sizeof(availableOpModes[0]);
@@ -197,6 +198,7 @@ void loop() {
     }
   }
 
+  
   if (expectedBehavior != currentBehavior->id()) {
     int c = sizeof(availableBehaviors) / sizeof(availableBehaviors[0]);
     bool foundIt = false;
@@ -214,7 +216,6 @@ void loop() {
       logger.log("Could not locate OpMode with id:" + String(expectedMode), true);
     }
   }
-
 
   expectedMode = currentMode->loop();
   expectedBehavior = currentBehavior->loop();

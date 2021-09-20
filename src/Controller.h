@@ -17,6 +17,7 @@ class Controller {
 
         bool IsBumped();
         bool IsTilted();
+        int Heading();
 
         void Action_EvadeObsticle();
     private:

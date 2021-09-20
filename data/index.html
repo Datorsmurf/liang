@@ -44,7 +44,7 @@ function start()
     websock.close();
   }*/
 
-  websock = new WebSocket('ws://' + window.location.hostname + ':81/');
+  websock = new WebSocket('ws://' + window.location.hostname + '/ws');
   websock.onopen = function(evt) { console.log('websock open'); };
   websock.onclose = function(e) {
     console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);

@@ -4,7 +4,7 @@
 Controller::Controller(MOTOR* leftMotor_, MOTOR* rightMotor_, MOTOR* cutterMotor_, GYRO* gyro_, BUMPER* bumper_){
     leftMotor = leftMotor_;
     rightMotor = rightMotor_;
-    cutterMotor_ = cutterMotor_;
+    cutterMotor = cutterMotor_;
     gyro = gyro_;
     bumper = bumper_;
 }
@@ -41,6 +41,10 @@ bool Controller::IsBumped() {
 
 bool Controller::IsTilted() {
     return gyro->getTilt() > TILT_ANGLE;
+}
+
+int Controller::Heading() {
+    return gyro->getHeading();
 }
 
 

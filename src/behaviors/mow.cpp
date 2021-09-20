@@ -13,9 +13,12 @@ Mow::Mow(Controller *controller_, LOGGER *logger_, BATTERY *battery_) {
 
 void Mow::start() {
     logger->log("Start MOW", true);
+    battery->resetVoltage();
 }
 
 int Mow::loop() {
+    controller->Run(77, 88, 99);
+    controller->StopCutter();
     if (battery->mustCharge()) {
         return BEHAVIOR_LOOK_FOR_BWF;
     }
