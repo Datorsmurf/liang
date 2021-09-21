@@ -24,22 +24,22 @@ void LOGGER::log(String msg, bool keepInHistory) {
     }
     
     Serial.println(msg);
-    webSocketServer->printfAll("%d: %s\n",t, msg.c_str());
+    webSocketServer->textAll(String(t) + " " + msg + '\n');
     //webSocketServer->broadcastTXT(String(t) + ": " + msg + '\n');
 }
 
 
 
 void LOGGER::sendLogHistory(int clientId) {
-    webSocketServer->printf(clientId, "Catching up with the log...");
+    webSocketServer->text(clientId, "Catching up with the log...");
     int maxCount = bufferIsLooped ? LOG_BUFFER_SIZE : bufferPos;
     int startAt = bufferIsLooped ? bufferPos : 0;
 
         for (size_t i = 0; i < maxCount; i++)
         {
             LogEvent e = eventBuffer[(startAt + i) % LOG_BUFFER_SIZE];
-            webSocketServer->printf(clientId, "%d: %s\n",e.millis, e.msg.c_str());
+            webSocketServer->text(clientId, String(e.millis) + " " + e.msg + '\n');
         }
-            webSocketServer->printf(clientId, "Done catching up with the log.");
+            webSocketServer->text(clientId, "Done catching up with the log.");
 
 }
