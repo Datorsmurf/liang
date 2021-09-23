@@ -1,0 +1,29 @@
+body { background-color: #D0D0D0; font-family: Arial, Helvetica, Sans-Serif; Color: black; }
+
+.container {
+  height: 100%;
+}
+
+.navbutton {
+  user-select: none;
+} 
+.log {
+  height: 100px;
+  border: 2px solid black;
+  /*position: absolute;*/
+  vertical-align: bottom;
+  display: contents;
+}
+
+.log-content {
+  margin-top: 5px;
+  border: 2px solid black;
+  /*position: absolute;*/
+  vertical-align: bottom;
+  height: 800px;
+  overflow: scroll;
+}
+
+.log-row {
+  margin: 0px;
+}
