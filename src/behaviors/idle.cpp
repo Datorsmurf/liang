@@ -1,6 +1,4 @@
 #include "idle.h"
-#include "Controller.h"
-#include "Logger.h"
 #include "definitions.h"
 
 
@@ -19,9 +17,17 @@ void Idle::start() {
 }
 
 int Idle::loop() {
+    // if (digitalRead(SWITCH_3_PIN) == HIGH) {
+    //     return BEHAVIOR_SENSOR_DEBUG;
+    // }
+
     return id();
 }
 
 int Idle::id() {
     return BEHAVIOR_IDLE;
+}
+
+String Idle::desc() {
+    return "Idling";
 }

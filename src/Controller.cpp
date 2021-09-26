@@ -13,18 +13,37 @@ void Controller::Turn(int degrees){
 
 }
 
-void Controller::Run(int leftSpeed, int rightSpeed, int actionTime){
-    leftMotor->setSpeed(leftSpeed, actionTime);
-    rightMotor->setSpeed(rightSpeed, actionTime);
+bool Controller::Run(int leftSpeed, int rightSpeed, int actionTime){
+    return leftMotor->setSpeed(leftSpeed, actionTime) + rightMotor->setSpeed(rightSpeed, actionTime) == 0;
 }
 
 void Controller::Move(int distanceInCm){
+    unsigned long moveEnd = millis() + abs(distanceInCm) / 10;
+    if (distanceInCm > 0){
+        while (moveEnd > millis())
+        {
+            leftMotor->setSpeed(FULL_SPEED, NORMAL_ACCELERATION_TIME);
+            rightMotor->setSpeed(FULL_SPEED, NORMAL_ACCELERATION_TIME);
+            
+        }
+    }
 
+    else {
+        while (moveEnd > millis())
+        {
+            leftMotor->setSpeed(-FULL_SPEED, NORMAL_ACCELERATION_TIME);
+            rightMotor->setSpeed(-FULL_SPEED, NORMAL_ACCELERATION_TIME);
+        }
+
+    }   
+    StopMovement();
 }
 
 void Controller::StopMovement(){
-    leftMotor->setSpeed(0,100);
-    rightMotor->setSpeed(0,100);
+    while(rightMotor->setSpeed(0,SHORT_ACCELERATION_TIME) + leftMotor->setSpeed(0,SHORT_ACCELERATION_TIME) > 0)
+    {
+        delay(1);
+    }
 }
 
 void Controller::RunCutter(int speed){
@@ -36,6 +55,7 @@ void Controller::StopCutter(){
 }
 
 bool Controller::IsBumped() {
+    return false;
     return bumper->IsBumped();
 }
 

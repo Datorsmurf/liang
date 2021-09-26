@@ -1,14 +1,13 @@
-#ifndef _OPMODECHARGE_H_
-#define _OPMODECHARGE_H_
+#ifndef _OPMODEUPGRADE_H_
+#define _OPMODEUPGRADE_H_
 
 #include "operationalmode.h"
 #include "Controller.h"
 #include "Logger.h"
-#include "battery.h"
 
-class OpModeCharge : public OPERATIONALMODE { 
+class OpModeUpgrade : public OPERATIONALMODE { 
     public:
-        OpModeCharge(Controller *controller_, LOGGER *logger_, BATTERY *battery_);
+        OpModeUpgrade(Controller *controller_, LOGGER *logger_);
         int start();
         int loop();
         int id();
@@ -16,7 +15,6 @@ class OpModeCharge : public OPERATIONALMODE {
     private:
         Controller *controller;
         LOGGER *logger;
-        BATTERY *battery;
 };
 
 #endif

@@ -21,3 +21,7 @@ int OpModeCharge::loop() {
 int OpModeCharge::id() {
     return OP_MODE_CHARGE;
 }
+
+String OpModeCharge::desc() {
+    return "Charge";
+}

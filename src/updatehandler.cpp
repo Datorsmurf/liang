@@ -3,8 +3,10 @@
 #include <updatehandler.h>
 #include "ArduinoOTA.h"
 #include "math.h"
-UPDATEHANDLER::UPDATEHANDLER(LOGGER *logger_) {
+#include "operational_modes/operationalmode.h"
+UPDATEHANDLER::UPDATEHANDLER(LOGGER *logger_, Controller *controller_) {
   logger = logger_;
+  controller = controller_;
 }
 
 void UPDATEHANDLER::setup() {
@@ -24,23 +26,29 @@ void UPDATEHANDLER::setup() {
   ArduinoOTA
     .onStart([this]() {
       String type;
-      if (ArduinoOTA.getCommand() == U_FLASH)
+      if (ArduinoOTA.getCommand() == U_FLASH){
         type = "sketch";
+        // controller->StopCutter();
+        // controller->StopMovement();
+      } 
       else // U_SPIFFS
         type = "filesystem";
 
       // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
       logger->log("Start updating " + type, true);
       lastLogPercent = 0;
-      // webSocket.close();
+      //updateEvent(0);
 
     })
     .onEnd([this]() {
+      //updateEvent(110);
       logger->log("DONE updating ", true);
+
     })
     .onProgress([this](unsigned int progress, unsigned int total) {
       int percentDone = floor(((100.0 * progress) / total));
       if (percentDone == 100 || percentDone >= lastLogPercent + 5) {
+        //updateEvent(percentDone);
         logger->log("Progress: " + String(percentDone) + "%", false);
         lastLogPercent = percentDone;
     }

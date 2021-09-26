@@ -37,3 +37,7 @@ int FollowBWF::loop() {
 int FollowBWF::id() {
     return BEHAVIOR_FOLLOW_BWF;
 }
+
+String FollowBWF::desc() {
+    return "Following BWF";
+}

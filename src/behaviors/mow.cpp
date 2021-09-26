@@ -17,27 +17,35 @@ void Mow::start() {
 }
 
 int Mow::loop() {
-    controller->Run(77, 88, 99);
-    controller->StopCutter();
     if (battery->mustCharge()) {
+        Serial.println("Must charge");
         return BEHAVIOR_LOOK_FOR_BWF;
     }
 
     if (controller->IsBumped()) {
+        Serial.println("Bumped");
         controller->Action_EvadeObsticle();
+        return id();
     }
 
     if (controller->IsTilted()) {
+        Serial.println("Tilter");
         controller->Action_EvadeObsticle();
+        return id();
     }
 
-    
+
     controller->RunCutter(CUTTER_SPEED);
-    controller->Run(100, 100, 300);
+    controller->Run(FULL_SPEED, FULL_SPEED, NORMAL_ACCELERATION_TIME);
+    
 
     return id();
 }
 
 int Mow::id() {
     return BEHAVIOR_MOW;
+}
+
+String Mow::desc() {
+    return "Mowing";
 }

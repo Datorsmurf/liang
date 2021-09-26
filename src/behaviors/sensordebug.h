@@ -1,16 +1,17 @@
-#ifndef _BEHAVIOUR_GO_AROUND_H_
-#define _BEHAVIOUR_GO_AROUND_H_
+#ifndef _BEHAVIOUR_SENSOR_DEBUG_H_
+#define _BEHAVIOUR_SENSOR_DEBUG_H_
 
 #include "behavior.h"
 #include "Controller.h"
 #include "Logger.h"
 #include "battery.h"
 #include "sensor.h"
+#include "definitions.h"
 
 
-class GoAround : public BEHAVIOR { 
+class SensorDebug : public BEHAVIOR { 
     public:
-        GoAround(Controller *controller_, LOGGER *logger_, BATTERY *battery_, SENSOR *leftSensor_, SENSOR *rightSensor_);
+        SensorDebug(Controller *controller_, LOGGER *logger_, BATTERY *battery_, SENSOR *leftSensor_, SENSOR *rightSensor_);
         void start();
         int loop();
         int id();
@@ -21,8 +22,7 @@ class GoAround : public BEHAVIOR {
         BATTERY *battery;
         SENSOR *leftSensor;
         SENSOR *rightSensor;
-        int startingHeading;
-        int unsigned long startingTime;
+        unsigned long lastPrint = 0;
 };
 
 #endif

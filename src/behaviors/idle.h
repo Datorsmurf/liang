@@ -5,6 +5,7 @@
 #include "Controller.h"
 #include "Logger.h"
 #include "battery.h"
+#include "sensor.h"
 
 
 class Idle : public BEHAVIOR { 
@@ -13,6 +14,7 @@ class Idle : public BEHAVIOR {
         void start();
         int loop();
         int id();
+        String desc();
     private:
         Controller *controller;
         LOGGER *logger;

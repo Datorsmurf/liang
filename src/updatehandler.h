@@ -1,19 +1,22 @@
 #ifndef _UPDATEHANDLER_H_
 #define _UPDATEHANDLER_H_
 
-#include <WebSocketsServer.h>
 #include "Logger.h"
+#include "Controller.h"
+#include "definitions.h"
 class UPDATEHANDLER { 
     public:
-        UPDATEHANDLER(LOGGER *logger_);
+        UPDATEHANDLER(LOGGER *logger_, Controller *controller_);
         void setup();
         void handle();
 
     private:
-        WebSocketsServer* webSocketServer;
         LOGGER *logger;
-        int lastLogPercent = 0;
+        Controller *controller;
+        
+        UpdateEvent updateEvent;
 
+        int lastLogPercent = 0;
 };
 
 #endif

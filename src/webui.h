@@ -1,7 +1,6 @@
 #ifndef _WEBUI_H_
 #define _WEBUI_H_
 
-#include <WebSocketsServer.h>
 #include <ESPAsyncWebServer.h>
 #include "Logger.h"
 #include "definitions.h"
@@ -15,15 +14,14 @@ class WEBUI {
         void handle();
 
     private:
-        void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length);
         void wsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len);
         void handleNotFound();
+        void handleNotFound2(AsyncWebServerRequest *request);
         void handleRoot();
         ModeSelectEvent modeSelectEvent;
         AsyncWebSocket* webSocketServer;
         AsyncWebServer* server;
         LOGGER* logger;
-
 };
 
 

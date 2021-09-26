@@ -46,3 +46,7 @@ int GoAround::loop() {
 int GoAround::id() {
     return BEHAVIOR_GO_AROUND_OBSTICLE;
 }
+
+String GoAround::desc() {
+    return "Going around";
+}

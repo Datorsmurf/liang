@@ -5,8 +5,10 @@
 #define OP_MODE_CHARGE 1
 #define OP_MODE_MOW 2
 #define OP_MODE_MOW_ONCE 3
+#define OP_MODE_UPGRADE 4
 
 #include "behaviors/behavior.h"
+#include "Arduino.h"
 
 
 class OPERATIONALMODE { 
@@ -18,6 +20,8 @@ class OPERATIONALMODE {
 
     //The... trumroll... Id
     virtual int id();
+
+    virtual String desc();
 };
 
 #endif

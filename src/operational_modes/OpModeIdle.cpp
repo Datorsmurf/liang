@@ -9,7 +9,7 @@ OpModeIdle::OpModeIdle(Controller *controller_, LOGGER *logger_) {
     logger = logger_;
 }
 int OpModeIdle::start() {
-    logger->log("Start OpModeIdle. Yawn no lawn...", true);
+    logger->log("Start OpModeIdle", true);
     return BEHAVIOR_IDLE;
 }
 
@@ -19,4 +19,9 @@ int OpModeIdle::loop() {
 
 int OpModeIdle::id() {
     return OP_MODE_IDLE;
+}
+
+
+String OpModeIdle::desc() {
+    return "Idle";
 }

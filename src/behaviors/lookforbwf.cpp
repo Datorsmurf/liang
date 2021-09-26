@@ -41,3 +41,7 @@ int LookForBWF::loop() {
 int LookForBWF::id() {
     return BEHAVIOR_LOOK_FOR_BWF;
 }
+
+String LookForBWF::desc() {
+    return "Looking for BWF";
+}

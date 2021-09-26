@@ -13,12 +13,12 @@ OpModeMow::OpModeMow(Controller *controller_, LOGGER *logger_, BATTERY *battery_
 }
 int OpModeMow::start() {
     logger->log("Start OpModeMow", true);
-    if (battery->isBeingCharged())  {
-        if (battery->isFullyCharged()){
-            return BEHAVIOR_LAUNCH;
-        } 
-        return BEHAVIOR_CHARGE;
-    }
+    // if (battery->isBeingCharged())  {
+    //     if (battery->isFullyCharged()){
+    //         return BEHAVIOR_LAUNCH;
+    //     } 
+    //     return BEHAVIOR_CHARGE;
+    // }
     return BEHAVIOR_MOW;
 }
 
@@ -28,4 +28,8 @@ int OpModeMow::loop() {
 
 int OpModeMow::id() {
     return OP_MODE_MOW;
+}
+
+String OpModeMow::desc() {
+    return "MowRepeat";
 }

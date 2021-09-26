@@ -1,21 +1,28 @@
 #ifndef _SENSOR_H_
 #define _SENSOR_H_
 
+#define PULSE_SIGNAL_VALID_MS 3000;
 #define PULSE_HISTORY_COUNT 10
+
+#include "Logger.h"
 
 class SENSOR { 
     public:
-        SENSOR(int pin_, bool missingSignalIsOut_);
+        SENSOR(int pin_, bool missingSignalIsOut_, LOGGER *logger_);
         void setup();
         bool IsIn();
         bool IsOut();
         bool IsOutOfBounds();
-        void handleInterrupt();
+        bool IsSignalMissing();
+        void IRAM_ATTR handleInterrupt();
+        String GetPulseHistoryS();
         
 
     private:
         static int inside_code[];
         static int outside_code[];
+
+        LOGGER *logger;
 
         int pin;
         bool missingSignalIsOut;
@@ -27,6 +34,7 @@ class SENSOR {
         int pulse_count_outside;
         int pulsehistory[PULSE_HISTORY_COUNT];
         int pulseHistoryPos = 0;
+        unsigned long pulseCount = 0;
 };
 
 #endif

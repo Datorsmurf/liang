@@ -43,7 +43,9 @@ class BATTERY {
 
     int getVoltage();
     void resetVoltage();
-    void updateVoltage();
+    void setup();
+
+    float updateVoltage();
 
   private:
     unsigned long readBatteryAndCalcValue();

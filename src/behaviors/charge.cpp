@@ -22,3 +22,7 @@ int Charge::loop() {
 int Charge::id() {
     return BEHAVIOR_CHARGE;
 }
+
+String Charge::desc() {
+    return "Charging";
+}

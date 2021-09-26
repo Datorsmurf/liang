@@ -1,7 +1,8 @@
 #include "Logger.h"
 
-LOGGER::LOGGER(AsyncWebSocket* webSocketServer_){
+LOGGER::LOGGER(AsyncWebSocket* webSocketServer_, MowerModel *model_){
     webSocketServer = webSocketServer_;
+    model = model_;
     bufferPos = -1;
     
 }
@@ -25,7 +26,7 @@ void LOGGER::log(String msg, bool keepInHistory) {
     
     Serial.println(msg);
     webSocketServer->textAll(String(t) + " " + msg + '\n');
-    //webSocketServer->broadcastTXT(String(t) + ": " + msg + '\n');
+    model->message = msg;
 }
 
 

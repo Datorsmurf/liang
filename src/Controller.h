@@ -9,7 +9,7 @@ class Controller {
     public:
         Controller(MOTOR* leftMotor_, MOTOR* rightMotor_, MOTOR* cutterMotor_, GYRO* gyro_, BUMPER* bumper_);
         void Turn(int degrees);
-        void Run(int leftSpeed, int rightSpeed, int actionTime);
+        bool Run(int leftSpeed, int rightSpeed, int actionTime);
         void Move(int distanceInCm);
         void StopMovement();
         void RunCutter(int speed);

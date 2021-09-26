@@ -18,12 +18,16 @@ void Launch::start() {
 }
 
 int Launch::loop() {
-    controller->Move(-100);
-    controller->Turn(90);
+    controller->Run(-FULL_SPEED, -FULL_SPEED, NORMAL_ACCELERATION_TIME);
+    
 
-    return BEHAVIOR_MOW;
+    return id();
 }
 
 int Launch::id() {
     return BEHAVIOR_LAUNCH;
+}
+
+String Launch::desc() {
+    return "Launching";
 }

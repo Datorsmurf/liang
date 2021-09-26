@@ -12,6 +12,7 @@ class OpModeMowOnce : public OPERATIONALMODE {
         int start();
         int loop();
         int id();
+        String desc();
     private:
         Controller *controller;
         LOGGER *logger;

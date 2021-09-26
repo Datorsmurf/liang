@@ -1,6 +1,5 @@
 #include "SPIFFS.h"
 #include "webui.h"
-#include "WebSocketsServer.h"
 #include "Logger.h"
 #include "operational_modes/operationalmode.h"
 
@@ -23,59 +22,60 @@ char* subString (const char* input, int offset, int len, char* dest)
   strncpy (dest, input + offset, len);
   return dest;
 }
-void WEBUI::webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length)
-{
-  // Serial.printf("webSocketEvent(%d, %d, ...)\r\n", num, type);
-  //        const char* pl = (const char *)payload;
+// void WEBUI::webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length)
+// {
+//   // Serial.printf("webSocketEvent(%d, %d, ...)\r\n", num, type);
+//   //        const char* pl = (const char *)payload;
 
-  // switch(type) {
-  //   case WStype_DISCONNECTED:
-  //     Serial.printf("[%u] Disconnected!\r\n", num);
-  //     break;
-  //   case WStype_CONNECTED:
-  //     {
-  //       IPAddress ip = webSocketServer->remoteIP(num);
-  //       Serial.printf("[%u] Connected from %d.%d.%d.%d url: %s\r\n", num, ip[0], ip[1], ip[2], ip[3], payload);
-  //       logger->log("Welcome " + String(num), false);
-  //       logger->sendLogHistory(num);
-  //     }
-  //     break;
-  //   case WStype_TEXT:
-  //     Serial.printf("[%u] get Text: %s\r\n", num, payload);
+//   // switch(type) {
+//   //   case WStype_DISCONNECTED:
+//   //     Serial.printf("[%u] Disconnected!\r\n", num);
+//   //     break;
+//   //   case WStype_CONNECTED:
+//   //     {
+//   //       IPAddress ip = webSocketServer->remoteIP(num);
+//   //       Serial.printf("[%u] Connected from %d.%d.%d.%d url: %s\r\n", num, ip[0], ip[1], ip[2], ip[3], payload);
+//   //       logger->log("Welcome " + String(num), false);
+//   //       logger->sendLogHistory(num);
+//   //     }
+//   //     break;
+//   //   case WStype_TEXT:
+//   //     Serial.printf("[%u] get Text: %s\r\n", num, payload);
 
-  //     if (strstr(pl, "mode_") != NULL) {
-  //       if (strstr(pl, "_idle") != NULL) {
-  //         modeSelectEvent(0);
-  //       } else if (strstr(pl, "_mow") != NULL) {
-  //         modeSelectEvent(1);
-  //       } else if (strstr(pl, "_once") != NULL) {
-  //         modeSelectEvent(2);
-  //       } else if (strstr(pl, "_charge") != NULL) {
-  //         modeSelectEvent(3);
-  //       } 
-  //     }
+//   //     if (strstr(pl, "mode_") != NULL) {
+//   //       if (strstr(pl, "_idle") != NULL) {
+//   //         modeSelectEvent(0);
+//   //       } else if (strstr(pl, "_mow") != NULL) {
+//   //         modeSelectEvent(1);
+//   //       } else if (strstr(pl, "_once") != NULL) {
+//   //         modeSelectEvent(2);
+//   //       } else if (strstr(pl, "_charge") != NULL) {
+//   //         modeSelectEvent(3);
+//   //       } 
+//   //     }
 
-  //     break;
-  //   case WStype_BIN:
-  //     Serial.printf("[%u] get binary length: %u\r\n", num, length);
-  //     //hexdump(payload, length);
+//   //     break;
+//   //   case WStype_BIN:
+//   //     Serial.printf("[%u] get binary length: %u\r\n", num, length);
+//   //     //hexdump(payload, length);
 
-  //     // echo data back to browser
-  //     webSocketServer->sendBIN(num, payload, length);
-  //     break;
-  //   case WStype_ERROR:
-  //     break;
+//   //     // echo data back to browser
+//   //     webSocketServer->sendBIN(num, payload, length);
+//   //     break;
+//   //   case WStype_ERROR:
+//   //     break;
 
-  //   default:
-  //     Serial.printf("Invalid WStype [%d]\r\n", type);
-  //     break;
-  // }
-}
+//   //   default:
+//   //     Serial.printf("Invalid WStype [%d]\r\n", type);
+//   //     break;
+//   // }
+// }
 
 void WEBUI::wsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len) {
 if(type == WS_EVT_CONNECT){
     Serial.printf("ws[%s][%u] connect\n", server->url(), client->id());
-    client->printf("Hello Client %u :)", client->id());
+    logger->log("Hello client " + String(client->id()), false);
+    //client->printf("Hello Client %u :)", client->id());
     client->ping();
     logger->sendLogHistory(client->id());
   } else if(type == WS_EVT_DISCONNECT){
@@ -173,8 +173,11 @@ void WEBUI::handleNotFound()
   // server->send(404, "text/plain", message);
 }
 
+void WEBUI::handleNotFound2 (AsyncWebServerRequest *request) {
+  request->send(404);
+}
 
- void WEBUI::handleRoot()
+void WEBUI::handleRoot()
 {
   Serial.println("handleroot");
   File f = SPIFFS.open("/index.html");
@@ -190,21 +193,11 @@ void WEBUI::handleNotFound()
 void WEBUI::setup() {
   server->addHandler(webSocketServer);
   server->serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
-    // server.on("/", HTTP_GET, [] (AsyncWebServerRequest *request) {
-    //     String message;
-
-    //     if (request->hasParam(PARAM_MESSAGE)) {
-    //         message = request->getParam(PARAM_MESSAGE)->value();
-    //     } else {
-    //         message = "No message sent";
-    //     }
-    //     request->send(200, "text/html", "Hello, GET: " + message);
-    // });
-    // server->onNotFound(std::bind(&WEBUI::handleNotFound, this));
-    server->begin();
-    webSocketServer->onEvent(std::bind(&WEBUI::wsEvent, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6));
-    //webSocketServer->onEvent(std::bind(&WEBUI::webSocketEvent, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
+  server->onNotFound(std::bind(&WEBUI::handleNotFound2, this, std::placeholders::_1));
+  server->begin();
+  webSocketServer->onEvent(std::bind(&WEBUI::wsEvent, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6));
 }
 void WEBUI::handle() {
-  webSocketServer->cleanupClients();
+
+  //webSocketServer->cleanupClients();
 }

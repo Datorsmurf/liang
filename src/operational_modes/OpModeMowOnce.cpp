@@ -28,3 +28,7 @@ int OpModeMowOnce::loop() {
 int OpModeMowOnce::id() {
     return OP_MODE_MOW_ONCE;
 }
+
+String OpModeMowOnce::desc() {
+    return "MowOnce";
+}

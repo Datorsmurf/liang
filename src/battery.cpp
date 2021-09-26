@@ -26,11 +26,12 @@ bool BATTERY::mustCharge() {
 
 bool BATTERY::isBeingCharged() {
   return true;
-  return digitalRead(batDockPin);
+  //return digitalRead(batDockPin);
 }
 
 bool BATTERY::isFullyCharged() {
-  return (readBatteryAndCalcValue() > fullyChargedLevel);
+  return false;
+  //return (readBatteryAndCalcValue() > fullyChargedLevel);
 }
 
 
@@ -43,10 +44,16 @@ void BATTERY::resetVoltage() {
   averageVoltage = readBatteryAndCalcValue();
 }
 
+void BATTERY::setup() {
+  resetVoltage();
+}
+
+
 // Take a battery reading and recalculate running average
-void BATTERY::updateVoltage() {
+float BATTERY::updateVoltage() {
   averageVoltage -= averageVoltage / FILTER;
   averageVoltage += readBatteryAndCalcValue() / FILTER;
+  return averageVoltage;
 }
 
 // Measure battery voltage in mV

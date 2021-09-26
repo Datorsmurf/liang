@@ -10,21 +10,29 @@
 #define PULSE_UNIT_LENGTH 100
 
 
-int SENSOR::outside_code[] = {OUTSIDE_BWF, INSIDE_BWF - OUTSIDE_BWF, OUTSIDE_BWF, INSIDE_BWF - OUTSIDE_BWF };
-int SENSOR::inside_code[] = {INSIDE_BWF, INSIDE_BWF};
+int SENSOR::outside_code[] = {OUTSIDE_BWF, INSIDE_BWF - OUTSIDE_BWF};
+int SENSOR::inside_code[] = {INSIDE_BWF};
 
-SENSOR::SENSOR(int pin_, bool missingSignalIsOut_){
+SENSOR::SENSOR(int pin_, bool missingSignalIsOut_, LOGGER *logger_){
     pin = pin_;
     missingSignalIsOut = missingSignalIsOut_;
     pulseHistoryPos = 0;
+    pulseCount = 0;
+    logger = logger_;
+    for (size_t i = 0; i < PULSE_HISTORY_COUNT; i++)
+    {
+      pulsehistory[i] = 0;
+    }
 }
 
 void SENSOR::setup() {
+  pinMode(pin, INPUT);
+  logger->log("Sensor setup for pin: " + String(pin), true);
 }
 
-void SENSOR::handleInterrupt() {
+void IRAM_ATTR  SENSOR::handleInterrupt() {
   unsigned long now = micros();
-  
+  pulseCount++;
 
   // Calculate the time since last pulse
   int time_since_pulse = int(now - last_pulse);
@@ -58,8 +66,9 @@ void SENSOR::handleInterrupt() {
 
   }
   
-  pulseHistoryPos = pulseHistoryPos++ % PULSE_HISTORY_COUNT;
-  pulsehistory[pulseHistoryPos] = pulse_length;
+   pulseHistoryPos++;
+   pulseHistoryPos = pulseHistoryPos % PULSE_HISTORY_COUNT;
+   pulsehistory[pulseHistoryPos] = pulse_length;
 
   // Store the received code for debug output
   // arr[arr_count++] = pulse_length;
@@ -76,4 +85,19 @@ bool SENSOR::IsOut() {
 
 bool SENSOR::IsOutOfBounds() {
     return missingSignalIsOut ? !IsIn() : IsOut();
+}
+
+bool SENSOR::IsSignalMissing() {
+  return millis() - max(lastInTime, lastOutTime) > PULSE_SIGNAL_VALID_MS;
+}
+
+String SENSOR::GetPulseHistoryS() {
+  return "";
+  String result = "S:";
+  for (size_t i = 0; i < PULSE_HISTORY_COUNT; i++)
+    {
+      result = result + " " + String(pulsehistory[i]);
+    }
+
+    return result;
 }
