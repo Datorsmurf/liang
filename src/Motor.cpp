@@ -29,8 +29,6 @@ void MOTOR::setup() {
 
   pinMode(loadPin, INPUT);
   adcAttachPin(loadPin);
-  analogReadResolution(11);
-  analogSetAttenuation(ADC_6db);  
 }
 
 int MOTOR::getLoad() {
@@ -52,7 +50,7 @@ int MOTOR::setSpeed(int targetSpeed, int actionTime) {
       ot_actionTime = actionTime;
 			ot_setTime = _now;
 
-      Serial.println("New speed " + String(ot_currentTargetValue));
+      //Serial.println("New speed " + String(ot_currentTargetValue));
 		}
 
 	if (ot_currentTargetValue == ot_currentValue) {
@@ -65,7 +63,7 @@ int MOTOR::setSpeed(int targetSpeed, int actionTime) {
       int newValue;
 
       if (ot_actionTime == 0) {
-        Serial.println("Actiontime zero");
+        //Serial.println("Actiontime zero");
 
         newValue = ot_currentTargetValue;
       }
@@ -84,7 +82,7 @@ int MOTOR::setSpeed(int targetSpeed, int actionTime) {
           //Serial.print(targetSpeed);
         }        
       }
-      Serial.println("New value: " + String(newValue));
+      //Serial.println("New value: " + String(newValue));
       if (newValue > 0) {
         ledcWrite(forward_channelNo,abs(newValue));
         ledcWrite(backwards_channelNo,0);

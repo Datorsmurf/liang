@@ -15,9 +15,12 @@
 BATTERY::BATTERY(int sensepin, int dockpin) {
   batSensePin = sensepin;
   batDockPin = dockpin;
+  pinMode(batSensePin, INPUT);
+  adcAttachPin(batSensePin);
 
-  fullyChargedLevel = BATTERY_FULL_MV;
-  depletedLevel = BATTERY_EMPTY_MV;
+  fullyChargedLevel = BATTERY_FULL;
+  depletedLevel = BATTERY_EMPTY;
+  resetVoltage();
 }
 
 bool BATTERY::mustCharge() {
@@ -30,8 +33,8 @@ bool BATTERY::isBeingCharged() {
 }
 
 bool BATTERY::isFullyCharged() {
-  return false;
-  //return (readBatteryAndCalcValue() > fullyChargedLevel);
+  
+  return averageVoltage > fullyChargedLevel;
 }
 
 
@@ -56,16 +59,15 @@ float BATTERY::updateVoltage() {
   return averageVoltage;
 }
 
-// Measure battery voltage in mV
-unsigned long BATTERY::readBatteryAndCalcValue(){
-  unsigned long reading = analogRead(batSensePin);
 
-  // Convert from ADC units to uV
-  reading = reading * 4880;
+float BATTERY::readBatteryAndCalcValue(){
+  float reading = analogRead(batSensePin);
+
+  //Convert to volts on the pin
+  reading = reading / ANALOG_RESOLUTION_MAX_VALUE*3.3;
+  
   // Adjust for voltage divider circuit
-  reading = (reading * VOLTDIVATOR) / 10;
-
-  // Convert to mV
-   return reading / 1000;
+  reading = (reading * VOLTDIVATOR);
+  return reading;
 
 }

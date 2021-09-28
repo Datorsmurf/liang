@@ -13,16 +13,25 @@ SensorDebug::SensorDebug(Controller *controller_, LOGGER *logger_, BATTERY *batt
 void SensorDebug::start() {
     controller->StopCutter();
     controller->StopMovement();
+    int checkStart = millis();
+    while(checkStart + OPTION_STEP_TIME > millis() && digitalRead(SWITCH_3_PIN) == LOW) {
+        delay(1);
+    }
     lastPrint = millis();
 }
 
 int SensorDebug::loop() {
-    if (digitalRead(SWITCH_3_PIN)) {
+    if (digitalRead(SWITCH_3_PIN) == LOW) {
         return BEHAVIOR_IDLE;
     }
 
+
     if (millis() - lastPrint > 500) {
-        logger->log(rightSensor->GetPulseHistoryS(), true);
+        if (millis() / 1000 % 4 > 2) {
+            logger->log("L: " + leftSensor->GetPulseHistoryS(), false);
+        } else {
+            logger->log("R: " + rightSensor->GetPulseHistoryS(), false);
+        }
         lastPrint = millis();
     }
     return id();

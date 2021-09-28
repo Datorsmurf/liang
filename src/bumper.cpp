@@ -6,9 +6,9 @@ BUMPER::BUMPER(int bumperPin_){
 }
 
 void BUMPER::setup() {
-    pinMode(bumperPin, INPUT);
+    pinMode(bumperPin, INPUT_PULLUP);
 }
 
 bool BUMPER::IsBumped() {
-    return digitalRead(bumperPin) == HIGH;
+    return digitalRead(bumperPin) == LOW;
 }

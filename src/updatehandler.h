@@ -6,7 +6,7 @@
 #include "definitions.h"
 class UPDATEHANDLER { 
     public:
-        UPDATEHANDLER(LOGGER *logger_, Controller *controller_);
+        UPDATEHANDLER(LOGGER *logger_, Controller *controller_, UpdateEvent updateEvent_);
         void setup();
         void handle();
 

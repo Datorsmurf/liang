@@ -30,7 +30,7 @@ void SENSOR::setup() {
   logger->log("Sensor setup for pin: " + String(pin), true);
 }
 
-void IRAM_ATTR  SENSOR::handleInterrupt() {
+void SENSOR::handleInterrupt() {
   unsigned long now = micros();
   pulseCount++;
 
@@ -92,8 +92,7 @@ bool SENSOR::IsSignalMissing() {
 }
 
 String SENSOR::GetPulseHistoryS() {
-  return "";
-  String result = "S:";
+  String result = "";
   for (size_t i = 0; i < PULSE_HISTORY_COUNT; i++)
     {
       result = result + " " + String(pulsehistory[i]);

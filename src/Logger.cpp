@@ -8,6 +8,7 @@ LOGGER::LOGGER(AsyncWebSocket* webSocketServer_, MowerModel *model_){
 }
 
 void LOGGER::log(String msg, bool keepInHistory) {
+    
     unsigned long t = millis();
     if (keepInHistory) {
         bufferPos++;

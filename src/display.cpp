@@ -24,26 +24,22 @@ void MOWERDISPLAY::setup() {
 }
 
 void MOWERDISPLAY::print(String msg, int row) {
-  //my_mutex.lock();
-//    Serial.println("D1");
-        //ssd1306_clearScreen();
-        char buffer[50];
-        sprintf(buffer, "%-21s", msg.substring(0, 21).c_str());
-//    Serial.println("D2");
-        ssd1306_printFixed(0, rowHeight*row,  buffer, STYLE_NORMAL);
-//    Serial.println("D3");
-    //my_mutex.unlock();
+  if (blocked) return;
+  char buffer[50];
+  sprintf(buffer, "%-21s", msg.substring(0, 21).c_str());
+  ssd1306_printFixed(0, rowHeight*row,  buffer, STYLE_NORMAL);
 }
 
 void MOWERDISPLAY::DrawMowerModel(MowerModel* model){
 
-    if (_cleared || printedModel->OpMode.compareTo(model->OpMode) + printedModel->Behavior.compareTo(model->message) != 0) {
-      print(printedModel->OpMode + "/" + model->Behavior, 0);
-      print("Cutter", 3);
-      print("66666", 7);
-      printedModel->OpMode = model->OpMode;
-      printedModel->Behavior = model->Behavior;
-    } 
+  if (blocked) return;
+
+  if (_cleared || printedModel->OpMode.compareTo(model->OpMode) + printedModel->Behavior.compareTo(model->message) != 0) {
+    print(printedModel->OpMode + "/" + model->Behavior, 0);
+    print("Cutter", 3);
+    printedModel->OpMode = model->OpMode;
+    printedModel->Behavior = model->Behavior;
+  } 
 
   if (_cleared || printedModel->message.compareTo(model->message) != 0) {
     print(model->message, 1);
@@ -80,6 +76,11 @@ void MOWERDISPLAY::DrawMowerModel(MowerModel* model){
       print("Right S:" + String(model->RightMotorSpeed) + " L: " + String(model->RightMotorLoad), 5);
       printedModel->RightMotorSpeed = model->RightMotorSpeed;
       printedModel->RightMotorLoad = model->RightMotorLoad;
+  }
+
+   if (_cleared || printedModel->BatteryVoltage != model->BatteryVoltage) {
+      print("Batt:" + String(model->BatteryVoltage, 2), 7);
+      printedModel->BatteryVoltage = model->BatteryVoltage;
   }
 
   _cleared = false;

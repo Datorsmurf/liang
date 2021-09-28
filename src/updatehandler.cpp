@@ -4,9 +4,10 @@
 #include "ArduinoOTA.h"
 #include "math.h"
 #include "operational_modes/operationalmode.h"
-UPDATEHANDLER::UPDATEHANDLER(LOGGER *logger_, Controller *controller_) {
+UPDATEHANDLER::UPDATEHANDLER(LOGGER *logger_, Controller *controller_, UpdateEvent updateEvent_) {
   logger = logger_;
   controller = controller_;
+  updateEvent = updateEvent_;
 }
 
 void UPDATEHANDLER::setup() {
@@ -28,8 +29,9 @@ void UPDATEHANDLER::setup() {
       String type;
       if (ArduinoOTA.getCommand() == U_FLASH){
         type = "sketch";
-        // controller->StopCutter();
-        // controller->StopMovement();
+        controller->StopCutter();
+        controller->StopMovement();
+        updateEvent(0);
       } 
       else // U_SPIFFS
         type = "filesystem";
@@ -37,7 +39,8 @@ void UPDATEHANDLER::setup() {
       // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
       logger->log("Start updating " + type, true);
       lastLogPercent = 0;
-      //updateEvent(0);
+     
+      updateEvent(0);
 
     })
     .onEnd([this]() {
@@ -51,7 +54,7 @@ void UPDATEHANDLER::setup() {
         //updateEvent(percentDone);
         logger->log("Progress: " + String(percentDone) + "%", false);
         lastLogPercent = percentDone;
-    }
+      }
     })
     .onError([](ota_error_t error) {
       Serial.printf("Error[%u]: ", error);

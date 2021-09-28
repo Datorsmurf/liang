@@ -13,13 +13,17 @@ void Idle::start() {
     logger->log("Start Idle", true);
     controller->StopCutter();
     controller->StopMovement();
+    int checkStart = millis();
+    while(checkStart + OPTION_STEP_TIME > millis() && digitalRead(SWITCH_3_PIN) == LOW) {
+        delay(1);
+    }
 
 }
 
 int Idle::loop() {
-    // if (digitalRead(SWITCH_3_PIN) == HIGH) {
-    //     return BEHAVIOR_SENSOR_DEBUG;
-    // }
+    if (digitalRead(SWITCH_3_PIN) == LOW) {
+        return BEHAVIOR_SENSOR_DEBUG;
+    }
 
     return id();
 }

@@ -15,8 +15,8 @@
 // Voltages should be specified in mV (12.56 V = 12560 mV)
 
 //LION
-#define BATTERY_FULL_MV       12560
-#define BATTERY_EMPTY_MV      10400
+#define BATTERY_FULL       12.560
+#define BATTERY_EMPTY      10.400
 
 //NiMH
 //#define BATTERY_FULL_MV        14500
@@ -29,8 +29,7 @@
 // Running average sample size
 #define FILTER        200
 
-// Voltage divider factor x10 to avoid decimal ( 4 = 40)
-#define VOLTDIVATOR   42
+#define VOLTDIVATOR   3.63
 
 
 class BATTERY {
@@ -48,7 +47,7 @@ class BATTERY {
     float updateVoltage();
 
   private:
-    unsigned long readBatteryAndCalcValue();
+    float readBatteryAndCalcValue();
     int batSensePin;
     int batDockPin;
     int fullyChargedLevel;

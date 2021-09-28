@@ -40,7 +40,7 @@ unsigned long lastPrint= 0;
 int expectedMode = 0;
 int expectedBehavior = 0;
 int manualMode = -1;
-bool updateInProgress = false;
+volatile bool updateInProgress = false;
 
 TaskHandle_t pollTask;
 
@@ -51,11 +51,11 @@ void setManualMode(int manualMode_) {
 }
 
 void updateEvent(int percentDone_) {
-  updateInProgress = true;
+  Serial.println("Update started");
 
-  if (percentDone_ > 100) {
-    //ESP.restart();
-  }
+detachInterrupt(LEFT_SENSOR_PIN);
+detachInterrupt(RIGHT_SENSOR_PIN);
+  updateInProgress = true;
 }
 
 MPU6050 mpu(Wire);
@@ -76,7 +76,7 @@ MOTOR cutterMotor(CUTTER_MOTOR_SENSE_PIN, CUTTER_MOTOR_FORWARD_PWM_PIN, CUTTER_M
 
 Controller controller(&leftMotor, &rightMotor, &cutterMotor, &gyro, &bumper);
 
-UPDATEHANDLER uh(&logger, &controller);
+UPDATEHANDLER uh(&logger, &controller, *updateEvent);
 
 OpModeCharge opModeCharge(&controller, &logger, &battery);
 OpModeMow opModeMow(&controller, &logger, &battery);
@@ -132,6 +132,7 @@ void pollPollables(void * parameter) {
   display.setup();
   mowerModel.message = "BOOTING";
   gyro.setup();
+  battery.resetVoltage();
 
   while (!updateInProgress)
   {
@@ -167,7 +168,8 @@ void pollPollables(void * parameter) {
     delay(2);
   }
 
-  while (true)
+
+  while (true) //Just chill and don't return while waiting for update
   {
     if (millis() - lastPrint >= 200) {
       
@@ -175,13 +177,15 @@ void pollPollables(void * parameter) {
       display.DrawMowerModel(&mowerModel);
     }
   }
-
 }
 
 
 void setup() {
   Serial.begin(115200);
 
+  analogReadResolution(11);
+  analogSetAttenuation(ADC_6db);  
+  
   xTaskCreatePinnedToCore(pollPollables, "pollTask", 8192, NULL, 5, &pollTask, 1);
 
 
@@ -202,6 +206,7 @@ void setup() {
 
   logger.log("IP: " + WiFi.localIP().toString(), true);
   delay(1000);
+
 
   uh.setup();
   webUi.setup();
@@ -225,8 +230,8 @@ void setup() {
   mowerModel.OpMode = currentMode->desc();
   mowerModel.Behavior = currentBehavior->desc();
 
-  pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(SWITCH_3_PIN, INPUT_PULLDOWN);
+  pinMode(LED_PIN, OUTPUT);
+  pinMode(SWITCH_3_PIN, INPUT_PULLUP);
 
 }
 
@@ -235,7 +240,9 @@ void setup() {
 void loop() {
 
   
-  digitalWrite(LED_PIN, !digitalRead(RIGHT_SENSOR_PIN));
+  //digitalWrite(LED_PIN, (millis() % 2000) < 300);
+  digitalWrite(LED_PIN, bumper.IsBumped());
+
   //Handle
   uh.handle();
   webUi.handle();

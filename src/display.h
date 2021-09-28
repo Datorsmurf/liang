@@ -12,12 +12,14 @@ class MOWERDISPLAY {
         MOWERDISPLAY();
         void setup();
         void DrawMowerModel(MowerModel* model);
+        void setBlocked(bool blocked_);
     private:
         void print(String msg, int row);
         int rowHeight = 9;
         unsigned long messageDisplayedAt = 0;
         MowerModel *printedModel;
         bool _cleared = false;
+        bool blocked = false;
 
 };
 
