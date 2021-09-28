@@ -36,7 +36,7 @@ int GoAround::loop() {
     }
 
     if (controller->IsBumped() || controller->IsTilted()) {
-        controller->Action_EvadeObsticle();
+        controller->DoEvadeObsticle();
         return BEHAVIOR_LOOK_FOR_BWF;
     }
 

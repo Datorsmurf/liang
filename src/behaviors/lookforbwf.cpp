@@ -26,11 +26,11 @@ void LookForBWF::start() {
 
 int LookForBWF::loop() {
     if (controller->IsBumped()) {
-        controller->Action_EvadeObsticle();
+        controller->DoEvadeObsticle();
     }
 
     if (controller->IsTilted()) {
-        controller->Action_EvadeObsticle();
+        controller->DoEvadeObsticle();
     }
     
     controller->Run(100, 100, 300);

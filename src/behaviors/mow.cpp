@@ -22,13 +22,13 @@ int Mow::loop() {
 
     if (controller->IsBumped()) {
         Serial.println("Bumped");
-        controller->Action_EvadeObsticle();
+        controller->DoEvadeObsticle();
         return id();
     }
 
     if (controller->IsTilted()) {
         Serial.println("Tilted");
-        controller->Action_EvadeObsticle();
+        controller->DoEvadeObsticle();
         return id();
     }
 
