@@ -59,16 +59,35 @@ bool Controller::IsBumped() {
     return bumper->IsBumped();
 }
 
+bool Controller::IsWheelOverload() {
+    
+    return leftMotor->isOverload() || rightMotor->isOverload();
+}
+
 bool Controller::IsTilted() {
     return gyro->getTilt() > TILT_ANGLE;
 }
+
+bool Controller::IsFlipped() {
+    return gyro->getTilt() > FLIP_ANGLE;
+}
+
 
 int Controller::Heading() {
     return gyro->getHeading();
 }
 
+void Controller::SetError(int error_) {
+    error = error_;
+}
 
-void Controller::Action_EvadeObsticle(){
+int Controller::GetError() {
+    return error;
+}
+
+
+
+void Controller::DoEvadeObsticle(){
     StopMovement();
     Move(-20);
     int turnAngle = 100;

@@ -9,12 +9,13 @@
 
 class MOTOR {
   public:
-    MOTOR(int loadPin_, int pwmpin_forward_, int pwmpin_backwards_, int forward_channelNo_, int backwards_channelNo_, LOGGER *logger_);
+    MOTOR(int loadPin_, int pwmpin_forward_, int pwmpin_backwards_, int forward_channelNo_, int backwards_channelNo_, int loadLimit_, LOGGER *logger_);
 
 	  int setSpeed(int speed, int actionTime);
     int getSpeed();
 
     int getLoad();
+    bool isOverload();
 
     void doLoop();
     void setup();
@@ -30,6 +31,7 @@ class MOTOR {
   int backwards_channelNo;
     int filteredLoad = 0;
     int currentLoadRead = 0;
+    int loadLimit;
 
     unsigned long ot_setTime = 0;
 	  int ot_currentTargetValue = -1;

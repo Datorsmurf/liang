@@ -12,13 +12,11 @@ Mow::Mow(Controller *controller_, LOGGER *logger_, BATTERY *battery_) {
 }
 
 void Mow::start() {
-    logger->log("Start MOW", true);
-    battery->resetVoltage();
 }
 
 int Mow::loop() {
     if (battery->mustCharge()) {
-        Serial.println("Must charge");
+        logger->log("Must charge", true);
         return BEHAVIOR_LOOK_FOR_BWF;
     }
 
@@ -29,7 +27,7 @@ int Mow::loop() {
     }
 
     if (controller->IsTilted()) {
-        Serial.println("Tilter");
+        Serial.println("Tilted");
         controller->Action_EvadeObsticle();
         return id();
     }

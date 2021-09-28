@@ -70,9 +70,9 @@ SENSOR rightSensor(RIGHT_SENSOR_PIN, false, &logger);
 BATTERY battery(BATTERY_SENSOR_PIN, BATTERY_CHARGE_PIN);
 BUMPER bumper(BUMPER_PIN);
 
-MOTOR leftMotor(LEFT_MOTOR_SENSE_PIN, LEFT_MOTOR_FORWARD_PWM_PIN, LEFT_MOTOR_BACKWARDS_PWM_PIN, LEFT_MOTOR_PWM_CHANNEL_FORWARD, LEFT_MOTOR_PWM_CHANNEL_BACKWARDS, &logger);
-MOTOR rightMotor(RIGHT_MOTOR_SENSE_PIN, RIGHT_MOTOR_FORWARD_PWM_PIN, RIGHT_MOTOR_BACKWARDS_PWM_PIN, RIGHT_MOTOR_PWM_CHANNEL_FORWARD, RIGHT_MOTOR_PWM_CHANNEL_BACKWARDS, &logger);
-MOTOR cutterMotor(CUTTER_MOTOR_SENSE_PIN, CUTTER_MOTOR_FORWARD_PWM_PIN, CUTTER_MOTOR_BACKWARDS_PWM_PIN, CUTTER_MOTOR_PWM_CHANNEL_FORWARD, CUTTER_MOTOR_PWM_CHANNEL_BACKWARDS, &logger);
+MOTOR leftMotor(LEFT_MOTOR_SENSE_PIN, LEFT_MOTOR_FORWARD_PWM_PIN, LEFT_MOTOR_BACKWARDS_PWM_PIN, LEFT_MOTOR_PWM_CHANNEL_FORWARD, LEFT_MOTOR_PWM_CHANNEL_BACKWARDS, LOAD_LIMIT_WHEEL, &logger);
+MOTOR rightMotor(RIGHT_MOTOR_SENSE_PIN, RIGHT_MOTOR_FORWARD_PWM_PIN, RIGHT_MOTOR_BACKWARDS_PWM_PIN, RIGHT_MOTOR_PWM_CHANNEL_FORWARD, RIGHT_MOTOR_PWM_CHANNEL_BACKWARDS, LOAD_LIMIT_WHEEL, &logger);
+MOTOR cutterMotor(CUTTER_MOTOR_SENSE_PIN, CUTTER_MOTOR_FORWARD_PWM_PIN, CUTTER_MOTOR_BACKWARDS_PWM_PIN, CUTTER_MOTOR_PWM_CHANNEL_FORWARD, CUTTER_MOTOR_PWM_CHANNEL_BACKWARDS, LOAD_LIMIT_CUTTER, &logger);
 
 Controller controller(&leftMotor, &rightMotor, &cutterMotor, &gyro, &bumper);
 
@@ -161,6 +161,7 @@ void pollPollables(void * parameter) {
     mowerModel.Heading = gyro.getHeading();
 
     mowerModel.BatteryVoltage = battery.updateVoltage();
+    mowerModel.IsDocked = battery.isBeingCharged();
 
     mowerModel.LeftSensorIsOutOfBounds = leftSensor.IsOutOfBounds();
     mowerModel.RightSensorIsOutOfBounds = rightSensor.IsOutOfBounds();
@@ -185,15 +186,17 @@ void setup() {
 
   analogReadResolution(11);
   analogSetAttenuation(ADC_6db);  
-  
+  mowerModel.OpMode = "Booting";
+  mowerModel.Behavior = "Polltask";
   xTaskCreatePinnedToCore(pollPollables, "pollTask", 8192, NULL, 5, &pollTask, 1);
 
-
+  mowerModel.Behavior = "SPIFFS";
   if(!SPIFFS.begin()){
     Serial.println("An Error has occurred while mounting SPIFFS");
     return;
   }
 
+  mowerModel.Behavior = "WIFI";
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASS);
@@ -207,6 +210,7 @@ void setup() {
   logger.log("IP: " + WiFi.localIP().toString(), true);
   delay(1000);
 
+  mowerModel.Behavior = "Setup";
 
   uh.setup();
   webUi.setup();
@@ -223,6 +227,9 @@ void setup() {
   rightMotor.setup();
   cutterMotor.setup();
 
+  mowerModel.Behavior = "Starting";
+
+
 
   expectedMode = currentMode->id();
   expectedBehavior = currentMode->start();
@@ -232,6 +239,7 @@ void setup() {
 
   pinMode(LED_PIN, OUTPUT);
   pinMode(SWITCH_3_PIN, INPUT_PULLUP);
+  pinMode(SWITCH_BOOT_PIN, INPUT_PULLUP);
 
 }
 
@@ -241,7 +249,10 @@ void loop() {
 
   
   //digitalWrite(LED_PIN, (millis() % 2000) < 300);
-  digitalWrite(LED_PIN, bumper.IsBumped());
+  //digitalWrite(LED_PIN, bumper.IsBumped());
+  //digitalWrite(LED_PIN, (digitalRead(SWITCH_3_PIN) == LOW));
+  digitalWrite(LED_PIN, battery.isBeingCharged());
+
 
   //Handle
   uh.doLoop();
@@ -251,6 +262,15 @@ void loop() {
     manualMode = -1;
   }
 
+  if (controller.IsFlipped()) {
+    controller.SetError(ERROR_FLIPPED);
+  }
+
+  if(controller.GetError() != ERROR_NOERROR) {
+    controller.StopCutter();
+    controller.StopMovement();
+    return;
+  }
 
   if (expectedMode != currentMode->id()) {
     int c = sizeof(availableOpModes) / sizeof(availableOpModes[0]);

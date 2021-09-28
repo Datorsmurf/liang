@@ -2,12 +2,13 @@
 
 
 
-MOTOR::MOTOR(int loadPin_, int pwmpin_forward_, int pwmpin_backwards_, int forward_channelNo_, int backwards_channelNo_, LOGGER *logger_) {
+MOTOR::MOTOR(int loadPin_, int pwmpin_forward_, int pwmpin_backwards_, int forward_channelNo_, int backwards_channelNo_, int loadLimit_, LOGGER *logger_) {
   loadPin = loadPin_;
   pwmpin_forward = pwmpin_forward_;
   pwmpin_backwards = pwmpin_backwards_;
   forward_channelNo = forward_channelNo_;
   backwards_channelNo = backwards_channelNo_;
+  loadLimit = loadLimit_;
   logger = logger_;
 }
 
@@ -15,16 +16,10 @@ void MOTOR::setup() {
   pinMode(pwmpin_forward, OUTPUT);
   ledcAttachPin(pwmpin_forward, forward_channelNo);
   ledcSetup(forward_channelNo, freq, resolution);
-  logger->log("Setup motor with forward pin " + String(pwmpin_forward), true);
-  logger->log("Setup motor with forward channel " + String(forward_channelNo), true);
-
-  logger->log("PWM pin backwards: " +  String(pwmpin_backwards), true);
   if (pwmpin_backwards > 0) {
     pinMode(pwmpin_backwards, OUTPUT);
     ledcAttachPin(pwmpin_backwards, backwards_channelNo);
     ledcSetup(backwards_channelNo, freq, resolution);
-    logger->log("Setup motor with backwards pin " + String(pwmpin_backwards), true);
-    logger->log("Setup motor with backwards channel " + String(backwards_channelNo), true);
   }
 
   pinMode(loadPin, INPUT);
@@ -33,6 +28,10 @@ void MOTOR::setup() {
 
 int MOTOR::getLoad() {
   return filteredLoad;
+}
+
+bool MOTOR::isOverload() {
+
 }
 
 void MOTOR::doLoop() {

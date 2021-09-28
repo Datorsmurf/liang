@@ -15,17 +15,24 @@ class Controller {
         void RunCutter(int speed);
         void StopCutter();
 
+        int GetError();
+        void SetError(int error);
+
         bool IsBumped();
+        bool IsWheelOverload();
         bool IsTilted();
+        bool IsFlipped();
         int Heading();
 
-        void Action_EvadeObsticle();
+        void DoEvadeObsticle();
     private:
         MOTOR* leftMotor;
         MOTOR* rightMotor;
         MOTOR* cutterMotor;
         GYRO* gyro;
         BUMPER* bumper;
+
+        int error = 0;
 
 };
 

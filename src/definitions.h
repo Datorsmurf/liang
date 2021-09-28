@@ -12,6 +12,7 @@ typedef std::function<void(int percentDone)> UpdateEvent;
 
 #define LED_PIN 17
 #define SWITCH_3_PIN 13
+#define SWITCH_BOOT_PIN 0
 
 #define LEFT_MOTOR_FORWARD_PWM_PIN 27
 #define LEFT_MOTOR_BACKWARDS_PWM_PIN 14
@@ -37,6 +38,11 @@ typedef std::function<void(int percentDone)> UpdateEvent;
 #define AUX_MOTOR_PWM_CHANNEL_BACKWARDS 1
 #define AUX_MOTOR_SENSE_PIN 39
 
+
+#define LOAD_LIMIT_WHEEL 200
+#define LOAD_LIMIT_CUTTER 110
+#define LOAD_LIMIT_AUX 200
+
 #define LEFT_SENSOR_PIN 26
 #define RIGHT_SENSOR_PIN 25
 
@@ -51,7 +57,8 @@ typedef std::function<void(int percentDone)> UpdateEvent;
 
 #define CUTTER_SPEED 255
 
-#define TILT_ANGLE 55;
+#define TILT_ANGLE 60;
+#define FLIP_ANGLE 100;
 
 #define OPTION_STEP_TIME 750
 
@@ -59,6 +66,8 @@ typedef std::function<void(int percentDone)> UpdateEvent;
 #define ANALOG_RESOLUTION 11
 #define ANALOG_RESOLUTION_MAX_VALUE 2048
 
+#define ERROR_NOERROR 0
+#define ERROR_FLIPPED 1
 
 #endif
 
