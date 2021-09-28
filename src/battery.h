@@ -12,22 +12,12 @@
 #ifndef _BATTERY_H_
 #define _BATTERY_H_
 
-// Voltages should be specified in mV (12.56 V = 12560 mV)
-
-//LION
+// Voltages should be specified in V
 #define BATTERY_FULL       12.560
 #define BATTERY_EMPTY      10.400
 
-//NiMH
-//#define BATTERY_FULL_MV        14500
-//#define BATTERY_EMPTY_MV       11500
-
-//LEAD ACID
-//#define BATTERY_FULL_MV    13300
-//#define BATTERY_EMPTY_MV   12000
-
 // Running average sample size
-#define FILTER        200
+#define FILTER        400
 
 #define VOLTDIVATOR   3.63
 

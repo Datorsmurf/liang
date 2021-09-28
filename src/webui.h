@@ -11,13 +11,11 @@ class WEBUI {
 
         WEBUI(AsyncWebServer* server_, AsyncWebSocket* webSocketServer_, LOGGER* logger_, ModeSelectEvent modeSelectEvent_);
         void setup();
-        void handle();
+        void doLoop();
 
     private:
         void wsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len);
-        void handleNotFound();
-        void handleNotFound2(AsyncWebServerRequest *request);
-        void handleRoot();
+        void handleNotFound(AsyncWebServerRequest *request);
         ModeSelectEvent modeSelectEvent;
         AsyncWebSocket* webSocketServer;
         AsyncWebServer* server;

@@ -73,7 +73,7 @@ void UPDATEHANDLER::setup() {
   Serial.println(WiFi.localIP());
 }
 
-void UPDATEHANDLER::handle() {
+void UPDATEHANDLER::doLoop() {
   ArduinoOTA.handle();
 }
 

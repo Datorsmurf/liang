@@ -26,11 +26,10 @@ void GYRO::loop() {
     now = micros();
     mpu->update();
     
-    if (lastReadTime != 0) {
+    // if (lastReadTime != 0) {
 
-        unsigned long delta =  now - lastReadTime;
-        //gx/131.0
-    }
+    //     unsigned long delta =  now - lastReadTime;
+    // }
 
     
     

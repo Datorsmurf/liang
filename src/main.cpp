@@ -244,8 +244,8 @@ void loop() {
   digitalWrite(LED_PIN, bumper.IsBumped());
 
   //Handle
-  uh.handle();
-  webUi.handle();
+  uh.doLoop();
+  webUi.doLoop();
   if (manualMode >= 0) {
     expectedMode = manualMode;
     manualMode = -1;

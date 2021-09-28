@@ -157,47 +157,19 @@ if(type == WS_EVT_CONNECT){
   }
 }
 
-void WEBUI::handleNotFound()
-{
-  // String message = "File Not Found\n\n";
-  // message += "URI: ";
-  // message += server->uri();
-  // message += "\nMethod: ";
-  // message += (server->method() == HTTP_GET)?"GET":"POST";
-  // message += "\nArguments: ";
-  // message += server->args();
-  // message += "\n";
-  // for (uint8_t i=0; i<server->args(); i++){
-  //   message += " " + server->argName(i) + ": " + server->arg(i) + "\n";
-  // }
-  // server->send(404, "text/plain", message);
-}
 
-void WEBUI::handleNotFound2 (AsyncWebServerRequest *request) {
+void WEBUI::handleNotFound(AsyncWebServerRequest *request) {
   request->send(404);
-}
-
-void WEBUI::handleRoot()
-{
-  Serial.println("handleroot");
-  File f = SPIFFS.open("/index.html");
-  if (!f) {
-    handleNotFound();
-    return;
-  }
-
-  //server->send(200, "text/html",f.readString());
-  f.close();
 }
 
 void WEBUI::setup() {
   server->addHandler(webSocketServer);
   server->serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
-  server->onNotFound(std::bind(&WEBUI::handleNotFound2, this, std::placeholders::_1));
+  server->onNotFound(std::bind(&WEBUI::handleNotFound, this, std::placeholders::_1));
   server->begin();
   webSocketServer->onEvent(std::bind(&WEBUI::wsEvent, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6));
 }
-void WEBUI::handle() {
+void WEBUI::doLoop() {
 
   //webSocketServer->cleanupClients();
 }
