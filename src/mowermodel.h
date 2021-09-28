@@ -13,6 +13,7 @@ struct MowerModel {
         int CutterMotorSpeed;
         int CutterMotorLoad;
         float BatteryVoltage;
+        bool IsDocked;
         bool LeftSensorIsOutOfBounds;
         bool RightSensorIsOutOfBounds;
         String OpMode;

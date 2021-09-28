@@ -15,6 +15,9 @@
 BATTERY::BATTERY(int sensepin, int dockpin) {
   batSensePin = sensepin;
   batDockPin = dockpin;
+  pinMode(batDockPin, INPUT_PULLDOWN);
+  
+
   pinMode(batSensePin, INPUT);
   adcAttachPin(batSensePin);
 
@@ -28,8 +31,7 @@ bool BATTERY::mustCharge() {
 }
 
 bool BATTERY::isBeingCharged() {
-  return true;
-  //return digitalRead(batDockPin);
+  return digitalRead(batDockPin);
 }
 
 bool BATTERY::isFullyCharged() {

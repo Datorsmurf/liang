@@ -36,7 +36,6 @@ void MOWERDISPLAY::DrawMowerModel(MowerModel* model){
 
   if (_cleared || printedModel->OpMode.compareTo(model->OpMode) + printedModel->Behavior.compareTo(model->message) != 0) {
     print(printedModel->OpMode + "/" + model->Behavior, 0);
-    print("Cutter", 3);
     printedModel->OpMode = model->OpMode;
     printedModel->Behavior = model->Behavior;
   } 
@@ -61,26 +60,35 @@ void MOWERDISPLAY::DrawMowerModel(MowerModel* model){
   }
 
 
+  if (_cleared || printedModel->CutterMotorSpeed != model->CutterMotorSpeed || printedModel->CutterMotorLoad != model->CutterMotorLoad) {
+      print("Cutter S:" + String(model->CutterMotorSpeed) + " L: " + String(model->CutterMotorLoad), 3);
+      printedModel->CutterMotorSpeed = model->CutterMotorSpeed;
+      printedModel->CutterMotorLoad = model->CutterMotorLoad;
+  }
+
+    if (_cleared || printedModel->LeftMotorSpeed != model->LeftMotorSpeed || printedModel->LeftMotorLoad != model->LeftMotorLoad) {
+      print("Left   S:" + String(model->LeftMotorSpeed) + " L: " + String(model->LeftMotorLoad), 4);
+      printedModel->LeftMotorSpeed = model->LeftMotorSpeed;
+      printedModel->LeftMotorLoad = model->LeftMotorLoad;
+  }
+
+  if (_cleared || printedModel->RightMotorSpeed != model->RightMotorSpeed || printedModel->RightMotorLoad != model->RightMotorLoad) {
+      print("Right  S:" + String(model->RightMotorSpeed) + " L: " + String(model->RightMotorLoad), 5);
+      printedModel->RightMotorSpeed = model->RightMotorSpeed;
+      printedModel->RightMotorLoad = model->RightMotorLoad;
+  }
+
+
   if (_cleared || printedModel->Heading != model->Heading || printedModel->Tilt != model->Tilt) {
       print("H: " + String(model->Heading, 2) + " T: " + String(model->Tilt, 2), 6);
       printedModel->Heading = model->Heading;
       printedModel->Tilt = model->Tilt;
   }
-
-  if (_cleared || printedModel->LeftMotorSpeed != model->LeftMotorSpeed || printedModel->LeftMotorLoad != model->LeftMotorLoad) {
-      print("Left  S:" + String(model->LeftMotorSpeed) + " L: " + String(model->LeftMotorLoad), 4);
-      printedModel->LeftMotorSpeed = model->LeftMotorSpeed;
-      printedModel->LeftMotorLoad = model->LeftMotorLoad;
-  }
-  if (_cleared || printedModel->RightMotorSpeed != model->RightMotorSpeed || printedModel->RightMotorLoad != model->RightMotorLoad) {
-      print("Right S:" + String(model->RightMotorSpeed) + " L: " + String(model->RightMotorLoad), 5);
-      printedModel->RightMotorSpeed = model->RightMotorSpeed;
-      printedModel->RightMotorLoad = model->RightMotorLoad;
-  }
-
-   if (_cleared || printedModel->BatteryVoltage != model->BatteryVoltage) {
-      print("Batt:" + String(model->BatteryVoltage, 2), 7);
-      printedModel->BatteryVoltage = model->BatteryVoltage;
+  
+  if (_cleared || printedModel->BatteryVoltage != model->BatteryVoltage || (printedModel->IsDocked != model->IsDocked)) {
+    print("Batt:" + String(model->BatteryVoltage, 2)+ " Dock: " + (model->IsDocked ? "Y" : "N"), 7) ;
+    printedModel->BatteryVoltage = model->BatteryVoltage;
+    printedModel->IsDocked = model->IsDocked;
   }
 
   _cleared = false;
