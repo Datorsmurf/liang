@@ -6,6 +6,7 @@
 #include "Logger.h"
 #include "battery.h"
 #include "sensor.h"
+#include "utils.h"
 
 
 class GoAround : public BEHAVIOR { 

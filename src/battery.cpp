@@ -15,11 +15,6 @@
 BATTERY::BATTERY(int sensepin, int dockpin) {
   batSensePin = sensepin;
   batDockPin = dockpin;
-  pinMode(batDockPin, INPUT_PULLDOWN);
-  
-
-  pinMode(batSensePin, INPUT);
-  adcAttachPin(batSensePin);
 
   fullyChargedLevel = BATTERY_FULL;
   depletedLevel = BATTERY_EMPTY;
@@ -50,6 +45,10 @@ void BATTERY::resetVoltage() {
 }
 
 void BATTERY::setup() {
+  pinMode(batDockPin, INPUT_PULLDOWN);
+  pinMode(batSensePin, ANALOG);
+  adcAttachPin(batSensePin);
+
   resetVoltage();
 }
 
@@ -63,13 +62,21 @@ float BATTERY::updateVoltage() {
 
 
 float BATTERY::readBatteryAndCalcValue(){
-  float reading = analogRead(batSensePin);
+  int readValue = analogRead(batSensePin);
+  //Serial.println("B1 " + String(readValue));
+  readValue = floatMap(readValue, 0, ANALOG_RESOLUTION_MAX_VALUE, 310, 3070);
+//  readValue = floatMap(readValue, 0, 3153, 306, ANALOG_RESOLUTION_MAX_VALUE);
+  //Serial.println("B4 " + String(readValue));
+
+  //Serial.println("r1 " + String(ANALOG_RESOLUTION_MAX_VALUE));
 
   //Convert to volts on the pin
-  reading = reading / ANALOG_RESOLUTION_MAX_VALUE*3.3;
-  
+  float reading = readValue / (3153/3.3);
+  //Serial.println("B2 " + String(reading, 3));
+  //Serial.println();
   // Adjust for voltage divider circuit
   reading = (reading * VOLTDIVATOR);
+  //Serial.println("B3 " + String(reading, 3));
   return reading;
 
 }

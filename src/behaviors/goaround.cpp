@@ -4,7 +4,6 @@
 #include "definitions.h"
 
 
-
 GoAround::GoAround(Controller *controller_, LOGGER *logger_, BATTERY *battery_, SENSOR *leftSensor_, SENSOR *rightSensor_) {
     controller = controller_;
     logger = logger_;
@@ -23,22 +22,22 @@ void GoAround::start() {
 }
 
 int GoAround::loop() {
-    logger->log("Bailing out and starting to look for BWF instead", true);
     
     //Found BWF
     if (leftSensor->IsOut() || rightSensor->IsOut()) {
         return BEHAVIOR_FOLLOW_BWF;
     }
 
-    //Timeout
-    if (startingTime + 10000 < millis()) {
-        return BEHAVIOR_LOOK_FOR_BWF;
+    //Timeout or turned too far
+    if (startingTime + 30000 < millis() || absDiff(startingHeading, controller->Heading()) > 100) {
+      return BEHAVIOR_LOOK_FOR_BWF;
     }
 
     if (controller->IsBumped() || controller->IsTilted()) {
         controller->DoEvadeObsticle();
         return BEHAVIOR_LOOK_FOR_BWF;
     }
+    controller->Run(FULL_SPEED, FULL_SPEED * 0.8, NORMAL_ACCELERATION_TIME);
 
     return id();
 }

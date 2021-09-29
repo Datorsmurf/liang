@@ -31,7 +31,7 @@ int MOTOR::getLoad() {
 }
 
 bool MOTOR::isOverload() {
-
+  return false;
 }
 
 void MOTOR::doLoop() {

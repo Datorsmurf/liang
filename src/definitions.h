@@ -64,7 +64,7 @@ typedef std::function<void(int percentDone)> UpdateEvent;
 
 //ALTER THESE TOGETHER
 #define ANALOG_RESOLUTION 11
-#define ANALOG_RESOLUTION_MAX_VALUE 2048
+#define ANALOG_RESOLUTION_MAX_VALUE (pow(2, ANALOG_RESOLUTION) - 1)
 
 #define ERROR_NOERROR 0
 #define ERROR_FLIPPED 1

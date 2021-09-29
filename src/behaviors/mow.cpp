@@ -32,6 +32,16 @@ int Mow::loop() {
         return id();
     }
 
+    if(controller->IsLeftOutOfBounds()) {
+        controller->StopMovement();
+        unsigned long t = millis();
+        while (controller->IsLeftOutOfBounds() )
+        {
+            controller->Run(FULL_SPEED, -FULL_SPEED, NORMAL_ACCELERATION_TIME);
+        }
+        
+    }
+
 
     controller->RunCutter(CUTTER_SPEED);
     controller->Run(FULL_SPEED, FULL_SPEED, NORMAL_ACCELERATION_TIME);

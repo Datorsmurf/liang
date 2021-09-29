@@ -1,12 +1,14 @@
 #include "Controller.h"
 #include "definitions.h"
 
-Controller::Controller(MOTOR* leftMotor_, MOTOR* rightMotor_, MOTOR* cutterMotor_, GYRO* gyro_, BUMPER* bumper_){
+Controller::Controller(MOTOR* leftMotor_, MOTOR* rightMotor_, MOTOR* cutterMotor_, GYRO* gyro_, BUMPER* bumper_, SENSOR* leftSensor_, SENSOR* rightSensor_){
     leftMotor = leftMotor_;
     rightMotor = rightMotor_;
     cutterMotor = cutterMotor_;
     gyro = gyro_;
     bumper = bumper_;
+    leftSensor = leftSensor_;
+    rightSensor = rightSensor_;
 }
 
 void Controller::Turn(int degrees){
@@ -59,8 +61,15 @@ bool Controller::IsBumped() {
     return bumper->IsBumped();
 }
 
+bool Controller::IsLeftOutOfBounds() {
+    return leftSensor->IsOutOfBounds();
+}
+
+bool Controller::IsRightOutOfBounds() {
+    return rightSensor->IsOutOfBounds();
+}
+
 bool Controller::IsWheelOverload() {
-    
     return leftMotor->isOverload() || rightMotor->isOverload();
 }
 
@@ -71,7 +80,6 @@ bool Controller::IsTilted() {
 bool Controller::IsFlipped() {
     return gyro->getTilt() > FLIP_ANGLE;
 }
-
 
 int Controller::Heading() {
     return gyro->getHeading();

@@ -35,6 +35,8 @@
 #include "gyro.h"
 #include "display.h"
 
+#include "utils.h"
+
 
 unsigned long lastPrint= 0;
 int expectedMode = 0;
@@ -74,7 +76,7 @@ MOTOR leftMotor(LEFT_MOTOR_SENSE_PIN, LEFT_MOTOR_FORWARD_PWM_PIN, LEFT_MOTOR_BAC
 MOTOR rightMotor(RIGHT_MOTOR_SENSE_PIN, RIGHT_MOTOR_FORWARD_PWM_PIN, RIGHT_MOTOR_BACKWARDS_PWM_PIN, RIGHT_MOTOR_PWM_CHANNEL_FORWARD, RIGHT_MOTOR_PWM_CHANNEL_BACKWARDS, LOAD_LIMIT_WHEEL, &logger);
 MOTOR cutterMotor(CUTTER_MOTOR_SENSE_PIN, CUTTER_MOTOR_FORWARD_PWM_PIN, CUTTER_MOTOR_BACKWARDS_PWM_PIN, CUTTER_MOTOR_PWM_CHANNEL_FORWARD, CUTTER_MOTOR_PWM_CHANNEL_BACKWARDS, LOAD_LIMIT_CUTTER, &logger);
 
-Controller controller(&leftMotor, &rightMotor, &cutterMotor, &gyro, &bumper);
+Controller controller(&leftMotor, &rightMotor, &cutterMotor, &gyro, &bumper, &leftSensor, &rightSensor);
 
 UPDATEHANDLER uh(&logger, &controller, *updateEvent);
 
@@ -185,7 +187,7 @@ void setup() {
   Serial.begin(115200);
 
   analogReadResolution(11);
-  analogSetAttenuation(ADC_6db);  
+  analogSetAttenuation(ADC_11db);  
   mowerModel.OpMode = "Booting";
   mowerModel.Behavior = "Polltask";
   xTaskCreatePinnedToCore(pollPollables, "pollTask", 8192, NULL, 5, &pollTask, 1);
@@ -216,6 +218,7 @@ void setup() {
   webUi.setup();
 
   battery.setup();
+  bumper.setup();
 
   leftSensor.setup();
   attachInterrupt(LEFT_SENSOR_PIN, handleInterruptLeft, RISING);
@@ -241,6 +244,8 @@ void setup() {
   pinMode(SWITCH_3_PIN, INPUT_PULLUP);
   pinMode(SWITCH_BOOT_PIN, INPUT_PULLUP);
 
+  
+
 }
 
 
@@ -251,8 +256,17 @@ void loop() {
   //digitalWrite(LED_PIN, (millis() % 2000) < 300);
   //digitalWrite(LED_PIN, bumper.IsBumped());
   //digitalWrite(LED_PIN, (digitalRead(SWITCH_3_PIN) == LOW));
-  digitalWrite(LED_PIN, battery.isBeingCharged());
+  //digitalWrite(LED_PIN, battery.isBeingCharged());
+  digitalWrite(LED_PIN, (digitalRead(SWITCH_3_PIN) == LOW) || (digitalRead(SWITCH_BOOT_PIN) == LOW));
 
+  if(digitalRead(SWITCH_BOOT_PIN) == LOW){    
+    for (size_t i = 0; i < 35; i++)
+    {
+      int j = i*100;
+      Serial.println(String(j) + ": " + String(floatMap(j, 0, 3153, 306, ANALOG_RESOLUTION_MAX_VALUE), 1));
+    }
+    delay(3000);
+  }
 
   //Handle
   uh.doLoop();

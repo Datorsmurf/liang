@@ -12,15 +12,16 @@
 #ifndef _BATTERY_H_
 #define _BATTERY_H_
 
+#include "utils.h"
+
 // Voltages should be specified in V
 #define BATTERY_FULL       12.560
 #define BATTERY_EMPTY      10.400
 
 // Running average sample size
-#define FILTER        400
+#define FILTER        200
 
-#define VOLTDIVATOR   3.63
-
+#define VOLTDIVATOR   4.33
 
 class BATTERY {
   public:
