@@ -62,7 +62,7 @@ typedef std::function<void(int percentDone)> UpdateEvent;
 
 #define OPTION_STEP_TIME 750
 
-//ALTER THESE TOGETHER
+
 #define ANALOG_RESOLUTION 11
 #define ANALOG_RESOLUTION_MAX_VALUE (pow(2, ANALOG_RESOLUTION) - 1)
 

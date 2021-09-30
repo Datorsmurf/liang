@@ -63,20 +63,6 @@ float BATTERY::updateVoltage() {
 
 float BATTERY::readBatteryAndCalcValue(){
   int readValue = analogRead(batSensePin);
-  //Serial.println("B1 " + String(readValue));
-  readValue = floatMap(readValue, 0, ANALOG_RESOLUTION_MAX_VALUE, 310, 3070);
-//  readValue = floatMap(readValue, 0, 3153, 306, ANALOG_RESOLUTION_MAX_VALUE);
-  //Serial.println("B4 " + String(readValue));
-
-  //Serial.println("r1 " + String(ANALOG_RESOLUTION_MAX_VALUE));
-
-  //Convert to volts on the pin
-  float reading = readValue / (3153/3.3);
-  //Serial.println("B2 " + String(reading, 3));
-  //Serial.println();
-  // Adjust for voltage divider circuit
-  reading = (reading * VOLTDIVATOR);
-  //Serial.println("B3 " + String(reading, 3));
+  float reading = 1.1 +  (readValue * (13.3 / ANALOG_RESOLUTION_MAX_VALUE));
   return reading;
-
 }

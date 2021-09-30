@@ -186,8 +186,10 @@ void pollPollables(void * parameter) {
 void setup() {
   Serial.begin(115200);
 
-  analogReadResolution(11);
+
+  analogReadResolution(ANALOG_RESOLUTION);
   analogSetAttenuation(ADC_11db);  
+
   mowerModel.OpMode = "Booting";
   mowerModel.Behavior = "Polltask";
   xTaskCreatePinnedToCore(pollPollables, "pollTask", 8192, NULL, 5, &pollTask, 1);
