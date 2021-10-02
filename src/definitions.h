@@ -26,7 +26,7 @@ typedef std::function<void(int percentDone)> UpdateEvent;
 #define RIGHT_MOTOR_PWM_CHANNEL_BACKWARDS 5
 #define RIGHT_MOTOR_SENSE_PIN 35
 
-#define CUTTER_MOTOR_FORWARD_PWM_PIN 15
+#define CUTTER_MOTOR_FORWARD_PWM_PIN 18
 #define CUTTER_MOTOR_BACKWARDS_PWM_PIN 5
 #define CUTTER_MOTOR_PWM_CHANNEL_FORWARD 4
 #define CUTTER_MOTOR_PWM_CHANNEL_BACKWARDS 3
@@ -57,17 +57,19 @@ typedef std::function<void(int percentDone)> UpdateEvent;
 
 #define CUTTER_SPEED 255
 
-#define TILT_ANGLE 60;
-#define FLIP_ANGLE 100;
+#define TILT_ANGLE 20;
+#define FLIP_ANGLE 60;
 
 #define OPTION_STEP_TIME 750
-
 
 #define ANALOG_RESOLUTION 11
 #define ANALOG_RESOLUTION_MAX_VALUE (pow(2, ANALOG_RESOLUTION) - 1)
 
 #define ERROR_NOERROR 0
 #define ERROR_FLIPPED 1
+#define ERROR_OUT 2
+#define ERROR_STUCK 3
+#define ERROR_BUMPER_STUCK 4
 
 #endif
 

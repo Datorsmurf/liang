@@ -13,7 +13,6 @@ class GYRO {
         void loop();
         float getHeading();
         float getTilt();
-        void dmpDataReady();
     private:
         LOGGER *logger;
         MPU6050 *mpu;

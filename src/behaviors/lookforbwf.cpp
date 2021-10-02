@@ -33,7 +33,7 @@ int LookForBWF::loop() {
         controller->DoEvadeObsticle();
     }
     
-    controller->Run(100, 100, 300);
+    controller->RunAsync(100, 100, 300);
 
     return id();
 }

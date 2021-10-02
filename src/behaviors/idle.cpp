@@ -25,6 +25,19 @@ int Idle::loop() {
         return BEHAVIOR_SENSOR_DEBUG;
     }
 
+    if(digitalRead(SWITCH_BOOT_PIN) == LOW){    
+        t = millis();
+        logger->log("Presssed", false);
+    };
+    
+    if (hasTimeout(t, 5000)) {
+        controller->StopCutter();
+    }
+     else {
+        controller->RunCutterAsync();
+    }
+
+
     return id();
 }
 

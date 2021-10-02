@@ -19,6 +19,7 @@ class Idle : public BEHAVIOR {
         Controller *controller;
         LOGGER *logger;
         BATTERY *battery;
+        unsigned long t = 0;
 };
 
 #endif

@@ -43,6 +43,7 @@ int expectedMode = 0;
 int expectedBehavior = 0;
 int manualMode = -1;
 volatile bool updateInProgress = false;
+volatile bool pollTaskInitDone = false;
 
 TaskHandle_t pollTask;
 
@@ -76,7 +77,7 @@ MOTOR leftMotor(LEFT_MOTOR_SENSE_PIN, LEFT_MOTOR_FORWARD_PWM_PIN, LEFT_MOTOR_BAC
 MOTOR rightMotor(RIGHT_MOTOR_SENSE_PIN, RIGHT_MOTOR_FORWARD_PWM_PIN, RIGHT_MOTOR_BACKWARDS_PWM_PIN, RIGHT_MOTOR_PWM_CHANNEL_FORWARD, RIGHT_MOTOR_PWM_CHANNEL_BACKWARDS, LOAD_LIMIT_WHEEL, &logger);
 MOTOR cutterMotor(CUTTER_MOTOR_SENSE_PIN, CUTTER_MOTOR_FORWARD_PWM_PIN, CUTTER_MOTOR_BACKWARDS_PWM_PIN, CUTTER_MOTOR_PWM_CHANNEL_FORWARD, CUTTER_MOTOR_PWM_CHANNEL_BACKWARDS, LOAD_LIMIT_CUTTER, &logger);
 
-Controller controller(&leftMotor, &rightMotor, &cutterMotor, &gyro, &bumper, &leftSensor, &rightSensor);
+Controller controller(&leftMotor, &rightMotor, &cutterMotor, &gyro, &bumper, &leftSensor, &rightSensor, &logger);
 
 UPDATEHANDLER uh(&logger, &controller, *updateEvent);
 
@@ -135,15 +136,18 @@ void pollPollables(void * parameter) {
   mowerModel.message = "BOOTING";
   gyro.setup();
   battery.resetVoltage();
-
+  pollTaskInitDone = true;
   while (!updateInProgress)
   {
-    if (millis() - lastPrint >= 200) {
+    if (hasTimeout(lastPrint, 200)) {
       
       lastPrint = millis();
       display.DrawMowerModel(&mowerModel);
-      
-      
+    }
+
+    bumper.doLoop();
+    if (bumper.IsStuck()) {
+      controller.SetError(ERROR_BUMPER_STUCK);
     }
 
     leftMotor.doLoop();
@@ -190,14 +194,20 @@ void setup() {
   analogReadResolution(ANALOG_RESOLUTION);
   analogSetAttenuation(ADC_11db);  
 
+
+
   mowerModel.OpMode = "Booting";
   mowerModel.Behavior = "Polltask";
+
   xTaskCreatePinnedToCore(pollPollables, "pollTask", 8192, NULL, 5, &pollTask, 1);
 
+  while(!pollTaskInitDone) {
+    delay(1);
+  }
   mowerModel.Behavior = "SPIFFS";
   if(!SPIFFS.begin()){
-    Serial.println("An Error has occurred while mounting SPIFFS");
-    return;
+    delay(5000);
+    ESP.restart();
   }
 
   mowerModel.Behavior = "WIFI";
@@ -259,16 +269,11 @@ void loop() {
   //digitalWrite(LED_PIN, bumper.IsBumped());
   //digitalWrite(LED_PIN, (digitalRead(SWITCH_3_PIN) == LOW));
   //digitalWrite(LED_PIN, battery.isBeingCharged());
-  digitalWrite(LED_PIN, (digitalRead(SWITCH_3_PIN) == LOW) || (digitalRead(SWITCH_BOOT_PIN) == LOW));
+  digitalWrite(LED_PIN, 
+    (digitalRead(SWITCH_3_PIN) == LOW) 
+    || (digitalRead(SWITCH_BOOT_PIN) == LOW)
+    || bumper.IsBumped());
 
-  if(digitalRead(SWITCH_BOOT_PIN) == LOW){    
-    for (size_t i = 0; i < 35; i++)
-    {
-      int j = i*100;
-      Serial.println(String(j) + ": " + String(floatMap(j, 0, 3153, 306, ANALOG_RESOLUTION_MAX_VALUE), 1));
-    }
-    delay(3000);
-  }
 
   //Handle
   uh.doLoop();
@@ -285,6 +290,8 @@ void loop() {
   if(controller.GetError() != ERROR_NOERROR) {
     controller.StopCutter();
     controller.StopMovement();
+    mowerModel.OpMode = "ERROR";
+    mowerModel.Behavior = String(controller.GetError());
     return;
   }
 
@@ -298,6 +305,7 @@ void loop() {
         currentMode = availableOpModes[i];
         mowerModel.OpMode = currentMode->desc();
         expectedBehavior = currentMode->start();
+        controller.SetError(ERROR_NOERROR);
         break;
       }
     }

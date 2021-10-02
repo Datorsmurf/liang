@@ -16,6 +16,7 @@ void GYRO::setup() {
     }
 
   logger->log("Calculating offsets, do not move MPU6050", true);
+  delay(2000);
   mpu->calcOffsets(true,true); // gyro and accelero
   delay(1000);
   //mpu->setFilterGyroCoef(0.98);
@@ -37,7 +38,7 @@ void GYRO::loop() {
 }
 
 float GYRO::getHeading() {
-    return mpu->getAngleZ();
+    return -mpu->getAngleZ();
 }
 
 float GYRO::getTilt() {

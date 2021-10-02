@@ -15,7 +15,7 @@ GoAround::GoAround(Controller *controller_, LOGGER *logger_, BATTERY *battery_, 
 void GoAround::start() {
     logger->log("Start GoAround", true);
     controller->StopMovement();
-    controller->Turn(90);
+    controller->TurnAngle(90);
     startingHeading = controller->Heading();
     startingTime = millis();
 
@@ -37,7 +37,7 @@ int GoAround::loop() {
         controller->DoEvadeObsticle();
         return BEHAVIOR_LOOK_FOR_BWF;
     }
-    controller->Run(FULL_SPEED, FULL_SPEED * 0.8, NORMAL_ACCELERATION_TIME);
+    controller->RunAsync(FULL_SPEED, FULL_SPEED * 0.8, NORMAL_ACCELERATION_TIME);
 
     return id();
 }

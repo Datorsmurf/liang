@@ -5,6 +5,7 @@
 #include "Controller.h"
 #include "Logger.h"
 #include "battery.h"
+#include "utils.h"
 
 
 class Mow : public BEHAVIOR { 
@@ -18,6 +19,8 @@ class Mow : public BEHAVIOR {
         Controller *controller;
         LOGGER *logger;
         BATTERY *battery;
+
+        unsigned long t;
 };
 
 #endif

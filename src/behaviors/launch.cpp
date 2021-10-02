@@ -18,7 +18,7 @@ void Launch::start() {
 }
 
 int Launch::loop() {
-    controller->Run(-FULL_SPEED, -FULL_SPEED, NORMAL_ACCELERATION_TIME);
+    controller->RunAsync(-FULL_SPEED, -FULL_SPEED, NORMAL_ACCELERATION_TIME);
     
 
     return id();

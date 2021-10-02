@@ -27,24 +27,25 @@ int Mow::loop() {
     }
 
     if (controller->IsTilted()) {
-        Serial.println("Tilted");
+        logger->log("Tilted", true);
         controller->DoEvadeObsticle();
         return id();
     }
 
     if(controller->IsLeftOutOfBounds()) {
         controller->StopMovement();
-        unsigned long t = millis();
-        while (controller->IsLeftOutOfBounds() )
+        t = millis();
+        while (controller->IsLeftOutOfBounds() || hasTimeout(t, 5000))
         {
-            controller->Run(FULL_SPEED, -FULL_SPEED, NORMAL_ACCELERATION_TIME);
+            controller->RunAsync(FULL_SPEED, -FULL_SPEED, NORMAL_ACCELERATION_TIME);
         }
-        
+        controller->TurnAngle(90);
+        return id();
     }
 
 
-    controller->RunCutter(CUTTER_SPEED);
-    controller->Run(FULL_SPEED, FULL_SPEED, NORMAL_ACCELERATION_TIME);
+    controller->RunCutterAsync();
+    controller->RunAsync(FULL_SPEED, FULL_SPEED, NORMAL_ACCELERATION_TIME);
     
 
     return id();

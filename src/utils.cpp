@@ -16,3 +16,8 @@ int absDiff(int i1, int i2) {
     if (i1 > i2) return i1-i2;
     return i2-i1;
 }
+
+
+bool hasTimeout(unsigned long startTime, unsigned long period){
+    return startTime + period < millis();    
+}
