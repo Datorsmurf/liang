@@ -12,7 +12,7 @@ OpModeMow::OpModeMow(Controller *controller_, LOGGER *logger_, BATTERY *battery_
     battery = battery_;
 }
 int OpModeMow::start() {
-    logger->log("Start OpModeMow", true);
+    logger->log("Start OpModeMow");
     // if (battery->isBeingCharged())  {
     //     if (battery->isFullyCharged()){
     //         return BEHAVIOR_LAUNCH;

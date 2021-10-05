@@ -12,7 +12,7 @@ Launch::Launch(Controller *controller_, LOGGER *logger_, BATTERY *battery_) {
 }
 
 void Launch::start() {
-    logger->log("Start Launch", true);
+    logger->log("Start Launch");
     controller->StopCutter();
     controller->StopMovement();
 }

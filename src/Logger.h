@@ -2,31 +2,30 @@
 #define _LOGGER_H_
 
 #include <Arduino.h>
-#include <ESPAsyncWebServer.h>
-#include "mowermodel.h"
-#include "stdio.h"
+#include "logevent.h"
+#include "interaction/presenter.h"
+#include <stdio.h>
+#include <vector>
 
-struct LogEvent {
-    unsigned long millis;
-    String msg;
-};
 
 #define LOG_BUFFER_SIZE 63
 #define LOG_MSG_MAX_LENGTH 64
 
 class LOGGER { 
     public:
-        LOGGER(AsyncWebSocket* webSocketServer_, MowerModel *model_);
-        void log(String msg, bool keepInHistory);
-        void sendLogHistory(int clientId);
+        LOGGER(std::vector<PRESENTER*> &logtargets_);
+            
+        void log(String msg);
+        void getLogHistory(std::vector<LogEvent> *events);
 
     private:
-        AsyncWebSocket* webSocketServer;
-        MowerModel *model;
-        
+        //Circular buffer
         LogEvent eventBuffer[LOG_BUFFER_SIZE];
-        int bufferPos;
+        int bufferPos = -1;
         bool bufferIsLooped = false;
+
+
+        std::vector<PRESENTER*> logTargets;
 };
 
 

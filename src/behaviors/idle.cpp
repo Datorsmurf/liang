@@ -10,7 +10,7 @@ Idle::Idle(Controller *controller_, LOGGER *logger_, BATTERY *battery_) {
 }
 
 void Idle::start() {
-    logger->log("Start Idle", true);
+    logger->log("Start Idle");
     controller->StopCutter();
     controller->StopMovement();
     int checkStart = millis();
@@ -24,11 +24,6 @@ int Idle::loop() {
     if (digitalRead(SWITCH_3_PIN) == LOW) {
         return BEHAVIOR_SENSOR_DEBUG;
     }
-
-    if(digitalRead(SWITCH_BOOT_PIN) == LOW){    
-        t = millis();
-        logger->log("Presssed", false);
-    };
     
     if (hasTimeout(t, 5000)) {
         controller->StopCutter();

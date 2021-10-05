@@ -4,7 +4,7 @@
 #include <MPU6050_light.h>
 
 #include "Logger.h"
-
+#define ANGLE_FILTER 0.2
 
 class GYRO { 
     public:
@@ -12,7 +12,9 @@ class GYRO {
         void setup();
         void loop();
         float getHeading();
-        float getTilt();
+        float getAngleX();
+        float getAngleY();
+        float getAngleYFiltered();
     private:
         LOGGER *logger;
         MPU6050 *mpu;
@@ -21,7 +23,7 @@ class GYRO {
         unsigned long lastReadTime = 0;
 
         unsigned long now = micros();
-
+        float filteredY = 0;
 };
 
 #endif

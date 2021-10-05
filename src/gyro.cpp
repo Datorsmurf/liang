@@ -11,11 +11,11 @@ void GYRO::setup() {
     
     byte status = mpu->begin();
     if (status != 0) {
-        logger->log("MPU ERROR", true);
+        logger->log("MPU ERROR");
         ESP.restart();
     }
 
-  logger->log("Calculating offsets, do not move MPU6050", true);
+  logger->log("Calculating offsets, do not move MPU6050");
   delay(2000);
   mpu->calcOffsets(true,true); // gyro and accelero
   delay(1000);
@@ -32,6 +32,7 @@ void GYRO::loop() {
     //     unsigned long delta =  now - lastReadTime;
     // }
 
+    filteredY = (filteredY * (1-ANGLE_FILTER)) + (getAngleY() * ANGLE_FILTER);
     
     
     lastReadTime = now;
@@ -41,7 +42,14 @@ float GYRO::getHeading() {
     return -mpu->getAngleZ();
 }
 
-float GYRO::getTilt() {
-    //This should be som fancy maths, combining the angles :)
-    return max(abs(mpu->getAngleX()), abs(mpu->getAngleY()));
+float GYRO::getAngleX() {
+    return mpu->getAngleX();
+}
+
+float GYRO::getAngleY() {
+    return -mpu->getAngleY();
+}
+
+float GYRO::getAngleYFiltered() {
+    return filteredY;
 }

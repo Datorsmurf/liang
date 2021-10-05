@@ -1,47 +1,48 @@
 #include "Logger.h"
 
-LOGGER::LOGGER(AsyncWebSocket* webSocketServer_, MowerModel *model_){
-    webSocketServer = webSocketServer_;
-    model = model_;
+LOGGER::LOGGER(std::vector<PRESENTER*> &logtargets_){
+    logTargets = logtargets_;
     bufferPos = -1;
-    
 }
 
-void LOGGER::log(String msg, bool keepInHistory) {
+
+void LOGGER::log(String msg) {
     
     unsigned long t = millis();
-    if (keepInHistory) {
-        bufferPos++;
-        if (bufferPos >= LOG_BUFFER_SIZE) {
-            bufferPos = 0;
-            bufferIsLooped = true;
-        }
-
-        LogEvent e = eventBuffer[bufferPos];
-        e.msg = msg;
-        e.millis = t;
-
-        bufferPos = bufferPos % LOG_BUFFER_SIZE;
-        eventBuffer[bufferPos] = e;
+    bufferPos++;
+    if (bufferPos >= LOG_BUFFER_SIZE) {
+        bufferPos = 0;
+        bufferIsLooped = true;
     }
+
+    LogEvent e = eventBuffer[bufferPos];
+    e.msg = msg;
+    e.millis = t;
+
+    bufferPos = bufferPos % LOG_BUFFER_SIZE;
+    eventBuffer[bufferPos] = e;
     
-    Serial.println(msg);
-    webSocketServer->textAll(String(t) + " " + msg + '\n');
-    model->message = msg;
+    for (size_t i = 0; i < logTargets.size(); i++)
+    {
+        try
+        {
+            logTargets[i]->SendLog(&e);
+        }
+        catch(const std::exception& e)
+        {
+            Serial.printf("Exception when logging: %s", e.what());
+        }
+    }
 }
 
 
-
-void LOGGER::sendLogHistory(int clientId) {
-    webSocketServer->text(clientId, "Catching up with the log...");
+void LOGGER::getLogHistory(std::vector<LogEvent> *logHistory) {
     int maxCount = bufferIsLooped ? LOG_BUFFER_SIZE : bufferPos;
     int startAt = bufferIsLooped ? bufferPos : 0;
 
-        for (size_t i = 0; i < maxCount; i++)
-        {
-            LogEvent e = eventBuffer[(startAt + i) % LOG_BUFFER_SIZE];
-            webSocketServer->text(clientId, String(e.millis) + " " + e.msg + '\n');
-        }
-            webSocketServer->text(clientId, "Done catching up with the log.");
-
+    for (size_t i = 0; i < maxCount; i++)
+    {
+        LogEvent e = eventBuffer[(startAt + i) % LOG_BUFFER_SIZE];
+        logHistory->push_back(e);
+    }
 }

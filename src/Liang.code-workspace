@@ -49,7 +49,12 @@
 			"cinttypes": "cpp",
 			"utility": "cpp",
 			"typeinfo": "cpp",
-			"regex": "cpp"
+			"regex": "cpp",
+			"bitset": "cpp",
+			"chrono": "cpp",
+			"ratio": "cpp",
+			"iostream": "cpp",
+			"mutex": "cpp"
 		}
 	}
 }

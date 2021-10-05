@@ -15,18 +15,18 @@ Controller::Controller(MOTOR* leftMotor_, MOTOR* rightMotor_, MOTOR* cutterMotor
 void Controller::TurnAngle(int degrees){
     degrees = (degrees % 360);
     float targetHeading = Heading() + degrees;
-    logger->log("TurnAngle " + String(degrees) + " start " + String(Heading()) + " target: " + String(targetHeading), true);
+    logger->log("TurnAngle " + String(degrees) + " start " + String(Heading()) + " target: " + String(targetHeading));
     unsigned long t = millis();
 
     while (abs(targetHeading - Heading()) > 3)
     {
         TurnAsync(degrees < 0);
         if (hasTimeout(t, 5000)) {
-            logger->log("TurnAngle " + String(degrees) + "timed out. Now at: " + String(Heading()), true);
+            logger->log("TurnAngle " + String(degrees) + "timed out. Now at: " + String(Heading()));
             return;
         }
     }
-    logger->log("TurnAngle " + String(degrees) + "ok. Now at: " + String(Heading()), true);
+    logger->log("TurnAngle " + String(degrees) + "ok. Now at: " + String(Heading()));
 }
 
 void Controller::TurnAsync(bool isLeftTurn){
@@ -39,7 +39,7 @@ bool Controller::RunAsync(int leftSpeed, int rightSpeed, int actionTime){
 }
 
 void Controller::Move(int distanceInCm){
-    logger->log("Move " + String(distanceInCm), true);
+    logger->log("Move " + String(distanceInCm));
     unsigned long moveEnd = millis() + abs(distanceInCm) * 100;
     if (distanceInCm > 0){
         while (moveEnd > millis())
@@ -70,7 +70,7 @@ void Controller::StopMovement(){
 }
 
 void Controller::RunCutterAsync(){
-    //cutterMotor->setSpeed(CUTTER_SPEED, 3000);
+    cutterMotor->setSpeed(CUTTER_SPEED, 7000);
 }
 
 void Controller::StopCutter(){
@@ -95,11 +95,12 @@ bool Controller::IsWheelOverload() {
 }
 
 bool Controller::IsTilted() {
-    return gyro->getTilt() > TILT_ANGLE;
+    return gyro->getAngleY() > TILT_ANGLE;
+
 }
 
 bool Controller::IsFlipped() {
-    return gyro->getTilt() > FLIP_ANGLE;
+    return max(abs(gyro->getAngleX()), abs(gyro->getAngleY())) > FLIP_ANGLE;
 }
 
 int Controller::Heading() {
@@ -108,7 +109,7 @@ int Controller::Heading() {
 
 void Controller::SetError(int error_) {
     if (error == error_) return;
-    logger->log("ERROR: " + String(error), true);
+    logger->log("ERROR: " + String(error));
     error = error_;
 }
 

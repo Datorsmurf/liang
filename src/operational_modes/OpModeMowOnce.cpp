@@ -12,7 +12,7 @@ OpModeMowOnce::OpModeMowOnce(Controller *controller_, LOGGER *logger_, BATTERY *
     battery = battery_;
 }
 int OpModeMowOnce::start() {
-    logger->log("Start OpModeMowOnce", true);
+    logger->log("Start OpModeMowOnce");
     if (battery->isBeingCharged())  {
         Serial.println("Returning launch");
         return BEHAVIOR_LAUNCH;

@@ -27,7 +27,7 @@ SENSOR::SENSOR(int pin_, bool missingSignalIsOut_, LOGGER *logger_){
 
 void SENSOR::setup() {
   pinMode(pin, INPUT);
-  logger->log("Sensor setup for pin: " + String(pin), true);
+  logger->log("Sensor setup for pin: " + String(pin));
 }
 
 void SENSOR::handleInterrupt() {

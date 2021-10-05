@@ -12,7 +12,7 @@ Charge::Charge(Controller *controller_, LOGGER *logger_, BATTERY *battery_) {
 }
 
 void Charge::start() {
-    logger->log("Start Charge", true);
+    logger->log("Start Charge");
 }
 
 int Charge::loop() {

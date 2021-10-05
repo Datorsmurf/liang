@@ -13,7 +13,7 @@ FollowBWF::FollowBWF(Controller *controller_, LOGGER *logger_, BATTERY *battery_
 }
 
 void FollowBWF::start() {
-    logger->log("Start FollowBwf", true);
+    logger->log("Start FollowBwf");
     controller->StopCutter();
     obsticleCount = 0;
     lastObsticle = 0;

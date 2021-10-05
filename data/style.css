@@ -27,3 +27,19 @@ body { background-color: #D0D0D0; font-family: Arial, Helvetica, Sans-Serif; Col
 .log-row {
   margin: 0px;
 }
+
+.mower-stats{
+
+}
+
+.single-stats{
+  display: block;
+}
+
+.stats-name{
+  font-weight: bold;
+}
+
+.stats-name::after{
+  content: ":";
+}

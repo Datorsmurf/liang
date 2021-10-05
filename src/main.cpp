@@ -25,15 +25,20 @@
 #include "behaviors/mow.h"
 #include "behaviors/sensordebug.h"
 
+#include "interaction/presenter.h"
+#include "logevent.h"
+
+#include "interaction/display.h"
+#include "interaction/webui.h"
+#include "interaction/serialui.h"
+
 #include "Controller.h"
-#include "webui.h"
 #include "definitions.h"
 #include "mowermodel.h"
 #include "sensor.h"
 #include "secrets.h"
 #include "battery.h"
 #include "gyro.h"
-#include "display.h"
 
 #include "utils.h"
 
@@ -44,6 +49,7 @@ int expectedBehavior = 0;
 int manualMode = -1;
 volatile bool updateInProgress = false;
 volatile bool pollTaskInitDone = false;
+bool fullModelResendRequired = true;
 
 TaskHandle_t pollTask;
 
@@ -64,9 +70,20 @@ detachInterrupt(RIGHT_SENSOR_PIN);
 MPU6050 mpu(Wire);
 AsyncWebServer webServer(80);
 AsyncWebSocket webSocket("/ws");
-LOGGER logger(&webSocket, &mowerModel);
 MOWERDISPLAY display;
-WEBUI webUi(&webServer, &webSocket, &logger, *setManualMode);
+SERIALUI serialUi(*setManualMode);
+WEBUI webUi(&webServer, &webSocket, *setManualMode);
+
+
+
+std::vector<PRESENTER*> presenters = {
+  &serialUi,
+  &display,
+  &webUi,  
+};
+
+
+LOGGER logger(presenters);
 GYRO gyro(&logger, &mpu);
 SENSOR leftSensor(LEFT_SENSOR_PIN, false, &logger);
 SENSOR rightSensor(RIGHT_SENSOR_PIN, false, &logger);
@@ -119,6 +136,7 @@ BEHAVIOR* availableBehaviors[] = {
   &sensorDebug,
 };
 
+
 void handleInterruptLeft() {
   leftSensor.handleInterrupt();
 }
@@ -133,16 +151,20 @@ void pollPollables(void * parameter) {
   Wire.begin();
 
   display.setup();
-  mowerModel.message = "BOOTING";
+  logger.log("BOOTING");
   gyro.setup();
   battery.resetVoltage();
   pollTaskInitDone = true;
   while (!updateInProgress)
   {
     if (hasTimeout(lastPrint, 200)) {
-      
+      bool useFullResend = fullModelResendRequired;
+      fullModelResendRequired = false;
       lastPrint = millis();
-      display.DrawMowerModel(&mowerModel);
+      for (size_t i = 0; i < presenters.size(); i++)
+      {
+        presenters[i]->PresentMowerModel(&mowerModel, useFullResend);
+      }
     }
 
     bumper.doLoop();
@@ -163,7 +185,7 @@ void pollPollables(void * parameter) {
     mowerModel.CutterMotorSpeed = cutterMotor.getSpeed();
 
     gyro.loop();
-    mowerModel.Tilt = gyro.getTilt();
+    mowerModel.Tilt = gyro.getAngleYFiltered();
     mowerModel.Heading = gyro.getHeading();
 
     mowerModel.BatteryVoltage = battery.updateVoltage();
@@ -178,11 +200,15 @@ void pollPollables(void * parameter) {
 
   while (true) //Just chill and don't return while waiting for update
   {
-    if (millis() - lastPrint >= 200) {
+    if (hasTimeout(lastPrint, 200)) {
       
       lastPrint = millis();
-      display.DrawMowerModel(&mowerModel);
+      for (size_t i = 0; i < presenters.size(); i++)
+      {
+        presenters[i]->PresentMowerModel(&mowerModel, fullModelResendRequired);
+      }
     }
+    delay(10);
   }
 }
 
@@ -194,6 +220,8 @@ void setup() {
   analogReadResolution(ANALOG_RESOLUTION);
   analogSetAttenuation(ADC_11db);  
 
+
+  webUi.SetLogger(&logger);
 
 
   mowerModel.OpMode = "Booting";
@@ -215,13 +243,12 @@ void setup() {
   WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASS);
   while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-      Serial.println("Connection Failed! Rebooting...");
-      mowerModel.message = "Connection Failed! Rebooting...";
-      delay(5000);
-      ESP.restart();
-    }
+    logger.log("Connection Failed! Rebooting...");
+    delay(5000);
+    ESP.restart();
+  }
 
-  logger.log("IP: " + WiFi.localIP().toString(), true);
+  logger.log("IP: " + WiFi.localIP().toString());
   delay(1000);
 
   mowerModel.Behavior = "Setup";
@@ -244,7 +271,7 @@ void setup() {
 
   mowerModel.Behavior = "Starting";
 
-
+  delay(1000);
 
   expectedMode = currentMode->id();
   expectedBehavior = currentMode->start();
@@ -255,16 +282,11 @@ void setup() {
   pinMode(LED_PIN, OUTPUT);
   pinMode(SWITCH_3_PIN, INPUT_PULLUP);
   pinMode(SWITCH_BOOT_PIN, INPUT_PULLUP);
-
-  
-
 }
 
 
 
 void loop() {
-
-  
   //digitalWrite(LED_PIN, (millis() % 2000) < 300);
   //digitalWrite(LED_PIN, bumper.IsBumped());
   //digitalWrite(LED_PIN, (digitalRead(SWITCH_3_PIN) == LOW));
@@ -311,7 +333,7 @@ void loop() {
     }
 
     if (!foundIt) {
-      logger.log("Could not locate OpMode with id:" + String(expectedMode), true);
+      logger.log("Could not locate OpMode with id:" + String(expectedMode));
     }
   }
 
@@ -331,7 +353,7 @@ void loop() {
     }
 
     if (!foundIt) {
-      logger.log("Could not locate behavior with id:" + String(expectedBehavior), true);
+      logger.log("Could not locate behavior with id:" + String(expectedBehavior));
     }
   }
 

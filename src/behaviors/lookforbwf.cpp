@@ -14,7 +14,7 @@ LookForBWF::LookForBWF(Controller *controller_, LOGGER *logger_, BATTERY *batter
 }
 
 void LookForBWF::start() {
-    logger->log("Start LookForBwf", true);
+    logger->log("Start LookForBwf");
 
     controller->StopCutter();
 
@@ -33,7 +33,7 @@ int LookForBWF::loop() {
         controller->DoEvadeObsticle();
     }
     
-    controller->RunAsync(100, 100, 300);
+    controller->RunAsync(FULL_SPEED, FULL_SPEED, NORMAL_ACCELERATION_TIME);
 
     return id();
 }

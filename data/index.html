@@ -31,10 +31,16 @@ function start()
     websock.close();
   };  
   websock.onmessage = function(evt) {
-    let el = $("#log")
-    el.append(`<p class='log-row'>${evt.data}</p>`);
 
-    el[0].scrollTop = el[0].scrollHeight;
+    let parts = evt.data.split(";");
+
+    if (parts[0] === "l") {
+      let el = $("#log")
+      el.append(`<p class='log-row'>${parts[1]}</p>`);
+      el[0].scrollTop = el[0].scrollHeight;
+    } else {
+      $(`#${parts[0]}`).text(parts[1]);
+    }
   };
 }
 function buttonclick(e)
@@ -62,6 +68,18 @@ function sendCommand(component, value) {
     <button class='navbutton' type='button' onmousedown='sendCommand("mode","once")'     ontouchstart='sendCommand("mode","once")'>Mow once</button>
     <button class='navbutton' type='button' onmousedown='sendCommand("mode","charge")'      ontouchstart='sendCommand("mode","charge")'>Charge</button>
     <br />
+    <div class=mower-stats>
+      <span class="single-stats"></span><span class="stats-name">Battery</span><span class="stats-value" id="BatteryVoltage">-</span>V</span></span>
+      <span class="single-stats"></span><span class="stats-name">Tilt</span><span class="stats-value" id="Tilt">-</span>&deg;</span></span>
+      <span class="single-stats"></span><span class="stats-name">Heading</span><span class="stats-value" id="Heading"></span>&deg;</span></span>
+      <span class="single-stats"></span><span class="stats-name">Left</span><span class="stats-value" id="LeftMotorSpeed">-</span>/<span class="stats-value" id="LeftMotorLoad">-</span></span></span>
+      <span class="single-stats"></span><span class="stats-name">Right</span><span class="stats-value" id="RightMotorSpeed">-</span>/<span class="stats-value" id="RightMotorLoad">-</span></span></span>
+      <span class="single-stats"></span><span class="stats-name">Cutter</span><span class="stats-value" id="CutterMotorSpeed">-</span>/<span class="stats-value" id="CutterMotorLoad">-</span></span></span>
+      <span class="single-stats"></span><span class="stats-name">Docked</span><span class="stats-value" id="IsDocked">-</span></span></span>
+      <span class="single-stats"></span><span class="stats-name">Sensors</span><span class="stats-value" id="LeftSensor">-</span>/<span class="stats-value" id="RightSensor">-</span></span></span>
+      <span class="single-stats"></span><span class="stats-name">OpMode</span><span class="stats-value" id="OpMode">-</span></span></span>
+      <span class="single-stats"></span><span class="stats-name">Behavior</span><span class="stats-value" id="Behavior">-</span></span></span>
+    </div>
     <div class='log'>
       <div><b>Log</b></div>
       <div class='log-content' id='log'>

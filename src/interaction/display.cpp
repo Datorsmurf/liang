@@ -23,6 +23,7 @@ void MOWERDISPLAY::setup() {
 //   ssd1306_clearScreen();
 }
 
+
 void MOWERDISPLAY::print(String msg, int row) {
   if (blocked) return;
   char buffer[50];
@@ -30,27 +31,27 @@ void MOWERDISPLAY::print(String msg, int row) {
   ssd1306_printFixed(0, rowHeight*row,  buffer, STYLE_NORMAL);
 }
 
-void MOWERDISPLAY::DrawMowerModel(MowerModel* model){
+
+void MOWERDISPLAY::SendLog(LogEvent *e) {
+  msg = e->msg;
+}
+
+void MOWERDISPLAY::PresentMowerModel(MowerModel* model, bool forceFullPresentation){
 
   if (blocked) return;
 
-  if (_cleared || printedModel->OpMode.compareTo(model->OpMode) + printedModel->Behavior.compareTo(model->message) != 0) {
+  if (_cleared || (printedModel->OpMode.compareTo(model->OpMode) != 0) || (printedModel->Behavior.compareTo(model->Behavior) != 0)) {
     print(printedModel->OpMode + "/" + model->Behavior, 0);
     printedModel->OpMode = model->OpMode;
     printedModel->Behavior = model->Behavior;
   } 
 
-  if (_cleared || printedModel->message.compareTo(model->message) != 0) {
-    print(model->message, 1);
-    printedModel->message = model->message;
+  if (msg.length() > 0) {
+    print(msg, 1);
     messageDisplayedAt = millis();
-  } else {
-    if (messageDisplayedAt + 3000 < millis()) {
-      print("", 1);
-      printedModel->message = "";
-      model->message = "";
-      
-    }
+    msg = "";
+  } else if (hasTimeout(messageDisplayedAt, 5000)) {
+    print("", 1);
   }
 
   if (_cleared || printedModel->LeftSensorIsOutOfBounds != model->LeftSensorIsOutOfBounds || printedModel->RightSensorIsOutOfBounds != model->RightSensorIsOutOfBounds) {
@@ -66,7 +67,7 @@ void MOWERDISPLAY::DrawMowerModel(MowerModel* model){
       printedModel->CutterMotorLoad = model->CutterMotorLoad;
   }
 
-    if (_cleared || printedModel->LeftMotorSpeed != model->LeftMotorSpeed || printedModel->LeftMotorLoad != model->LeftMotorLoad) {
+  if (_cleared || printedModel->LeftMotorSpeed != model->LeftMotorSpeed || printedModel->LeftMotorLoad != model->LeftMotorLoad) {
       print("Left   S:" + String(model->LeftMotorSpeed) + " L: " + String(model->LeftMotorLoad), 4);
       printedModel->LeftMotorSpeed = model->LeftMotorSpeed;
       printedModel->LeftMotorLoad = model->LeftMotorLoad;

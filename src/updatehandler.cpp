@@ -37,7 +37,7 @@ void UPDATEHANDLER::setup() {
         type = "filesystem";
 
       // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-      logger->log("Start updating " + type, true);
+      logger->log("Start updating " + type);
       lastLogPercent = 0;
      
       updateEvent(0);
@@ -45,14 +45,14 @@ void UPDATEHANDLER::setup() {
     })
     .onEnd([this]() {
       //updateEvent(110);
-      logger->log("DONE updating ", true);
+      logger->log("DONE updating ");
 
     })
     .onProgress([this](unsigned int progress, unsigned int total) {
       int percentDone = floor(((100.0 * progress) / total));
-      if (percentDone == 100 || percentDone >= lastLogPercent + 5) {
+      if (percentDone == 100 || percentDone >= lastLogPercent + 10) {
         //updateEvent(percentDone);
-        logger->log("Progress: " + String(percentDone) + "%", false);
+        logger->log("Progress: " + String(percentDone) + "%");
         lastLogPercent = percentDone;
       }
     })

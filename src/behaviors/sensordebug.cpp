@@ -28,9 +28,9 @@ int SensorDebug::loop() {
 
     if (millis() - lastPrint > 500) {
         if (millis() / 1000 % 4 > 2) {
-            logger->log("L: " + leftSensor->GetPulseHistoryS(), false);
+            logger->log("L: " + leftSensor->GetPulseHistoryS());
         } else {
-            logger->log("R: " + rightSensor->GetPulseHistoryS(), false);
+            logger->log("R: " + rightSensor->GetPulseHistoryS());
         }
         lastPrint = millis();
     }

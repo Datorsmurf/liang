@@ -16,18 +16,18 @@ void Mow::start() {
 
 int Mow::loop() {
     if (battery->mustCharge()) {
-        logger->log("Must charge", true);
+        logger->log("Must charge");
         return BEHAVIOR_LOOK_FOR_BWF;
     }
 
     if (controller->IsBumped()) {
-        Serial.println("Bumped");
+        logger->log("Bumped");
         controller->DoEvadeObsticle();
         return id();
     }
 
     if (controller->IsTilted()) {
-        logger->log("Tilted", true);
+        logger->log("Tilted");
         controller->DoEvadeObsticle();
         return id();
     }

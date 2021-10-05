@@ -55,7 +55,7 @@ typedef std::function<void(int percentDone)> UpdateEvent;
 #define NORMAL_ACCELERATION_TIME 400
 #define SHORT_ACCELERATION_TIME 100
 
-#define CUTTER_SPEED 255
+#define CUTTER_SPEED 150
 
 #define TILT_ANGLE 20;
 #define FLIP_ANGLE 60;

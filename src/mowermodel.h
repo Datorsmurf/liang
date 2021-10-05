@@ -18,7 +18,6 @@ struct MowerModel {
         bool RightSensorIsOutOfBounds;
         String OpMode;
         String Behavior;
-        String message;
 };
 
 #endif
