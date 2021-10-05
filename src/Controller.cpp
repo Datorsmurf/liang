@@ -77,6 +77,29 @@ void Controller::StopCutter(){
     cutterMotor->setSpeed(0,0);
 }
 
+bool Controller::HandleObsticle(){
+    if (IsBumped()) {
+        logger->log("Bumped");
+        DoEvadeObsticle();
+        return true;
+    }
+
+    if (IsTilted()) {
+        logger->log("Tilted");
+        DoEvadeObsticle();
+        return true;
+    }
+
+    
+    if (IsWheelOverload()) {
+        logger->log("Wheel overload");
+        DoEvadeObsticle();
+        return true;
+    }
+
+    return false;
+}
+
 bool Controller::IsBumped() {
     return bumper->IsBumped();
 }

@@ -5,10 +5,11 @@
 
 
 
-Charge::Charge(Controller *controller_, LOGGER *logger_, BATTERY *battery_) {
+Charge::Charge(Controller *controller_, LOGGER *logger_, BATTERY *battery_, OPERATIONALMODE *currentMode_) {
     controller = controller_;
     logger = logger_;
     battery = battery_;
+    currentMode = currentMode_;
 }
 
 void Charge::start() {
@@ -16,6 +17,9 @@ void Charge::start() {
 }
 
 int Charge::loop() {
+    if (currentMode->id() == OP_MODE_MOW && battery->isFullyCharged()) {
+        return BEHAVIOR_LAUNCH;
+    }
     return id();
 }
 

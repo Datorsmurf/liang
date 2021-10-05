@@ -5,10 +5,12 @@
 
 
 
-FollowBWF::FollowBWF(Controller *controller_, LOGGER *logger_, BATTERY *battery_) {
+FollowBWF::FollowBWF(Controller *controller_, LOGGER *logger_, BATTERY *battery_, MOTOR *leftMotor_, MOTOR *rightMotor_) {
     controller = controller_;
     logger = logger_;
     battery = battery_;
+    leftMotor = leftMotor_;
+    rightMotor = rightMotor_;
     obsticleCountBeforeEvade = 3;
 }
 
@@ -20,20 +22,63 @@ void FollowBWF::start() {
 }
 
 int FollowBWF::loop() {
-    if (controller->IsBumped() || controller->IsTilted()) {
+    if (hasTimeout(lastObsticle, 10000)) {
+        obsticleCount = 0;
+    }
+
+    if (battery->isBeingCharged()) {
+        return BEHAVIOR_CHARGE;
+    }
+
+    if (controller->IsBumped() || controller->IsTilted() || controller->IsWheelOverload()) {
+
+        controller->StopMovement();
+
+        //Just stand here for a while to let the charging be detectable.
+        delay(1000);
+        if (battery->isBeingCharged()) {
+            return BEHAVIOR_CHARGE;
+        }
+
+
         obsticleCount++;
         lastObsticle = millis();
 
         if (obsticleCount > obsticleCountBeforeEvade) {
+            obsticleCount = 0;
             return BEHAVIOR_GO_AROUND_OBSTICLE;
         }
 
-        controller->StopMovement();
         controller->Move(-30);
     }
 
-    if (hasTimeout(lastObsticle, 10000)) {
-        obsticleCount = 0;
+    if (controller->IsRightOutOfBounds()) {
+        controller->StopMovement();
+
+        unsigned long t = millis();
+        while (true)
+        {
+            if (!controller->IsRightOutOfBounds()) {
+                logger->log("Back inside!");
+                break;
+            }
+            if (hasTimeout(t, 2000)) {
+                logger->log("Giving up");
+                break;
+            }
+            controller->RunAsync(-FULL_SPEED, -FULL_SPEED, NORMAL_ACCELERATION_TIME);
+        }
+        controller->TurnAngle(DOCKING_TURN_ANGLE_AFTER_BACK_UP);
+        return id();
+    }
+
+    if (controller->IsLeftOutOfBounds()) {
+        leftMotor->setSpeed(DOCKING_WHEEL_HIGH_SPEED, DOCKING_TIME_TO_HIGH_SPEED);
+        rightMotor->setSpeed(DOCKING_WHEEL_LOW_SPEED, DOCKING_TIME_TO_SLOW_SPEED);
+    } else {
+        leftMotor->setSpeed(DOCKING_WHEEL_LOW_SPEED, DOCKING_TIME_TO_SLOW_SPEED);
+        rightMotor->setSpeed(DOCKING_WHEEL_HIGH_SPEED, DOCKING_TIME_TO_HIGH_SPEED);
+
     }
 
     return id();

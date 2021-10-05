@@ -18,6 +18,7 @@ class Controller {
         void StopMovement();
         void RunCutterAsync();
         void StopCutter();
+        bool HandleObsticle();
 
         int GetError();
         void SetError(int error);

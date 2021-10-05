@@ -18,10 +18,11 @@ void Launch::start() {
 }
 
 int Launch::loop() {
-    controller->RunAsync(-FULL_SPEED, -FULL_SPEED, NORMAL_ACCELERATION_TIME);
-    
+    controller->Move(-70);
+    controller->TurnAngle(90);
+  
 
-    return id();
+    return BEHAVIOR_MOW;
 }
 
 int Launch::id() {

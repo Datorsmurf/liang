@@ -114,8 +114,8 @@ OPERATIONALMODE* availableOpModes[] = {
 OPERATIONALMODE* currentMode = availableOpModes[0];
 
 
-Charge charge(&controller, &logger, &battery);
-FollowBWF followBWF(&controller, &logger, &battery);
+Charge charge(&controller, &logger, &battery, currentMode);
+FollowBWF followBWF(&controller, &logger, &battery, &leftMotor, &rightMotor);
 GoAround goAround(&controller, &logger, &battery, &leftSensor, &rightSensor);
 Idle idle(&controller, &logger, &battery);
 SensorDebug sensorDebug(&controller, &logger, &battery, &leftSensor, &rightSensor);

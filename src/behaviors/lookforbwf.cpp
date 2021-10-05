@@ -20,19 +20,19 @@ void LookForBWF::start() {
 
     if (currentMode->id() == OP_MODE_MOW_ONCE){
         modeSelectEvent(OP_MODE_CHARGE);
-
     }   
 }
 
 int LookForBWF::loop() {
-    if (controller->IsBumped()) {
-        controller->DoEvadeObsticle();
-    }
-
-    if (controller->IsTilted()) {
-        controller->DoEvadeObsticle();
+    
+    if (controller->IsLeftOutOfBounds() || controller->IsRightOutOfBounds()) {
+        return BEHAVIOR_FOLLOW_BWF;
     }
     
+    if (controller->HandleObsticle()) {
+        return id();
+    }
+
     controller->RunAsync(FULL_SPEED, FULL_SPEED, NORMAL_ACCELERATION_TIME);
 
     return id();

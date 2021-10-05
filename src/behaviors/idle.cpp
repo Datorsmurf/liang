@@ -10,14 +10,12 @@ Idle::Idle(Controller *controller_, LOGGER *logger_, BATTERY *battery_) {
 }
 
 void Idle::start() {
-    logger->log("Start Idle");
     controller->StopCutter();
     controller->StopMovement();
     int checkStart = millis();
     while(checkStart + OPTION_STEP_TIME > millis() && digitalRead(SWITCH_3_PIN) == LOW) {
         delay(1);
     }
-
 }
 
 int Idle::loop() {

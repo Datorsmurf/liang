@@ -20,22 +20,7 @@ int Mow::loop() {
         return BEHAVIOR_LOOK_FOR_BWF;
     }
 
-    if (controller->IsBumped()) {
-        logger->log("Bumped");
-        controller->DoEvadeObsticle();
-        return id();
-    }
-
-    if (controller->IsTilted()) {
-        logger->log("Tilted");
-        controller->DoEvadeObsticle();
-        return id();
-    }
-
-    
-    if (controller->IsWheelOverload()) {
-        logger->log("Wheel overload");
-        controller->DoEvadeObsticle();
+    if (controller->HandleObsticle()) {
         return id();
     }
 

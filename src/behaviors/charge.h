@@ -5,11 +5,13 @@
 #include "Controller.h"
 #include "Logger.h"
 #include "battery.h"
+#include "operational_modes/operationalmode.h"
+#include "definitions.h"
 
 
 class Charge : public BEHAVIOR { 
     public:
-        Charge(Controller *controller_, LOGGER *logger_, BATTERY *battery_);
+        Charge(Controller *controller_, LOGGER *logger_, BATTERY *battery_, OPERATIONALMODE *currentMode_);
         void start();
         int loop();
         int id();
@@ -18,6 +20,7 @@ class Charge : public BEHAVIOR {
         Controller *controller;
         LOGGER *logger;
         BATTERY *battery;
+        OPERATIONALMODE *currentMode;
 };
 
 #endif
