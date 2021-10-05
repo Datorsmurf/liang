@@ -31,14 +31,18 @@ int MOTOR::getLoad() {
 }
 
 bool MOTOR::isOverload() {
+  if(filteredLoad > LOAD_LIMIT_WHEEL) {
+    logger->log("Overload: " + String(filteredLoad));
+    return true;
+  };
   return false;
 }
 
 void MOTOR::doLoop() {
+  if (isAtTargetSpeed()) {
     currentLoadRead = analogRead(loadPin);
-    filteredLoad = filteredLoad 
-      - (filteredLoad / 10) 
-      + (currentLoadRead / 10);
+    filteredLoad = filteredLoad * (1-LOAD_FILTER) + currentLoadRead * LOAD_FILTER;
+  }
 }
 
 int MOTOR::setSpeed(int targetSpeed, int actionTime) {

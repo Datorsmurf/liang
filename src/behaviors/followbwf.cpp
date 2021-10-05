@@ -22,6 +22,7 @@ void FollowBWF::start() {
 int FollowBWF::loop() {
     if (controller->IsBumped() || controller->IsTilted()) {
         obsticleCount++;
+        lastObsticle = millis();
 
         if (obsticleCount > obsticleCountBeforeEvade) {
             return BEHAVIOR_GO_AROUND_OBSTICLE;
@@ -29,6 +30,10 @@ int FollowBWF::loop() {
 
         controller->StopMovement();
         controller->Move(-30);
+    }
+
+    if (hasTimeout(lastObsticle, 10000)) {
+        obsticleCount = 0;
     }
 
     return id();

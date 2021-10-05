@@ -36,7 +36,7 @@ function start()
 
     if (parts[0] === "l") {
       let el = $("#log")
-      el.append(`<p class='log-row'>${parts[1]}</p>`);
+      el.prepend(`<p class='log-row'>${parts[1]}</p>`);
       el[0].scrollTop = el[0].scrollHeight;
     } else {
       $(`#${parts[0]}`).text(parts[1]);

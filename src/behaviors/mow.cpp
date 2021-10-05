@@ -32,17 +32,54 @@ int Mow::loop() {
         return id();
     }
 
-    if(controller->IsLeftOutOfBounds()) {
-        controller->StopMovement();
-        t = millis();
-        while (controller->IsLeftOutOfBounds() || hasTimeout(t, 5000))
-        {
-            controller->RunAsync(FULL_SPEED, -FULL_SPEED, NORMAL_ACCELERATION_TIME);
-        }
-        controller->TurnAngle(90);
+    
+    if (controller->IsWheelOverload()) {
+        logger->log("Wheel overload");
+        controller->DoEvadeObsticle();
         return id();
     }
 
+    if(controller->IsLeftOutOfBounds()) {
+        logger->log("Left out");
+        controller->StopMovement();
+        t = millis();
+        while (true)
+        {
+            if (!controller->IsLeftOutOfBounds()) {
+                logger->log("Back inside!");
+                break;
+            }
+            if (hasTimeout(t, 5000)) {
+                logger->log("Giving up");
+                break;
+            }
+            controller->RunAsync(-FULL_SPEED, -FULL_SPEED, NORMAL_ACCELERATION_TIME);
+        }
+        controller->StopMovement();
+        controller->TurnAngle(120);
+        return id();
+    }
+
+    if(controller->IsRightOutOfBounds()) {
+        logger->log("Right out");
+        controller->StopMovement();
+        t = millis();
+        while (true)
+        {
+            if (!controller->IsRightOutOfBounds()) {
+                logger->log("Back inside!");
+                break;
+            }
+            if (hasTimeout(t, 5000)) {
+                logger->log("Giving up");
+                break;
+            }
+            controller->RunAsync(-FULL_SPEED, -FULL_SPEED, NORMAL_ACCELERATION_TIME);
+        }
+        controller->StopMovement();
+        controller->TurnAngle(-120);
+        return id();
+    }
 
     controller->RunCutterAsync();
     controller->RunAsync(FULL_SPEED, FULL_SPEED, NORMAL_ACCELERATION_TIME);

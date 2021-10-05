@@ -78,7 +78,6 @@ void Controller::StopCutter(){
 }
 
 bool Controller::IsBumped() {
-    return false;
     return bumper->IsBumped();
 }
 
