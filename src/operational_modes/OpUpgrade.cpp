@@ -9,7 +9,7 @@ OpModeUpgrade::OpModeUpgrade(Controller *controller_, LOGGER *logger_) {
     logger = logger_;
 }
 int OpModeUpgrade::start() {
-    logger->log("Enter update mode");
+    controller->SetError(ERROR_NOERROR);
     return BEHAVIOR_IDLE;
 }
 

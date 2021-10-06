@@ -11,6 +11,7 @@
 #define BEHAVIOR_CHARGE 5
 #define BEHAVIOR_LAUNCH 6
 #define BEHAVIOR_SENSOR_DEBUG 7
+#define BEHAVIOR_ERROR 8
 
 class BEHAVIOR { 
     public:

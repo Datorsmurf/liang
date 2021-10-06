@@ -39,7 +39,7 @@ typedef std::function<void(int percentDone)> UpdateEvent;
 #define AUX_MOTOR_SENSE_PIN 39
 
 
-#define LOAD_LIMIT_WHEEL 80
+#define LOAD_LIMIT_WHEEL 100
 #define LOAD_LIMIT_CUTTER 110
 #define LOAD_FILTER 0.01
 #define LOAD_LIMIT_AUX 200
@@ -71,6 +71,8 @@ typedef std::function<void(int percentDone)> UpdateEvent;
 #define ERROR_OUT 2
 #define ERROR_STUCK 3
 #define ERROR_BUMPER_STUCK 4
+#define ERROR_INVALID_OP_MODE 5
+#define ERROR_INVALID_BAHAVIOR 6
 
 #endif
 

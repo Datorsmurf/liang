@@ -13,6 +13,7 @@
 #include "operational_modes/OpModeMow.h"
 #include "operational_modes/OpModeMowOnce.h"
 #include "operational_modes/OpModeIdle.h"
+#include "operational_modes/OpModeError.h"
 #include "operational_modes/OpModeUpgrade.h"
 
 #include "behaviors/behavior.h"
@@ -20,6 +21,7 @@
 #include "behaviors/followbwf.h"
 #include "behaviors/goaround.h"
 #include "behaviors/idle.h"
+#include "behaviors/error.h"
 #include "behaviors/launch.h"
 #include "behaviors/lookforbwf.h"
 #include "behaviors/mow.h"
@@ -102,10 +104,12 @@ OpModeCharge opModeCharge(&controller, &logger, &battery);
 OpModeMow opModeMow(&controller, &logger, &battery);
 OpModeMowOnce opModeMowOnce(&controller, &logger, &battery);
 OpModeIdle opModeIdle(&controller, &logger);
+OpModeError opModeError(&controller, &logger);
 OpModeUpgrade opModeUpgrade(&controller, &logger);
 
 OPERATIONALMODE* availableOpModes[] = { 
   &opModeIdle,
+  &opModeError,
   &opModeMow,
   &opModeMowOnce,
   &opModeCharge,
@@ -118,6 +122,7 @@ Charge charge(&controller, &logger, &battery, currentMode);
 FollowBWF followBWF(&controller, &logger, &battery, &leftMotor, &rightMotor);
 GoAround goAround(&controller, &logger, &battery, &leftSensor, &rightSensor);
 Idle idle(&controller, &logger, &battery);
+Error error(&controller, &logger, &battery);
 SensorDebug sensorDebug(&controller, &logger, &battery, &leftSensor, &rightSensor);
 Launch launch(&controller, &logger, &battery);
 LookForBWF lookForBwf(&controller, &logger, &battery, *setManualMode, currentMode);
@@ -134,6 +139,7 @@ BEHAVIOR* availableBehaviors[] = {
   &lookForBwf,
   &mow,
   &sensorDebug,
+  &error,
 };
 
 
@@ -300,22 +306,18 @@ void loop() {
   //Handle
   uh.doLoop();
   webUi.doLoop();
-  if (manualMode >= 0) {
-    expectedMode = manualMode;
-    manualMode = -1;
-  }
 
   if (controller.IsFlipped()) {
     controller.SetError(ERROR_FLIPPED);
   }
 
-  if(controller.GetError() != ERROR_NOERROR) {
-    controller.StopCutter();
-    controller.StopMovement();
-    mowerModel.OpMode = "ERROR";
-    mowerModel.Behavior = String(controller.GetError());
-    return;
+  if (manualMode >= 0) {
+    expectedMode = manualMode;
+    manualMode = -1;
+  } else if(controller.GetError() != ERROR_NOERROR) {
+    expectedMode = OP_MODE_ERROR;
   }
+
 
   if (expectedMode != currentMode->id()) {
     int c = sizeof(availableOpModes) / sizeof(availableOpModes[0]);
@@ -325,15 +327,16 @@ void loop() {
       if (availableOpModes[i]->id() == expectedMode) {
         foundIt = true;
         currentMode = availableOpModes[i];
+        logger.log("Enter mode: " + currentMode->desc());
         mowerModel.OpMode = currentMode->desc();
         expectedBehavior = currentMode->start();
-        controller.SetError(ERROR_NOERROR);
         break;
       }
     }
 
     if (!foundIt) {
       logger.log("Could not locate OpMode with id:" + String(expectedMode));
+      controller.SetError(ERROR_INVALID_OP_MODE);
     }
   }
 
@@ -346,6 +349,7 @@ void loop() {
       if (availableBehaviors[i]->id() == expectedBehavior) {
         foundIt = true;
         currentBehavior = availableBehaviors[i];
+        logger.log("Enter behavior: " + currentBehavior->desc());
         mowerModel.Behavior = currentBehavior->desc();
         currentBehavior->start();
         break;
@@ -354,11 +358,10 @@ void loop() {
 
     if (!foundIt) {
       logger.log("Could not locate behavior with id:" + String(expectedBehavior));
+      controller.SetError(ERROR_INVALID_BAHAVIOR);
     }
   }
 
   expectedMode = currentMode->loop();
   expectedBehavior = currentBehavior->loop();
-
-  
 }

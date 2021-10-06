@@ -6,6 +6,7 @@
 #define OP_MODE_MOW 2
 #define OP_MODE_MOW_ONCE 3
 #define OP_MODE_UPGRADE 4
+#define OP_MODE_ERROR 5
 
 #include "behaviors/behavior.h"
 #include "Arduino.h"

@@ -8,6 +8,8 @@ OpModeCharge::OpModeCharge(Controller *controller_, LOGGER *logger_, BATTERY *ba
 int OpModeCharge::start() {
     logger->log("Start OpModeCharge");
     controller->StopCutter();
+    controller->SetError(ERROR_NOERROR);
+
 
     if (battery->isBeingCharged()) return BEHAVIOR_CHARGE;
 

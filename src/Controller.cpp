@@ -21,7 +21,7 @@ void Controller::TurnAngle(int degrees){
     while (abs(targetHeading - Heading()) > 3)
     {
         TurnAsync(degrees < 0);
-        if (hasTimeout(t, 5000)) {
+        if (hasTimeout(t, 2500)) {
             logger->log("TurnAngle " + String(degrees) + "timed out. Now at: " + String(Heading()));
             return;
         }

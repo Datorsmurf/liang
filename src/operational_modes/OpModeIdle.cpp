@@ -9,7 +9,7 @@ OpModeIdle::OpModeIdle(Controller *controller_, LOGGER *logger_) {
     logger = logger_;
 }
 int OpModeIdle::start() {
-    logger->log("Start OpModeIdle");
+    controller->SetError(ERROR_NOERROR);
     return BEHAVIOR_IDLE;
 }
 

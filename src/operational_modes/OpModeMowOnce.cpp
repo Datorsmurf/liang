@@ -12,6 +12,7 @@ OpModeMowOnce::OpModeMowOnce(Controller *controller_, LOGGER *logger_, BATTERY *
     battery = battery_;
 }
 int OpModeMowOnce::start() {
+    controller->SetError(ERROR_NOERROR);
     if (battery->isBeingCharged())  {
         return BEHAVIOR_LAUNCH;
     }
