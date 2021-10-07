@@ -26,6 +26,7 @@
 #include "behaviors/lookforbwf.h"
 #include "behaviors/mow.h"
 #include "behaviors/sensordebug.h"
+#include "behaviors/motordebug.h"
 
 #include "interaction/presenter.h"
 #include "logevent.h"
@@ -124,6 +125,7 @@ GoAround goAround(&controller, &logger, &battery, &leftSensor, &rightSensor);
 Idle idle(&controller, &logger, &battery);
 Error error(&controller, &logger, &battery, &mowerModel);
 SensorDebug sensorDebug(&controller, &logger, &battery, &leftSensor, &rightSensor);
+MotorDebug motorDebug(&controller, &logger, &battery, &leftSensor, &rightSensor);
 Launch launch(&controller, &logger, &battery);
 LookForBWF lookForBwf(&controller, &logger, &battery, *setManualMode, currentMode);
 Mow mow(&controller, &logger, &battery);
@@ -139,6 +141,7 @@ BEHAVIOR* availableBehaviors[] = {
   &lookForBwf,
   &mow,
   &sensorDebug,
+  &motorDebug,
   &error,
 };
 

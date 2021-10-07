@@ -23,15 +23,17 @@ void Controller::TurnAngle(int degrees){
         TurnAsync(degrees < 0);
         if (hasTimeout(t, 2500)) {
             logger->log("TurnAngle " + String(degrees) + "timed out. Now at: " + String(Heading()));
+            StopMovement();
             return;
         }
     }
     logger->log("TurnAngle " + String(degrees) + "ok. Now at: " + String(Heading()));
+    StopMovement();
 }
 
 void Controller::TurnAsync(bool isLeftTurn){
-    leftMotor->setSpeed(FULL_SPEED * (isLeftTurn ? -1 : 1) , NORMAL_ACCELERATION_TIME);
-    rightMotor->setSpeed(FULL_SPEED * (isLeftTurn ? 1 : -1), NORMAL_ACCELERATION_TIME);
+    leftMotor->setSpeed(FULL_SPEED * (isLeftTurn ? -1 : 1) , SHORT_ACCELERATION_TIME);
+    rightMotor->setSpeed(FULL_SPEED * (isLeftTurn ? 1 : -1), SHORT_ACCELERATION_TIME);
 }
 
 bool Controller::RunAsync(int leftSpeed, int rightSpeed, int actionTime){
@@ -70,7 +72,7 @@ void Controller::StopMovement(){
 }
 
 void Controller::RunCutterAsync(){
-    cutterMotor->setSpeed(CUTTER_SPEED, 7000);
+    cutterMotor->setSpeed(CUTTER_SPEED, 2000);
 }
 
 void Controller::StopCutter(){

@@ -22,7 +22,7 @@ void SensorDebug::start() {
 
 int SensorDebug::loop() {
     if (digitalRead(SWITCH_3_PIN) == LOW) {
-        return BEHAVIOR_IDLE;
+        return BEHAVIOR_MOTOR_DEBUG;
     }
 
 

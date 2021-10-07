@@ -40,7 +40,7 @@ class MOTOR {
 	  int ot_actionTime = 0;
     bool _atTargetSpeed;
 
-    const int freq = 4000;
+    const int freq = 1000;
     const int resolution = 8;
   LOGGER* logger;
 
