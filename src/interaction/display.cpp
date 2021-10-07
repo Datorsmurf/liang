@@ -41,7 +41,7 @@ void MOWERDISPLAY::PresentMowerModel(MowerModel* model, bool forceFullPresentati
   if (blocked) return;
 
   if (_cleared || (printedModel->OpMode.compareTo(model->OpMode) != 0) || (printedModel->Behavior.compareTo(model->Behavior) != 0)) {
-    print(printedModel->OpMode + "/" + model->Behavior, 0);
+    print(model->OpMode + "/" + model->Behavior, 0);
     printedModel->OpMode = model->OpMode;
     printedModel->Behavior = model->Behavior;
   } 

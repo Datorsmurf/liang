@@ -122,7 +122,7 @@ Charge charge(&controller, &logger, &battery, currentMode);
 FollowBWF followBWF(&controller, &logger, &battery, &leftMotor, &rightMotor);
 GoAround goAround(&controller, &logger, &battery, &leftSensor, &rightSensor);
 Idle idle(&controller, &logger, &battery);
-Error error(&controller, &logger, &battery);
+Error error(&controller, &logger, &battery, &mowerModel);
 SensorDebug sensorDebug(&controller, &logger, &battery, &leftSensor, &rightSensor);
 Launch launch(&controller, &logger, &battery);
 LookForBWF lookForBwf(&controller, &logger, &battery, *setManualMode, currentMode);
@@ -364,4 +364,5 @@ void loop() {
 
   expectedMode = currentMode->loop();
   expectedBehavior = currentBehavior->loop();
+  delay(0);
 }

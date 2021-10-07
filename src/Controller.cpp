@@ -40,7 +40,7 @@ bool Controller::RunAsync(int leftSpeed, int rightSpeed, int actionTime){
 
 void Controller::Move(int distanceInCm){
     logger->log("Move " + String(distanceInCm));
-    unsigned long moveEnd = millis() + abs(distanceInCm) * 100;
+    unsigned long moveEnd = millis() + abs(distanceInCm) * 30;
     if (distanceInCm > 0){
         while (moveEnd > millis())
         {
@@ -131,8 +131,8 @@ int Controller::Heading() {
 
 void Controller::SetError(int error_) {
     if (error == error_) return;
-    logger->log("ERROR: " + String(error));
     error = error_;
+    logger->log("ERROR: " + String(error));
 }
 
 int Controller::GetError() {

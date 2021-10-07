@@ -14,8 +14,6 @@ LookForBWF::LookForBWF(Controller *controller_, LOGGER *logger_, BATTERY *batter
 }
 
 void LookForBWF::start() {
-    logger->log("Start LookForBwf");
-
     controller->StopCutter();
 
     if (currentMode->id() == OP_MODE_MOW_ONCE){

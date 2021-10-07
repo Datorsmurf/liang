@@ -13,7 +13,6 @@ Charge::Charge(Controller *controller_, LOGGER *logger_, BATTERY *battery_, OPER
 }
 
 void Charge::start() {
-    logger->log("Start Charge");
     controller->StopMovement();
     controller->StopCutter();
 }

@@ -10,7 +10,7 @@
 
 class Error : public BEHAVIOR { 
     public:
-        Error(Controller *controller_, LOGGER *logger_, BATTERY *battery_);
+        Error(Controller *controller_, LOGGER *logger_, BATTERY *battery_, MowerModel *mowerModel_);
         void start();
         int loop();
         int id();
@@ -19,6 +19,9 @@ class Error : public BEHAVIOR {
         Controller *controller;
         LOGGER *logger;
         BATTERY *battery;
+        MowerModel *mowerModel;
+
+        String getErrorDesc(int error);
         unsigned long t = 0;
 };
 
