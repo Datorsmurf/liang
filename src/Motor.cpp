@@ -13,11 +13,11 @@ MOTOR::MOTOR(int loadPin_, int pwmpin_forward_, int pwmpin_backwards_, int forwa
 }
 
 void MOTOR::setup() {
-  pinMode(pwmpin_forward, OUTPUT_OPEN_DRAIN);
+  pinMode(pwmpin_forward, OUTPUT);
   ledcAttachPin(pwmpin_forward, forward_channelNo);
   ledcSetup(forward_channelNo, freq, resolution);
   if (pwmpin_backwards > 0) {
-    pinMode(pwmpin_backwards, OUTPUT_OPEN_DRAIN);
+    pinMode(pwmpin_backwards, OUTPUT);
     ledcAttachPin(pwmpin_backwards, backwards_channelNo);
     ledcSetup(backwards_channelNo, freq, resolution);
   }

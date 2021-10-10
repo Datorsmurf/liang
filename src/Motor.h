@@ -5,8 +5,6 @@
 #include <Logger.h>
 #include "definitions.h"
 
-#define MOTOR_LOAD_FILTER 10;
-
 class MOTOR {
   public:
     MOTOR(int loadPin_, int pwmpin_forward_, int pwmpin_backwards_, int forward_channelNo_, int backwards_channelNo_, int loadLimit_, LOGGER *logger_);
