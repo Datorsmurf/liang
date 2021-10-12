@@ -27,9 +27,8 @@ bool WEBUI::sendToClients(String prefix, String data, unsigned int minSilentTime
 
   auto search = preixSendTimes.find(prefix);
   if (!webSocketServer->availableForWriteAll()) {
-    Serial.println("Websocket not available for write all");
-    webSocketServer->pingAll();
-    webSocketServer->cleanupClients();
+    Serial.println("Websocket not available for write all, skipping message");
+    
     return false;
   }
   if ((search == preixSendTimes.end()) || hasTimeout(search->second, minSilentTime)) {
@@ -145,10 +144,10 @@ void WEBUI::SendLog(LogEvent *e) {
 void WEBUI::wsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len) {
 if(type == WS_EVT_CONNECT){
     Serial.printf("ws[%s][%u] connect\n", server->url(), client->id());
+    client->ping();
     logger->log("Hello client " + String(client->id()));
     //client->printf("Hello Client %u :)", client->id());
-    client->ping();
-    client->text("Catching up with the log.");
+    client->text("l;Catching up with the log.");
     
     std::vector<LogEvent> logHistory;
 
@@ -156,10 +155,10 @@ if(type == WS_EVT_CONNECT){
 
     for (size_t i = 0; i < logHistory.size(); i++) 
     {
-      client->printf("%lu %s", logHistory[i].millis, logHistory[i].msg.c_str());
+      client->printf("l;%lu %s", logHistory[i].millis, logHistory[i].msg.c_str());
     }
     
-    client->text("Done catching up with the log.");
+    client->text("l;Done catching up with the log.");
     forceFullPrint = true;
     
     //logger->sendLogHistory(client->id());

@@ -1,8 +1,6 @@
 body { background-color: #43aa59; font-family: Arial, Helvetica, Sans-Serif; Color: black; }
 
-.container {
-  height: 100%;
-}
+
 
 .navbutton {
   user-select: none;
@@ -10,18 +8,16 @@ body { background-color: #43aa59; font-family: Arial, Helvetica, Sans-Serif; Col
 .log {
   height: 100px;
   border: 2px solid black;
-  /*position: absolute;*/
   vertical-align: bottom;
   display: contents;
 }
 
 .log-content {
-  margin-top: 5px;
-  border: 2px solid black;
-  /*position: absolute;*/
-  vertical-align: bottom;
-  height: 800px;
-  overflow: scroll;
+  /* margin-top: 5px;
+  border: 2px solid black; */
+  /* vertical-align: bottom;
+  height: 800px; */
+  
 }
 
 .log-row {
@@ -29,11 +25,24 @@ body { background-color: #43aa59; font-family: Arial, Helvetica, Sans-Serif; Col
 }
 
 .mower-stats{
-
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
+.mode-select{
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+
+.stats-group{
+  margin-bottom: 5px;
+  margin-right: 10px;
+  min-width: 240px;
+
+}
 .single-stats{
-  display: block;
+  /* display: block; */
 }
 
 .stats-name{
@@ -41,5 +50,11 @@ body { background-color: #43aa59; font-family: Arial, Helvetica, Sans-Serif; Col
 }
 
 .stats-name::after{
-  content: ":";
+  content: ": ";
+}
+
+.btn {
+  margin: 3px 0px;
+  width: 100%;
+  overflow: hidden;
 }
