@@ -12,8 +12,11 @@ void GYRO::setup() {
     byte status = mpu->begin();
     if (status != 0) {
         logger->log("MPU ERROR");
-        ESP.restart();
+        //ESP.restart();
+        initOk = false;
     }
+
+    initOk = true;
 
   logger->log("Calculating offsets, do not move MPU6050");
   delay(2000);

@@ -24,6 +24,7 @@ class GYRO {
 
         unsigned long now = micros();
         float filteredY = 0;
+        bool initOk = false;
 };
 
 #endif
