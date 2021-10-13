@@ -62,14 +62,12 @@ function sendCommand(component, value) {
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
   <div class='container'> 
     <h1>Liang</h1>
-
-      <div class="row">
-        <div class="stats-group card col-md-3">
-          <div class="card-body">
-            <h5 class="card-title">Status</h5>
-            <div class="container_">
-              <div class="row">
-                <div class="col-5 single-stats">Mode</div><div class="col-7"><span class="stats-value" id="OpMode">-</span></div>
+<div class="row g-2">
+    <div class="col-12 col-md-4">
+      <div class="p-3 stats-group">
+	  <h5>Status</h5>
+	  <div class="row">
+               <div class="col-5 single-stats">Mode</div><div class="col-7"><span class="stats-value" id="OpMode">-</span></div>
               </div>
               <div class="row">
                 <div class="col-5 single-stats">State</div><div class="col-7"><span class="stats-value" id="Behavior">-</span></div>
@@ -95,16 +93,13 @@ function sendCommand(component, value) {
                     <button class='btn btn-info text-nowrap' type='button' onmousedown='sendCommand("mode","charge")'      ontouchstart='sendCommand("mode","charge")'>Charge</button>
                   </div>
                 </div>
-             
-            </div>
-          </div>
-        </div>
-
-        <div class="stats-group card col-md-3">
-          <div class="card-body">
-            <h5 class="card-title">Sensors</h5>
-            <div class="container_">
-              <div class="row">
+	  </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="p-3 stats-group">
+	  <h5>Sensors</h5>
+	  
+	  <div class="row">
                 <div class="col-8 single-stats">Battery</div><div class="col-4"><span class="stats-value" id="BatteryVoltage">-</span>V</div>
               </div>
               <div class="row">
@@ -122,15 +117,14 @@ function sendCommand(component, value) {
               <div class="row">
                 <div class="col-8 single-stats">BWF Right</div><div class="col-4"><span class="stats-value" id="RightSensor">-</span></div>
               </div>
-            </div>
-          </div>
-        </div>
-          <div class="stats-group card col-md-3">
-            <div class="card-body">
-              <h5 class="card-title">Motors</h5>
-              <div class="container_">
-                <div class="row">
-                  <div class="col-3 single-stats">&nbsp;</div><div class="col-5">Speed</div><div class="col-4">Load</div>
+	  </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="p-3 stats-group">
+	  
+	  <h5>Motors</h5>
+	  <div class="row">
+                  <div class="col-4 single-stats">&nbsp;</div><div class="col-4">Speed</div><div class="col-4">Load</div>
                 </div>
                 <div class="row">
                   <div class="col-4 single-stats">Left</div><div class="col-4"><span class="stats-value" id="LeftMotorSpeed">120</div><div class="col-4"><span class="stats-value" id="LeftMotorLoad">100</span></div>
@@ -141,21 +135,20 @@ function sendCommand(component, value) {
                 <div class="row">
                   <div class="col-4 single-stats">Cutter</div><div class="col-4"><span class="stats-value" id="CutterMotorSpeed">120</div><div class="col-4"><span class="stats-value" id="CutterMotorLoad">100</span></div>
                 </div>
-              </div>
-            </div>
-          </div>        
-        </div>
-        <div class="row">
-          <div class="stats-group card col-md-9">
-            <div class="card-body">
-              <h5 class="card-title">Log</h5>
+	  
+	  </div>
+    </div>
+    <div class="col-12">
+      <div class="p-3 stats-group">
+	  
+	          <h5 class="card-title">Log</h5>
               <div class='log-content' id='log'>
               </div>
-            </div>
-          </div>
-        </div>
-      
+	  </div>
     </div>
+  </div>
+
+     
 
 
 

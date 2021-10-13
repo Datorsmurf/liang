@@ -203,7 +203,7 @@ void pollPollables(void * parameter) {
     mowerModel.LeftSensorIsOutOfBounds = leftSensor.IsOutOfBounds();
     mowerModel.RightSensorIsOutOfBounds = rightSensor.IsOutOfBounds();
 
-    delay(2);
+    yield();
   }
 
 

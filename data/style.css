@@ -37,8 +37,11 @@ body { background-color: #43aa59; font-family: Arial, Helvetica, Sans-Serif; Col
 
 .stats-group{
   margin-bottom: 5px;
-  margin-right: 10px;
-  min-width: 240px;
+  /*margin-right: 10px;*/
+  /*min-width: 240px;*/
+    background-color: wheat;
+    border-radius: 2px;
+	height: 100%
 
 }
 .single-stats{
