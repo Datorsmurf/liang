@@ -9,6 +9,13 @@ WEBUI::WEBUI(AsyncWebServer* server_, AsyncWebSocket* webSocketServer_, ModeSele
     server = server_;
     modeSelectEvent = modeSelectEvent_;
     printedModel = new MowerModel();
+
+    clientsWaitingForLogDump = xQueueCreate( 10, sizeof( uint32_t ) );
+ 
+    if(clientsWaitingForLogDump == NULL){
+      Serial.println("Error creating the queue");
+    }
+ 
 }
 
 void WEBUI::SetLogger(LOGGER* logger_) {
@@ -136,6 +143,8 @@ void WEBUI::PresentMowerModel(MowerModel* model, bool forceFullPresentation) {
 		  printedModel->Behavior = model->Behavior;
 	  }
   }
+
+  
 }
 
 void WEBUI::SendLog(LogEvent *e) {
@@ -146,20 +155,12 @@ void WEBUI::wsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsE
 if(type == WS_EVT_CONNECT){
     Serial.printf("ws[%s][%u] connect\n", server->url(), client->id());
     client->ping();
-    logger->log("Hello client " + String(client->id()));
+    uint32_t clientId = client->id();
+    logger->log("Hello client " + String(clientId));
+    xQueueSend(clientsWaitingForLogDump, &clientId, portMAX_DELAY);
+    
     //client->printf("Hello Client %u :)", client->id());
-    // client->text("l;Catching up with the log.");
     
-    // std::vector<LogEvent> logHistory;
-
-    // logger->getLogHistory(&logHistory);
-
-    // for (size_t i = 0; i < logHistory.size(); i++) 
-    // {
-    //   client->printf("l;%lu %s", logHistory[i].millis, logHistory[i].msg.c_str());
-    // }
-    
-    // client->text("l;Done catching up with the log.");
     forceFullPrint = true;
     
     //logger->sendLogHistory(client->id());
@@ -256,5 +257,27 @@ void WEBUI::setup() {
 }
 void WEBUI::doLoop() {
 
-  //webSocketServer->cleanupClients();
+//webSocketServer->cleanupClients();
+
+  uint32_t clientId;
+  while (xQueueReceive(clientsWaitingForLogDump, &clientId, 0))
+  {
+    
+    webSocketServer->text(clientId, "l;Catching up with the log.");
+
+    // std::vector<LogEvent> logHistory;
+
+    // logger->getLogHistory(&logHistory);
+
+    // for (size_t i = 0; i < logHistory.size()-1; i++) 
+    // {
+    //   unsigned long millis = logHistory[i].millis;
+    //   auto msg = logHistory[i].msg.c_str();
+    //   Serial.printf("%i l;%lu %s\n", clientId, millis, msg);
+    //   webSocketServer->printf(clientId, "l;%lu\n", millis);
+    //   yield();
+    // }
+
+    webSocketServer->text(clientId, "l;Done catching up with the log.");
+  }
 }

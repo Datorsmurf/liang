@@ -33,6 +33,7 @@ class WEBUI : public PRESENTER {
         MowerModel *printedModel;
         std::map<String, unsigned long> preixSendTimes = std::map<String, unsigned long>();
         bool forceFullPrint = true;
+        QueueHandle_t  clientsWaitingForLogDump;
 
         LOGGER* logger;
 };
