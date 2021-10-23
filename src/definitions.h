@@ -14,7 +14,9 @@ typedef std::function<void(int percentDone)> UpdateEvent;
 #define SWITCH_3_PIN 13
 #define SWITCH_BOOT_PIN 0
 
+#ifndef BOARD_VERSION
 #define BOARD_VERSION 11
+#endif
 
 #if BOARD_VERSION == 10
     #define LEFT_MOTOR_FORWARD_PWM_PIN 27
