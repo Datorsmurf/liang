@@ -4,10 +4,11 @@
 
 #include <Logger.h>
 #include "definitions.h"
+#include "utils.h"
 
 class MOTOR {
   public:
-    MOTOR(int loadPin_, int pwmpin_forward_, int pwmpin_backwards_, int forward_channelNo_, int backwards_channelNo_, int loadLimit_, LOGGER *logger_);
+    MOTOR(int loadPin_, int pwmpin_forward_, int pwmpin_backwards_, int forward_channelNo_, int backwards_channelNo_, int loadLimit_, int ignoreStartLoadsFor_, LOGGER *logger_);
 
 	  int setSpeed(int speed, int actionTime);
     int getSpeed();
@@ -21,15 +22,18 @@ class MOTOR {
     bool isAtTargetSpeed();
 
   private:
+
+    void setAtTargetSpeed(bool value);
     int loadPin;
     int pwmpin_forward;
     int pwmpin_backwards;
     int speed;
-  int forward_channelNo;
-  int backwards_channelNo;
+    int forward_channelNo;
+    int backwards_channelNo;
     int filteredLoad = 0;
     int currentLoadRead = 0;
     int loadLimit;
+    int ignoreStartLoadsFor;
 
     unsigned long ot_setTime = 0;
 	  int ot_currentTargetValue = -1;
@@ -37,10 +41,11 @@ class MOTOR {
 	  int ot_currentValue = -2;
 	  int ot_actionTime = 0;
     bool _atTargetSpeed;
+    unsigned long _atTargetSpeedSince = 0;
 
     const int freq = 1000;
     const int resolution = 8;
-  LOGGER* logger;
+    LOGGER* logger;
 
 };
 

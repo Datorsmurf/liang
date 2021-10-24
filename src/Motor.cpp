@@ -2,7 +2,7 @@
 
 
 
-MOTOR::MOTOR(int loadPin_, int pwmpin_forward_, int pwmpin_backwards_, int forward_channelNo_, int backwards_channelNo_, int loadLimit_, LOGGER *logger_) {
+MOTOR::MOTOR(int loadPin_, int pwmpin_forward_, int pwmpin_backwards_, int forward_channelNo_, int backwards_channelNo_, int loadLimit_, int ignoreStartLoadsFor_, LOGGER *logger_) {
   loadPin = loadPin_;
   pwmpin_forward = pwmpin_forward_;
   pwmpin_backwards = pwmpin_backwards_;
@@ -10,6 +10,7 @@ MOTOR::MOTOR(int loadPin_, int pwmpin_forward_, int pwmpin_backwards_, int forwa
   backwards_channelNo = backwards_channelNo_;
   loadLimit = loadLimit_;
   logger = logger_;
+  ignoreStartLoadsFor = ignoreStartLoadsFor_;
 }
 
 void MOTOR::setup() {
@@ -32,14 +33,14 @@ int MOTOR::getLoad() {
 
 bool MOTOR::isOverload() {
   if(filteredLoad > LOAD_LIMIT_WHEEL) {
-    logger->log("Overload: " + String(filteredLoad));
+    logger->log("Overload: " + String(filteredLoad) + " atTargetSince " + String(_atTargetSpeedSince));
     return true;
   };
   return false;
 }
 
 void MOTOR::doLoop() {
-  if (isAtTargetSpeed()) {
+  if (isAtTargetSpeed() && hasTimeout(_atTargetSpeedSince, ignoreStartLoadsFor)) {
     currentLoadRead = analogRead(loadPin);
     filteredLoad = filteredLoad * (1-LOAD_FILTER) + currentLoadRead * LOAD_FILTER;
   }
@@ -59,7 +60,7 @@ int MOTOR::setSpeed(int targetSpeed, int actionTime) {
 	if (ot_currentTargetValue == ot_currentValue) {
       //Serial.print("Speed is already set: ");
       //Serial.print(targetSpeed);
-      _atTargetSpeed = true;
+      setAtTargetSpeed(true);
       return 0;
     }
     else {
@@ -96,18 +97,24 @@ int MOTOR::setSpeed(int targetSpeed, int actionTime) {
       }
       
       ot_currentValue = newValue;
-      _atTargetSpeed = ot_currentTargetValue == ot_currentValue;
-      // if (_atTargetSpeed){
-      //   logger->log(logName + String(newValue) + "T" + String(ot_currentTargetValue), true);
-      // }      
-
+      setAtTargetSpeed(ot_currentTargetValue == ot_currentValue);
     }
 
-    bool r = ot_currentTargetValue - ot_currentValue;
-    _atTargetSpeed = r == 0;
-    return r;
+    int diff = ot_currentTargetValue - ot_currentValue;
+    setAtTargetSpeed(diff == 0);
+
+    return diff;
 }
 
+void MOTOR::setAtTargetSpeed(bool value) {
+    if (value && !_atTargetSpeed) {
+        _atTargetSpeedSince = millis();
+    }
+
+    _atTargetSpeed = value;
+  
+
+}
 bool MOTOR::isAtTargetSpeed() {
   return _atTargetSpeed;;
 }

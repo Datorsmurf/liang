@@ -23,13 +23,8 @@ int Idle::loop() {
         return BEHAVIOR_SENSOR_DEBUG;
     }
     
-    if (hasTimeout(t, 5000)) {
-        controller->StopCutter();
-    }
-     else {
-        controller->RunCutterAsync();
-    }
-
+    controller->StopCutter();
+    controller->StopMovement();
 
     return id();
 }

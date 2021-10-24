@@ -54,7 +54,7 @@ typedef std::function<void(int percentDone)> UpdateEvent;
 #define AUX_MOTOR_PWM_CHANNEL_BACKWARDS 6
 #define AUX_MOTOR_SENSE_PIN 39
 
-
+#define LOAD_START_IGNORE_TIME 300
 #define LOAD_LIMIT_WHEEL 110
 #define LOAD_LIMIT_CUTTER 110
 #define LOAD_FILTER 0.01
@@ -72,7 +72,7 @@ typedef std::function<void(int percentDone)> UpdateEvent;
 #define NORMAL_ACCELERATION_TIME 400
 #define SHORT_ACCELERATION_TIME 100
 
-#define CUTTER_SPEED 150
+#define CUTTER_SPEED 255
 
 #define TILT_ANGLE 40;
 #define FLIP_ANGLE 80;
