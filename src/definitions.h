@@ -90,5 +90,8 @@ typedef std::function<void(int percentDone)> UpdateEvent;
 #define ERROR_INVALID_OP_MODE 5
 #define ERROR_INVALID_BAHAVIOR 6
 
+#define LOG_BUFFER_SIZE 63
+
+
 #endif
 

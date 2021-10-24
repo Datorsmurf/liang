@@ -6,9 +6,8 @@
 #include "interaction/presenter.h"
 #include <stdio.h>
 #include <vector>
+#include "definitions.h"
 
-
-#define LOG_BUFFER_SIZE 63
 #define LOG_MSG_MAX_LENGTH 64
 
 class LOGGER { 
