@@ -1,21 +1,10 @@
-#include "SPIFFS.h"
 #include "webui.h"
-#include "Logger.h"
-#include "operational_modes/operationalmode.h"
-#include <vector>
 
 WEBUI::WEBUI(AsyncWebServer* server_, AsyncWebSocket* webSocketServer_, ModeSelectEvent modeSelectEvent_){
     webSocketServer = webSocketServer_;
     server = server_;
     modeSelectEvent = modeSelectEvent_;
     printedModel = new MowerModel();
-
-    clientsWaitingForLogDump = xQueueCreate( 10, sizeof( uint32_t ) );
- 
-    if(clientsWaitingForLogDump == NULL){
-      Serial.println("Error creating the queue");
-    }
- 
 }
 
 void WEBUI::SetLogger(LOGGER* logger_) {
@@ -27,137 +16,149 @@ bool WEBUI::sendToClients(String prefix, int data, unsigned int minSilentTime) {
   return sendToClients(prefix, String(data), minSilentTime);
 }
 
-bool WEBUI::sendToClients(String prefix, String data, unsigned int minSilentTime) {
-  if (!WiFi.isConnected()) return false;
+bool WEBUI::hasPrefixSilentTimePassed(String prefix, String data, unsigned int minSilentTime) {
 
-  //Serial.printf("%s, %s, %d", prefix.c_str(), data.c_str(), minSilentTime);
-
-  auto search = preixSendTimes.find(prefix);
-  if (!webSocketServer->availableForWriteAll()) {
-    Serial.println("Websocket not available for write all, skipping message");
-    
-    return true;
-  }
-  if ((search == preixSendTimes.end()) || hasTimeout(search->second, minSilentTime)) {
-    //Serial.printf("Sendall: %s;%s\n", prefix.c_str(), data.c_str());
-    webSocketServer->printfAll("%s;%s", prefix.c_str(), data.c_str());
-    
-    preixSendTimes[prefix] = millis();
-    return true;
+  auto search = prefixSendTimes.find(prefix);
+  if ((search == prefixSendTimes.end()) || hasTimeout(search->second, minSilentTime)) {
+    prefixSendTimes[prefix] = millis();
+       return true;
   } 
   return false;
 }
 
 void WEBUI::PresentMowerModel(MowerModel* model, bool forceFullPresentation) {
   webSocketServer->cleanupClients();
+  if (webSocketServer->count() == 0) {
+    //Serial.println("No client. Skipping presentation");
+    return;
+  }
+
+  DynamicJsonDocument doc(1024);
 
   forceFullPresentation = forceFullPresentation || forceFullPrint;
   forceFullPrint = false;
 
+  bool sendThrottledData = forceFullPresentation;
+
+  if (forceFullPresentation || hasTimeout(sendTimeForThrottledData, dataThrottleTime)) {
+    sendTimeForThrottledData = millis();
+    sendThrottledData = true;
+  }
+
   if (forceFullPresentation || printedModel->CurrentOpModeId != model->CurrentOpModeId) {
-    if(sendToClients("CurrentOpModeId", model->CurrentOpModeId)) {
-		  printedModel->CurrentOpModeId = model->CurrentOpModeId;
-	  }
+    doc["CurrentOpModeId"] =  model->CurrentOpModeId;
+		printedModel->CurrentOpModeId = model->CurrentOpModeId;
   }
 
-  if (forceFullPresentation ||round(printedModel->Tilt) != round(model->Tilt)) {
-    if(sendToClients("Tilt", String(model->Tilt, 0))) {
-		  printedModel->Tilt = model->Tilt;
-	  }
+  if (sendThrottledData && forceFullPresentation ||round(printedModel->Tilt) != round(model->Tilt)) {
+    doc["Tilt"] = String(model->Tilt, 0);
+		printedModel->Tilt = model->Tilt;
   }
 
-  if (forceFullPresentation ||round(printedModel->Heading) != round(model->Heading)) {
-    if(sendToClients("Heading", String(model->Heading, 0))) {
-		  printedModel->Heading = model->Heading;
-	  }
+  if (sendThrottledData && round(printedModel->Heading) != round(model->Heading)) {
+    doc["Heading"] = String(model->Heading, 0);
+		printedModel->Heading = model->Heading;
   }
 
-  if (forceFullPresentation ||printedModel->LeftMotorSpeed != model->LeftMotorSpeed) {
-    if(sendToClients("LeftMotorSpeed", model->LeftMotorSpeed, 100)) {
-		  printedModel->LeftMotorSpeed = model->LeftMotorSpeed;
-	  }
+  if (sendThrottledData && printedModel->LeftMotorSpeed != model->LeftMotorSpeed) {
+    doc["LeftMotorSpeed"] = model->LeftMotorSpeed;
+		printedModel->LeftMotorSpeed = model->LeftMotorSpeed;
   }
 
-  if (forceFullPresentation ||printedModel->LeftMotorLoad != model->LeftMotorLoad) {
-    if(sendToClients("LeftMotorLoad", model->LeftMotorLoad)) {
-		  printedModel->LeftMotorLoad = model->LeftMotorLoad;
-	  }
+  if (sendThrottledData &&printedModel->LeftMotorLoad != model->LeftMotorLoad) {
+    doc["LeftMotorLoad"] = model->LeftMotorLoad;
+		printedModel->LeftMotorLoad = model->LeftMotorLoad;	  
   }
   
-  if (forceFullPresentation ||printedModel->RightMotorSpeed != model->RightMotorSpeed) {
-    if(sendToClients("RightMotorSpeed", model->RightMotorSpeed, 100)) {
-		  printedModel->RightMotorSpeed = model->RightMotorSpeed;
-	  }
+  if (sendThrottledData &&printedModel->RightMotorSpeed != model->RightMotorSpeed) {
+    doc["RightMotorSpeed"] = model->RightMotorSpeed;
+		printedModel->RightMotorSpeed = model->RightMotorSpeed;	  
   }
   
-  if (forceFullPresentation ||printedModel->RightMotorLoad != model->RightMotorLoad) {
-    if(sendToClients("RightMotorLoad", model->RightMotorLoad)) {
-		  printedModel->RightMotorLoad = model->RightMotorLoad;
-	  }
+  if (sendThrottledData && printedModel->RightMotorLoad != model->RightMotorLoad) {
+    doc["RightMotorLoad"] = model->RightMotorLoad;
+		printedModel->RightMotorLoad = model->RightMotorLoad;	  
   }
 
-  if (forceFullPresentation ||printedModel->CutterMotorSpeed != model->CutterMotorSpeed) {
-    if(sendToClients("CutterMotorSpeed", model->CutterMotorSpeed, 100)) {
-		  printedModel->CutterMotorSpeed = model->CutterMotorSpeed;
-	  }
+  if (sendThrottledData && printedModel->CutterMotorSpeed != model->CutterMotorSpeed) {
+    doc["CutterMotorSpeed"] = model->CutterMotorSpeed;
+		printedModel->CutterMotorSpeed = model->CutterMotorSpeed;	  
   }
   
-  if (forceFullPresentation ||printedModel->CutterMotorLoad != model->CutterMotorLoad) {
-    if(sendToClients("CutterMotorLoad", model->CutterMotorLoad)) {
-		  printedModel->CutterMotorLoad = model->CutterMotorLoad;
-	  }
+  if (sendThrottledData && printedModel->CutterMotorLoad != model->CutterMotorLoad) {
+    doc["CutterMotorLoad"] = model->CutterMotorLoad;
+		printedModel->CutterMotorLoad = model->CutterMotorLoad;	  
   }
 
-  if (forceFullPresentation ||round(printedModel->BatteryVoltage * 100) != round(model->BatteryVoltage * 100)) {
-    if(sendToClients("BatteryVoltage", String(model->BatteryVoltage, 2))) {
-		  printedModel->BatteryVoltage = model->BatteryVoltage;
-	  }
+  if (sendThrottledData && round(printedModel->BatteryVoltage * 100) != round(model->BatteryVoltage * 100)) {
+    doc["BatteryVoltage"]  = String(model->BatteryVoltage, 2);
+		printedModel->BatteryVoltage = model->BatteryVoltage;	  
   }
 
-  if (forceFullPresentation ||printedModel->IsDocked != model->IsDocked) {
-    if(sendToClients("IsDocked", model->IsDocked ? "Y" : "N")) {
-		  printedModel->IsDocked = model->IsDocked;
-	  }
+  if (forceFullPresentation || printedModel->IsDocked != model->IsDocked) {
+    doc["IsDocked"] = model->IsDocked ? "Y" : "N";
+		printedModel->IsDocked = model->IsDocked;	  
   }
 
-  if (forceFullPresentation ||printedModel->LeftSensorIsOutOfBounds != model->LeftSensorIsOutOfBounds) {
-    if(sendToClients("LeftSensor", model->LeftSensorIsOutOfBounds ? "OUT" : "IN", 100)) {
-		  printedModel->LeftSensorIsOutOfBounds = model->LeftSensorIsOutOfBounds;
-	  }
+  if (forceFullPresentation || printedModel->LeftSensorIsOutOfBounds != model->LeftSensorIsOutOfBounds) {
+    doc["LeftSensor"] = model->LeftSensorIsOutOfBounds ? "OUT" : "IN";
+		printedModel->LeftSensorIsOutOfBounds = model->LeftSensorIsOutOfBounds;
   }
 
-  if (forceFullPresentation ||printedModel->RightSensorIsOutOfBounds != model->RightSensorIsOutOfBounds) {
-    if(sendToClients("RightSensor", model->RightSensorIsOutOfBounds ? "OUT" : "IN", 100)) {
-		  printedModel->RightSensorIsOutOfBounds = model->RightSensorIsOutOfBounds;
-	  }
+  if (forceFullPresentation || printedModel->RightSensorIsOutOfBounds != model->RightSensorIsOutOfBounds) {
+    doc["RightSensor"] = model->RightSensorIsOutOfBounds ? "OUT" : "IN";
+		printedModel->RightSensorIsOutOfBounds = model->RightSensorIsOutOfBounds;	  
   }
 
-  if (forceFullPresentation ||printedModel->OpMode.compareTo(model->OpMode) != 0) {
-    if(sendToClients("OpMode", model->OpMode)) {
-		  printedModel->OpMode = model->OpMode;
-	  }
+  if (forceFullPresentation || printedModel->OpMode.compareTo(model->OpMode) != 0) {
+    doc["OpMode"] = model->OpMode;
+		printedModel->OpMode = model->OpMode;	  
   }
 
-  if (forceFullPresentation ||printedModel->Behavior.compareTo(model->Behavior) != 0) {
-    if(sendToClients("Behavior", model->Behavior)) {
-		  printedModel->Behavior = model->Behavior;
-	  }
+  if (forceFullPresentation || printedModel->Behavior.compareTo(model->Behavior) != 0) {
+    doc["Behavior"] = model->Behavior;
+		printedModel->Behavior = model->Behavior;
   }
 
+  if (doc.size() == 0) return;
+
+  char buffer[1024];
+  size_t len = serializeJsonPretty(doc, buffer);
   
+  webSocketServer->textAll(buffer, len);
 }
 
 void WEBUI::SendLog(LogEvent *e) {
-  webSocketServer->printfAll("l;%lu %s", e->millis, e->msg.c_str());
+  //enqueueMessage(0, "l;" + String(e->millis) + " " + e->msg);
 }
 
 void WEBUI::wsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len) {
 if(type == WS_EVT_CONNECT){
     Serial.printf("ws[%s][%u] connect\n", server->url(), client->id());
-    client->ping();
+    //client->ping();
     uint32_t clientId = client->id();
     logger->log("Hello client " + String(clientId));
-    xQueueSend(clientsWaitingForLogDump, &clientId, portMAX_DELAY);
+
+
+    // std::vector<LogEvent> logHistory;
+
+    // logger->getLogHistory(&logHistory);
+    // Serial.println("Connect 2. Size: " + String(logHistory.size()));
+    // for (size_t i = 0; i < logHistory.size()-1; i++) 
+    // {
+    //   Serial.println("Connect i: " + String(i));
+
+    //   PendingMessage pm;
+    //   pm.clientId = clientId;
+    //   String msg = "l;" + String(logHistory[i].millis) + " " + logHistory[i].msg;
+    //   pm.msg = &msg;
+    //   Serial.println("Connect 3");
+    //   xQueueSend(pendingMessages, &pm, 0);
+    //   Serial.println("Connect 4");
+      
+    // }
+
+    //xQueueSend(pendingMessages, &clientId, portMAX_DELAY);
     
     //client->printf("Hello Client %u :)", client->id());
     
@@ -259,25 +260,48 @@ void WEBUI::doLoop() {
 
 //webSocketServer->cleanupClients();
 
-  uint32_t clientId;
-  while (xQueueReceive(clientsWaitingForLogDump, &clientId, 0))
-  {
-    
-    webSocketServer->text(clientId, "l;Catching up with the log.");
 
-    // std::vector<LogEvent> logHistory;
 
-    // logger->getLogHistory(&logHistory);
+  // PendingMessage pendingPeek;
+  // Serial.println("0");
+  // if (xQueuePeek(pendingMessages, &pendingPeek, 0)) {
+  //   Serial.println("10");
+  //   if (pendingPeek.clientId == 0) {
+  //     Serial.println("15");
+  //     PendingMessage pending;
+  //     if (webSocketServer->availableForWriteAll() && xQueueReceive(pendingMessages, &pending, 0))
+  //     {
+  //           Serial.println("16");
+  //           Serial.println(String(pending.clientId));
+  //             Serial.println("17");
+  //             if (pending.msg == nullptr) {
+  //               Serial.println("Null msg pointer");
 
-    // for (size_t i = 0; i < logHistory.size()-1; i++) 
-    // {
-    //   unsigned long millis = logHistory[i].millis;
-    //   auto msg = logHistory[i].msg.c_str();
-    //   Serial.printf("%i l;%lu %s\n", clientId, millis, msg);
-    //   webSocketServer->printf(clientId, "l;%lu\n", millis);
-    //   yield();
-    // }
+  //             } else {
+  //               Serial.println("Not null msg pointer");
+  //               Serial.printf("%p", pending.msg);
+  //               Serial.println("Apa");
+  //             }
 
-    webSocketServer->text(clientId, "l;Done catching up with the log.");
-  }
+  //         String s = *pending.msg;
+  //         Serial.println(s);
+  //         webSocketServer->textAll(s);
+  //             Serial.println("19");
+  //     }
+
+  //   } else {
+  //     PendingMessage pending;
+  //         Serial.println("20");
+
+  //     if (webSocketServer->availableForWrite(pendingPeek.clientId) && xQueueReceive(pendingMessages, &pending, 0))
+  //     {
+  //         webSocketServer->text(pending.clientId, *pending.msg);
+  //     }
+
+  //   }
+
+  //     //webSocketServer->text(clientId, "l;Done catching up with the log.");
+
+  
+  
 }

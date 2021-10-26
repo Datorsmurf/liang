@@ -30,16 +30,20 @@ function start()
     websock.close();
   };  
   websock.onmessage = function(evt) {
+    let d = JSON.parse(evt.data)
 
-    let parts = evt.data.split(";");
-
-    if (parts[0] === "l") {
-      let el = $("#log")
-      el.prepend(`<p class='log-row'>${parts[1]}</p>`);
-      el[0].scrollTop = el[0].scrollHeight;
-    } else {
-      $(`#${parts[0]}`).text(parts[1]);
+    for (const [key, value] of Object.entries(d)) {
+      $(`#${key}`).text(value);
     }
+
+
+    // if (parts[0] === "l") {
+    //   let el = $("#log")
+    //   el.prepend(`<p class='log-row'>${parts[1]}</p>`);
+    //   el[0].scrollTop = el[0].scrollHeight;
+    // } else {
+    //   $(`#${parts[0]}`).text(parts[1]);
+    // }
   };
 }
 function buttonclick(e)
