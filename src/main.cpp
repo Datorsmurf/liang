@@ -243,6 +243,7 @@ void setup() {
   }
   mowerModel.Behavior = "SPIFFS";
   if(!SPIFFS.begin()){
+    logger.log("SPIFFS failed! Rebooting...");
     delay(5000);
     ESP.restart();
   }
@@ -252,7 +253,7 @@ void setup() {
   WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASS);
   while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    logger.log("Connection Failed! Rebooting...");
+    logger.log("Wifi connect failed! Rebooting...");
     delay(5000);
     ESP.restart();
   }

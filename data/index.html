@@ -55,9 +55,13 @@ function sendCommand(component, value) {
   /*if (!websock) {
     start();
   }*/
-  let msg = `${component}_${value}`;
-  console.log(msg);
-  websock.send(msg);
+  let msg = {};
+  msg.component = component;
+  msg.value = value;
+
+  let s = JSON.stringify(msg);
+  console.log(s);
+  websock.send(s);
 }
 
 </script>

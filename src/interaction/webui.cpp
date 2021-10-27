@@ -28,6 +28,7 @@ bool WEBUI::hasPrefixSilentTimePassed(String prefix, String data, unsigned int m
 
 void WEBUI::PresentMowerModel(MowerModel* model, bool forceFullPresentation) {
   webSocketServer->cleanupClients();
+
   if (webSocketServer->count() == 0) {
     //Serial.println("No client. Skipping presentation");
     return;
@@ -50,47 +51,47 @@ void WEBUI::PresentMowerModel(MowerModel* model, bool forceFullPresentation) {
 		printedModel->CurrentOpModeId = model->CurrentOpModeId;
   }
 
-  if (sendThrottledData && forceFullPresentation ||round(printedModel->Tilt) != round(model->Tilt)) {
+  if (forceFullPresentation || (sendThrottledData && forceFullPresentation ||round(printedModel->Tilt) != round(model->Tilt))) {
     doc["Tilt"] = String(model->Tilt, 0);
 		printedModel->Tilt = model->Tilt;
   }
 
-  if (sendThrottledData && round(printedModel->Heading) != round(model->Heading)) {
+  if (forceFullPresentation || (sendThrottledData && round(printedModel->Heading) != round(model->Heading))) {
     doc["Heading"] = String(model->Heading, 0);
 		printedModel->Heading = model->Heading;
   }
 
-  if (sendThrottledData && printedModel->LeftMotorSpeed != model->LeftMotorSpeed) {
+  if (forceFullPresentation || printedModel->LeftMotorSpeed != model->LeftMotorSpeed) {
     doc["LeftMotorSpeed"] = model->LeftMotorSpeed;
 		printedModel->LeftMotorSpeed = model->LeftMotorSpeed;
   }
 
-  if (sendThrottledData &&printedModel->LeftMotorLoad != model->LeftMotorLoad) {
+  if (forceFullPresentation || (sendThrottledData && printedModel->LeftMotorLoad != model->LeftMotorLoad)) {
     doc["LeftMotorLoad"] = model->LeftMotorLoad;
 		printedModel->LeftMotorLoad = model->LeftMotorLoad;	  
   }
   
-  if (sendThrottledData &&printedModel->RightMotorSpeed != model->RightMotorSpeed) {
+  if (forceFullPresentation || printedModel->RightMotorSpeed != model->RightMotorSpeed) {
     doc["RightMotorSpeed"] = model->RightMotorSpeed;
 		printedModel->RightMotorSpeed = model->RightMotorSpeed;	  
   }
   
-  if (sendThrottledData && printedModel->RightMotorLoad != model->RightMotorLoad) {
+  if (forceFullPresentation || (sendThrottledData && printedModel->RightMotorLoad != model->RightMotorLoad)) {
     doc["RightMotorLoad"] = model->RightMotorLoad;
 		printedModel->RightMotorLoad = model->RightMotorLoad;	  
   }
 
-  if (sendThrottledData && printedModel->CutterMotorSpeed != model->CutterMotorSpeed) {
+  if (forceFullPresentation || printedModel->CutterMotorSpeed != model->CutterMotorSpeed) {
     doc["CutterMotorSpeed"] = model->CutterMotorSpeed;
 		printedModel->CutterMotorSpeed = model->CutterMotorSpeed;	  
   }
   
-  if (sendThrottledData && printedModel->CutterMotorLoad != model->CutterMotorLoad) {
+  if (forceFullPresentation || (sendThrottledData && printedModel->CutterMotorLoad != model->CutterMotorLoad)) {
     doc["CutterMotorLoad"] = model->CutterMotorLoad;
 		printedModel->CutterMotorLoad = model->CutterMotorLoad;	  
   }
 
-  if (sendThrottledData && round(printedModel->BatteryVoltage * 100) != round(model->BatteryVoltage * 100)) {
+  if (forceFullPresentation || (sendThrottledData && round(printedModel->BatteryVoltage * 100) != round(model->BatteryVoltage * 100))) {
     doc["BatteryVoltage"]  = String(model->BatteryVoltage, 2);
 		printedModel->BatteryVoltage = model->BatteryVoltage;	  
   }
@@ -193,16 +194,17 @@ if(type == WS_EVT_CONNECT){
       
 
       if(info->opcode == WS_TEXT) {
-        if (msg.indexOf("mode_") == 0 ) {
-          if (msg.indexOf("_idle") > 0) {
-            modeSelectEvent(OP_MODE_IDLE);
-          } else if (msg.indexOf("_mow") > 0) {
-            modeSelectEvent(OP_MODE_MOW);
-          } else if (msg.indexOf("_once") > 0) {
-            modeSelectEvent(OP_MODE_MOW_ONCE);
-          } else if (msg.indexOf("_charge") > 0) {
-            modeSelectEvent(OP_MODE_CHARGE);
-          } 
+        DynamicJsonDocument doc(100);
+        deserializeJson(doc, msg);
+
+        if(doc["component"] == "mode" && doc["value"] == "idle") {
+          modeSelectEvent(OP_MODE_IDLE);
+        } else if(doc["component"] == "mode" && doc["value"] == "mow") {
+          modeSelectEvent(OP_MODE_MOW);
+        } else if(doc["component"] == "mode" && doc["value"] == "once") {
+          modeSelectEvent(OP_MODE_MOW_ONCE);
+        } else if(doc["component"] == "mode" && doc["value"] == "charge") {
+          modeSelectEvent(OP_MODE_CHARGE);
         }
       }
       else
