@@ -32,8 +32,17 @@ function start()
   websock.onmessage = function(evt) {
     let d = JSON.parse(evt.data)
 
-    for (const [key, value] of Object.entries(d)) {
-      $(`#${key}`).text(value);
+    if (d.type === "model") {
+      for (const [key, value] of Object.entries(d)) {
+        $(`#${key}`).text(value);
+      }
+    }
+
+    if (d.type === "log") {
+       let el = $("#log")
+       el.prepend(`<div class='log-row'><div class='log-time'>${d.time}</div> <div class='log-msg'>${d.msg}</div></div>`);
+       el[0].scrollTop = el[0].scrollHeight;
+
     }
 
 
@@ -49,6 +58,21 @@ function start()
 function buttonclick(e)
 {
   websock.send(e.id);
+}
+
+var isLogHidden = true;
+
+function toggleLog() {
+
+  $("#log").toggleClass("log-hidden")
+  if (isLogHidden) {
+    sendCommand("log", "start")
+  } else {
+    sendCommand("log", "stop");
+    $("#log").empty();
+  }
+
+  isLogHidden = !isLogHidden;
 }
 
 function sendCommand(component, value) {
@@ -149,8 +173,9 @@ function sendCommand(component, value) {
     <div class="col-12">
       <div class="px-3 py-2  stats-group">
 	  
-	          <h5 class="card-title">Log</h5>
-              <div class='log-content' id='log'>
+	          <h5 class="card-title">Log<span id="log-toggle" onclick="toggleLog();"> [Toggle]</span></h5>
+              <div class='log-content log-hidden' id='log'>
+                
               </div>
 	  </div>
     </div>

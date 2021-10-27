@@ -61,3 +61,19 @@ body { background-color: #43aa59; font-family: Arial, Helvetica, Sans-Serif; Col
   width: 100%;
   overflow: hidden;
 }
+
+.log-hidden {
+  background-color: red;
+  visibility: collapse;
+}
+
+#log-toggle {
+  font-style: italic;
+  cursor: pointer;
+  font-size: small;
+}
+
+.log-time {
+  min-width: 4.0rem;
+  float: left;
+}

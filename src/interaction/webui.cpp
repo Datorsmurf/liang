@@ -5,6 +5,7 @@ WEBUI::WEBUI(AsyncWebServer* server_, AsyncWebSocket* webSocketServer_, ModeSele
     server = server_;
     modeSelectEvent = modeSelectEvent_;
     printedModel = new MowerModel();
+    loggingClients = std::vector<uint32_t>();
 }
 
 void WEBUI::SetLogger(LOGGER* logger_) {
@@ -123,6 +124,7 @@ void WEBUI::PresentMowerModel(MowerModel* model, bool forceFullPresentation) {
 
   if (doc.size() == 0) return;
 
+  doc["type"] = "model";
   char buffer[1024];
   size_t len = serializeJsonPretty(doc, buffer);
   
@@ -130,7 +132,37 @@ void WEBUI::PresentMowerModel(MowerModel* model, bool forceFullPresentation) {
 }
 
 void WEBUI::SendLog(LogEvent *e) {
+
+  if (webSocketServer->count() == 0 ) {
+    Serial.println("Empty clientlist");
+    loggingClients.clear();
+  } 
+
+  if (loggingClients.size() == 0) {
+    Serial.println("No logging clients");
+    return;
+  }
+
+  DynamicJsonDocument doc(100);
+  doc["type"] = "log";
+  doc["time"] = e->millis;
+  doc["msg"] = e->msg;
   //enqueueMessage(0, "l;" + String(e->millis) + " " + e->msg);
+  
+  char buffer[1024];
+  size_t len = serializeJsonPretty(doc, buffer);
+   
+  for(const auto &logClientId: loggingClients) {
+    
+    if (webSocketServer->client(logClientId) == nullptr) {
+      Serial.print("Remove client ");
+      Serial.println(logClientId);
+      loggingClients.erase(std::remove(loggingClients.begin(), loggingClients.end(), logClientId), loggingClients.end());  
+    }
+    webSocketServer->text(logClientId, buffer, len);
+  }
+  
+  
 }
 
 void WEBUI::wsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len) {
@@ -205,6 +237,13 @@ if(type == WS_EVT_CONNECT){
           modeSelectEvent(OP_MODE_MOW_ONCE);
         } else if(doc["component"] == "mode" && doc["value"] == "charge") {
           modeSelectEvent(OP_MODE_CHARGE);
+        } else if(doc["component"] == "log" && doc["value"] == "start") {
+          loggingClients.push_back(client->id());
+          Serial.print("Start log. ");
+          Serial.println(loggingClients.size());
+        } else if(doc["component"] == "log" && doc["value"] == "stop") {
+          Serial.println("Stop log");
+          loggingClients.erase(std::remove(loggingClients.begin(), loggingClients.end(), client->id()), loggingClients.end());
         }
       }
       else

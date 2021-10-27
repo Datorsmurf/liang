@@ -48,6 +48,7 @@ class WEBUI : public PRESENTER {
         bool forceFullPrint = true;
         unsigned long dataThrottleTime = 1000; //Time to wait before sending everchanging data such as voltage or motorloads.
         unsigned long sendTimeForThrottledData = 0;
+        std::vector<uint32_t> loggingClients;
 
         LOGGER* logger;
 };
