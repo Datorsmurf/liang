@@ -279,13 +279,14 @@ void WEBUI::setup() {
 }
 void WEBUI::doLoop() {
   if (clientWaitingForFullLog > 0) {
-        std::vector<LogEvent> logHistory;
+      int counter = 0;
+      std::vector<LogEvent> logHistory;
 
       logger->getLogHistory(&logHistory);
 
       //Serial.printf("Logsize: %ul", logHistory.size());
-      DynamicJsonDocument doc(1024);
-      DynamicJsonDocument logsArrayDoc(1024);
+      DynamicJsonDocument doc(4096 + 1024);
+      DynamicJsonDocument logsArrayDoc(4096);
       JsonArray logsArray = logsArrayDoc.to<JsonArray>();
       for (auto logEvent : logHistory)
       {
@@ -294,6 +295,18 @@ void WEBUI::doLoop() {
         logDoc["msg"] = logEvent.msg;
 
         logsArray.add(logDoc);
+
+        if (counter++ > 20) {
+          counter = 0;
+
+          doc["type"] = "logs";
+          doc["logs"] = logsArray;
+          sendDoc(doc, clientWaitingForFullLog);
+
+          logsArray.clear();
+
+        }
+
       }
       doc["type"] = "logs";
       doc["logs"] = logsArray;
