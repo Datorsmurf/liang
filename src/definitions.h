@@ -54,10 +54,10 @@ typedef std::function<void(int percentDone)> UpdateEvent;
 #define AUX_MOTOR_PWM_CHANNEL_BACKWARDS 6
 #define AUX_MOTOR_SENSE_PIN 39
 
-#define LOAD_START_IGNORE_TIME 300
+#define LOAD_START_IGNORE_TIME 500
 #define LOAD_LIMIT_WHEEL 110
 #define LOAD_LIMIT_CUTTER 110
-#define LOAD_FILTER 0.01
+#define LOAD_FILTER 0.02
 #define LOAD_LIMIT_AUX 200
 
 #define LEFT_SENSOR_PIN 26
@@ -90,7 +90,7 @@ typedef std::function<void(int percentDone)> UpdateEvent;
 #define ERROR_INVALID_OP_MODE 5
 #define ERROR_INVALID_BAHAVIOR 6
 
-#define LOG_BUFFER_SIZE 63
+#define LOG_BUFFER_SIZE 48
 
 
 #endif

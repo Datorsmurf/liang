@@ -14,14 +14,6 @@
 #include <ArduinoJson.h>
 #include "SPIFFS.h"
 
-
-
-class PendingMessage {
-    public:
-        uint32_t clientId = 0;
-        String *msg = nullptr;
-};
-
 class WEBUI : public PRESENTER { 
     public:
 
@@ -36,6 +28,7 @@ class WEBUI : public PRESENTER {
     private:
         bool sendToClients(String prefix, String data, unsigned int minSilentTime = 1000);
         bool sendToClients(String prefix, int data, unsigned int minSilentTime = 1000);
+        void sendDoc(DynamicJsonDocument doc, uint32_t clientId);
         void wsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len);
         void handleNotFound(AsyncWebServerRequest *request);
         //bool enqueueMessage(uint32_t clientId, const String& msg);
@@ -49,6 +42,7 @@ class WEBUI : public PRESENTER {
         unsigned long dataThrottleTime = 1000; //Time to wait before sending everchanging data such as voltage or motorloads.
         unsigned long sendTimeForThrottledData = 0;
         std::vector<uint32_t> loggingClients;
+        uint32_t clientWaitingForFullLog = 0;
 
         LOGGER* logger;
 };

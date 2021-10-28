@@ -15,11 +15,11 @@ void LOGGER::log(String msg) {
         bufferIsLooped = true;
     }
 
+
     LogEvent e = eventBuffer[bufferPos];
     e.msg = msg;
     e.millis = t;
 
-    bufferPos = bufferPos % LOG_BUFFER_SIZE;
     eventBuffer[bufferPos] = e;
     
     for (size_t i = 0; i < logTargets.size(); i++)
@@ -30,19 +30,21 @@ void LOGGER::log(String msg) {
         }
         catch(const std::exception& e)
         {
-            Serial.printf("Exception when logging: %s", e.what());
+            Serial.printf("Exception when logging: %s\n", e.what());
         }
     }
 }
 
 
 void LOGGER::getLogHistory(std::vector<LogEvent> *logHistory) {
-    int maxCount = bufferIsLooped ? LOG_BUFFER_SIZE : bufferPos;
-    int startAt = bufferIsLooped ? bufferPos : 0;
+    int maxCount = bufferIsLooped ? LOG_BUFFER_SIZE : bufferPos+1;
+    int startAt = bufferIsLooped ? bufferPos + 1 : 0;
+    int pos;
 
     for (size_t i = 0; i < maxCount; i++)
     {
-        LogEvent e = eventBuffer[(startAt + i) % LOG_BUFFER_SIZE];
-        logHistory->push_back(e);
+        pos = (startAt + i) % LOG_BUFFER_SIZE;
+        LogEvent e = eventBuffer[pos];
+       logHistory->push_back(e);
     }
 }

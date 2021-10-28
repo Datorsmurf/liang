@@ -39,22 +39,24 @@ function start()
     }
 
     if (d.type === "log") {
-       let el = $("#log")
-       el.prepend(`<div class='log-row'><div class='log-time'>${d.time}</div> <div class='log-msg'>${d.msg}</div></div>`);
-       el[0].scrollTop = el[0].scrollHeight;
-
+      addLog(d);
     }
 
-
-    // if (parts[0] === "l") {
-    //   let el = $("#log")
-    //   el.prepend(`<p class='log-row'>${parts[1]}</p>`);
-    //   el[0].scrollTop = el[0].scrollHeight;
-    // } else {
-    //   $(`#${parts[0]}`).text(parts[1]);
-    // }
+    if (d.type === "logs") {
+      d.logs.forEach(log => {
+        addLog(log);  
+      });
+      
+    }
   };
 }
+
+function addLog(log) {
+  let el = $("#log")
+  el.prepend(`<div class='log-row'><div class='log-time'>${log.time}</div> <div class='log-msg'>${log.msg}</div></div>`);
+  el[0].scrollTop = el[0].scrollHeight;
+}
+
 function buttonclick(e)
 {
   websock.send(e.id);
@@ -84,7 +86,6 @@ function sendCommand(component, value) {
   msg.value = value;
 
   let s = JSON.stringify(msg);
-  console.log(s);
   websock.send(s);
 }
 
