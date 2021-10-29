@@ -46,15 +46,16 @@ function start()
       d.logs.forEach(log => {
         addLog(log);  
       });
-      
     }
   };
 }
 
 function addLog(log) {
-  let el = $("#log")
-  el.prepend(`<div class='log-row'><div class='log-time'>${log.time}</div> <div class='log-msg'>${log.msg}</div></div>`);
-  el[0].scrollTop = el[0].scrollHeight;
+  if (log && log.time) {
+    let el = $("#log")
+    el.prepend(`<div class='log-row'><div class='log-time'>${log.time}</div> <div class='log-msg'>${log.msg}</div></div>`);
+    el[0].scrollTop = el[0].scrollHeight;
+  }
 }
 
 function buttonclick(e)
