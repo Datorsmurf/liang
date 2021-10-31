@@ -244,7 +244,7 @@ void setupWifi() {
       IPAddress NMask(255, 255, 255, 0);
       WiFi.softAPConfig(IP, gateway, NMask);
       WiFi.softAP("Liang");
-
+      logger.log("User http://" + WiFi.softAPIP().toString() + "/settings.html to edit wifi settings");
       logger.log("IP: " + WiFi.softAPIP().toString());
   } else {
     logger.log("IP: " + WiFi.localIP().toString());
