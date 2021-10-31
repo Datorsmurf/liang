@@ -92,6 +92,8 @@ typedef std::function<void(int percentDone)> UpdateEvent;
 
 #define LOG_BUFFER_SIZE 100
 
+#define EEPROM_ADR_WIFI_SSID 0
+#define EEPROM_ADR_WIFI_PWD 33
 
 #endif
 

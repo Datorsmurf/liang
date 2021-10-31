@@ -175,6 +175,7 @@ void WEBUI::SendLog(LogEvent *e) {
 }
 
 void WEBUI::wsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len) {
+
 if(type == WS_EVT_CONNECT){
     Serial.printf("ws[%s][%u] connect\n", server->url(), client->id());
     logger->log("Hello client " + String(client->id()));
@@ -210,7 +211,7 @@ if(type == WS_EVT_CONNECT){
       if(info->opcode == WS_TEXT) {
         DynamicJsonDocument doc(100);
         deserializeJson(doc, msg);
-
+        logger->log("1");
         if(doc["component"] == "mode" && doc["value"] == "idle") {
           modeSelectEvent(OP_MODE_IDLE);
         } else if(doc["component"] == "mode" && doc["value"] == "mow") {
@@ -224,6 +225,14 @@ if(type == WS_EVT_CONNECT){
           clientWaitingForFullLog = client->id();
         } else if(doc["component"] == "log" && doc["value"] == "stop") {
           loggingClients.erase(std::remove(loggingClients.begin(), loggingClients.end(), client->id()), loggingClients.end());
+        } else if(doc["component"] == "wifi"){
+          logger->log("Settings received...");
+          EEPROM.writeString(EEPROM_ADR_WIFI_SSID, doc["ssid"].as<String>());
+          EEPROM.writeString(EEPROM_ADR_WIFI_PWD, doc["pwd"].as<String>());
+          EEPROM.commit();
+          logger->log("WifiSettings saved, restarting...");
+          delay(500);
+          ESP.restart();
         }
       }
       else
@@ -273,6 +282,7 @@ void WEBUI::handleNotFound(AsyncWebServerRequest *request) {
 void WEBUI::setup() {
   server->addHandler(webSocketServer);
   server->serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
+ 
   server->onNotFound(std::bind(&WEBUI::handleNotFound, this, std::placeholders::_1));
   server->begin();
   webSocketServer->onEvent(std::bind(&WEBUI::wsEvent, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6));

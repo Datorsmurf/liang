@@ -68,9 +68,7 @@ void UPDATEHANDLER::setup() {
   ArduinoOTA.setPort(8266);
   ArduinoOTA.begin();
 
-  Serial.println("Ready for OTA");
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
+  logger->log("Ready for OTA");
 }
 
 void UPDATEHANDLER::doLoop() {

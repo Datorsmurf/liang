@@ -7,6 +7,7 @@
 #include <ESPAsyncWebServer.h>
 #include "SPIFFS.h"
 #include "MPU6050_light.h"
+#include "EEPROM.h"
 
 #include "operational_modes/operationalmode.h"
 #include "operational_modes/OpModeCharge.h"
@@ -39,7 +40,6 @@
 #include "definitions.h"
 #include "mowermodel.h"
 #include "sensor.h"
-#include "secrets.h"
 #include "battery.h"
 #include "gyro.h"
 
@@ -221,6 +221,36 @@ void pollPollables(void * parameter) {
   }
 }
 
+void setupWifi() {
+  mowerModel.Behavior = "WIFI";
+
+  String ssid = EEPROM.readString(EEPROM_ADR_WIFI_SSID);
+  String pwd = EEPROM.readString(EEPROM_ADR_WIFI_PWD);
+
+  logger.log("SSID: " + ssid);
+
+  bool isWifiConfigured = false;
+  if (ssid.length() > 0) {
+    isWifiConfigured = true;
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(ssid.c_str(), pwd.c_str());
+  }
+
+  if (!isWifiConfigured || WiFi.waitForConnectResult() != WL_CONNECTED) {
+    WiFi.disconnect();
+      WiFi.mode(WIFI_AP);
+      IPAddress IP(10, 0, 2, 1);
+      IPAddress gateway(10, 0, 2, 1);
+      IPAddress NMask(255, 255, 255, 0);
+      WiFi.softAPConfig(IP, gateway, NMask);
+      WiFi.softAP("Liang");
+
+      logger.log("IP: " + WiFi.softAPIP().toString());
+  } else {
+    logger.log("IP: " + WiFi.localIP().toString());
+  }
+  delay(1000);
+}
 
 void setup() {
   Serial.begin(115200);
@@ -248,18 +278,17 @@ void setup() {
     ESP.restart();
   }
 
-  mowerModel.Behavior = "WIFI";
-
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(WIFI_SSID, WIFI_PASS);
-  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    logger.log("Wifi connect failed! Rebooting...");
+  if (!EEPROM.begin(64)) {
+    logger.log("Failed to initialise EEPROM, restarting...");
     delay(5000);
     ESP.restart();
   }
 
-  logger.log("IP: " + WiFi.localIP().toString());
-  delay(1000);
+  // EEPROM.writeString(EEPROM_ADR_WIFI_SSID, WIFI_SSID);
+  // EEPROM.writeString(EEPROM_ADR_WIFI_PWD, WIFI_PASS);
+  // EEPROM.commit();
+
+  setupWifi();
 
   mowerModel.Behavior = "Setup";
 

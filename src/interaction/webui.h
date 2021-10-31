@@ -2,6 +2,7 @@
 #define _WEBUI_H_
 
 #include <ESPAsyncWebServer.h>
+#include "EEPROM.h"
 #include "Logger.h"
 #include "interaction/presenter.h"
 #include "operational_modes/operationalmode.h"
