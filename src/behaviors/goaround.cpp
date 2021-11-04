@@ -33,11 +33,10 @@ int GoAround::loop() {
       return BEHAVIOR_LOOK_FOR_BWF;
     }
 
-    if (controller->IsBumped() || controller->IsTilted()) {
-        controller->DoEvadeObsticle();
+    if (controller->HandleObsticle()){
         return BEHAVIOR_LOOK_FOR_BWF;
     }
-    controller->RunAsync(FULL_SPEED, FULL_SPEED * 0.8, NORMAL_ACCELERATION_TIME);
+    controller->RunAsync(FULL_SPEED * 0.8, FULL_SPEED, NORMAL_ACCELERATION_TIME);
 
     return id();
 }

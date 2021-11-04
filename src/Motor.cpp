@@ -2,7 +2,7 @@
 
 
 
-MOTOR::MOTOR(int loadPin_, int pwmpin_forward_, int pwmpin_backwards_, int forward_channelNo_, int backwards_channelNo_, int loadLimit_, int ignoreStartLoadsFor_, LOGGER *logger_) {
+MOTOR::MOTOR(int loadPin_, int pwmpin_forward_, int pwmpin_backwards_, int forward_channelNo_, int backwards_channelNo_, int loadLimit_, int ignoreStartLoadsFor_, LOGGER *logger_, const String &logName_) {
   loadPin = loadPin_;
   pwmpin_forward = pwmpin_forward_;
   pwmpin_backwards = pwmpin_backwards_;
@@ -11,6 +11,7 @@ MOTOR::MOTOR(int loadPin_, int pwmpin_forward_, int pwmpin_backwards_, int forwa
   loadLimit = loadLimit_;
   logger = logger_;
   ignoreStartLoadsFor = ignoreStartLoadsFor_;
+  logName = logName_;
 }
 
 void MOTOR::setup() {
@@ -32,18 +33,20 @@ int MOTOR::getLoad() {
 }
 
 bool MOTOR::isOverload() {
+  if(!isAtTargetSpeed()) return false;
+
+  if (!hasTimeout(_atTargetSpeedSince, ignoreStartLoadsFor)) return false;
+
   if(filteredLoad > LOAD_LIMIT_WHEEL) {
-    logger->log("Overload: " + String(filteredLoad) + " atTargetSince " + String(_atTargetSpeedSince));
+    logger->log(logName +  ": Overload: " + String(filteredLoad));
     return true;
   };
   return false;
 }
 
 void MOTOR::doLoop() {
-  if (isAtTargetSpeed() && hasTimeout(_atTargetSpeedSince, ignoreStartLoadsFor)) {
     currentLoadRead = analogRead(loadPin);
     filteredLoad = filteredLoad * (1-LOAD_FILTER) + currentLoadRead * LOAD_FILTER;
-  }
 }
 
 int MOTOR::setSpeed(int targetSpeed, int actionTime) {
@@ -97,18 +100,18 @@ int MOTOR::setSpeed(int targetSpeed, int actionTime) {
       }
       
       ot_currentValue = newValue;
-      setAtTargetSpeed(ot_currentTargetValue == ot_currentValue);
     }
 
     int diff = ot_currentTargetValue - ot_currentValue;
     setAtTargetSpeed(diff == 0);
 
-    return diff;
+    return abs(diff);
 }
 
 void MOTOR::setAtTargetSpeed(bool value) {
     if (value && !_atTargetSpeed) {
         _atTargetSpeedSince = millis();
+        //logger->log(logName + " AtTarget: " + String(ot_currentValue) + " since:" + String(_atTargetSpeedSince));
     }
 
     _atTargetSpeed = value;

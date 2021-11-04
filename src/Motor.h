@@ -8,7 +8,7 @@
 
 class MOTOR {
   public:
-    MOTOR(int loadPin_, int pwmpin_forward_, int pwmpin_backwards_, int forward_channelNo_, int backwards_channelNo_, int loadLimit_, int ignoreStartLoadsFor_, LOGGER *logger_);
+    MOTOR(int loadPin_, int pwmpin_forward_, int pwmpin_backwards_, int forward_channelNo_, int backwards_channelNo_, int loadLimit_, int ignoreStartLoadsFor_, LOGGER *logger_, const String &logName_);
 
 	  int setSpeed(int speed, int actionTime);
     int getSpeed();
@@ -34,6 +34,8 @@ class MOTOR {
     int currentLoadRead = 0;
     int loadLimit;
     int ignoreStartLoadsFor;
+    String logName;
+
 
     unsigned long ot_setTime = 0;
 	  int ot_currentTargetValue = -1;

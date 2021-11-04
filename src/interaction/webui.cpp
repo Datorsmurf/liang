@@ -211,7 +211,6 @@ if(type == WS_EVT_CONNECT){
       if(info->opcode == WS_TEXT) {
         DynamicJsonDocument doc(100);
         deserializeJson(doc, msg);
-        logger->log("1");
         if(doc["component"] == "mode" && doc["value"] == "idle") {
           modeSelectEvent(OP_MODE_IDLE);
         } else if(doc["component"] == "mode" && doc["value"] == "mow") {
@@ -306,7 +305,7 @@ void WEBUI::doLoop() {
 
         logsArray.add(logDoc);
 
-        if (counter++ > 20) {
+        if (counter++ > 15) {
           counter = 0;
 
           doc["type"] = "logs";

@@ -42,7 +42,7 @@ bool Controller::RunAsync(int leftSpeed, int rightSpeed, int actionTime){
 
 void Controller::Move(int distanceInCm){
     logger->log("Move " + String(distanceInCm));
-    unsigned long moveEnd = millis() + abs(distanceInCm) * 30;
+    unsigned long moveEnd = millis() + abs(distanceInCm) * 40;
     if (distanceInCm > 0){
         while (moveEnd > millis())
         {
@@ -58,17 +58,27 @@ void Controller::Move(int distanceInCm){
             leftMotor->setSpeed(-FULL_SPEED, NORMAL_ACCELERATION_TIME);
             rightMotor->setSpeed(-FULL_SPEED, NORMAL_ACCELERATION_TIME);
         }
-
     }   
     StopMovement();
 }
 
 void Controller::StopMovement(){
     
-    while(rightMotor->setSpeed(0,SHORT_ACCELERATION_TIME) + leftMotor->setSpeed(0,SHORT_ACCELERATION_TIME) > 0)
-    {
-        delay(1);
+    if (leftMotor->getSpeed() == 0 && rightMotor->getSpeed() == 0) {
+        return;
     }
+
+    while(true)
+    {
+        rightMotor->setSpeed(0,SHORT_ACCELERATION_TIME);
+        leftMotor->setSpeed(0,SHORT_ACCELERATION_TIME);
+
+        if (rightMotor->isAtTargetSpeed() && leftMotor->isAtTargetSpeed()) {
+            break;
+        }
+        delay(1);
+    }    
+    delay(200);
 }
 
 void Controller::RunCutterAsync(){
