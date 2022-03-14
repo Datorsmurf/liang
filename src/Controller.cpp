@@ -65,6 +65,7 @@ void Controller::Move(int distanceInCm){
 void Controller::StopMovement(){
     
     if (leftMotor->getSpeed() == 0 && rightMotor->getSpeed() == 0) {
+        //gyro->resetOdometer();
         return;
     }
 
@@ -78,7 +79,8 @@ void Controller::StopMovement(){
         }
         delay(1);
     }    
-    delay(200);
+    delay(3000);
+    gyro->resetOdometer();
 }
 
 void Controller::RunCutterAsync(){

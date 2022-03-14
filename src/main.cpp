@@ -196,6 +196,9 @@ void pollPollables(void * parameter) {
     gyro.loop();
     mowerModel.Tilt = gyro.getAngleYFiltered();
     mowerModel.Heading = gyro.getHeading();
+    mowerModel.Acceleration = gyro.getAcceleration();
+    mowerModel.speed = gyro.getSpeed();
+    mowerModel.distanceTravelled = gyro.getTravelledDistance();
 
     mowerModel.BatteryVoltage = battery.updateVoltage();
     mowerModel.IsDocked = battery.isBeingCharged();

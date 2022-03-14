@@ -37,8 +37,10 @@ bool MOTOR::isOverload() {
 
   if (!hasTimeout(_atTargetSpeedSince, ignoreStartLoadsFor)) return false;
 
+  if(getSpeed() < FULL_SPEED * 0.8) return false;
+  
   if(filteredLoad > LOAD_LIMIT_WHEEL) {
-    logger->log(logName +  ": Overload: " + String(filteredLoad));
+    logger->log(logName +  ": Overload: " + String(filteredLoad) + " Speed: " + String(getSpeed()));
     return true;
   };
   return false;

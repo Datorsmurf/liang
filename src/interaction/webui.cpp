@@ -61,6 +61,21 @@ void WEBUI::PresentMowerModel(MowerModel* model, bool forceFullPresentation) {
 		printedModel->Heading = model->Heading;
   }
 
+  if (forceFullPresentation || (sendThrottledData && round(printedModel->Acceleration * 10000) != round(model->Acceleration * 10000))) {
+    doc["Acceleration"] = String(model->Acceleration, 4);
+		printedModel->Acceleration = model->Acceleration;
+  }
+
+ if (forceFullPresentation || (sendThrottledData && round(printedModel->speed * 10000) != round(model->speed * 10000))) {
+    doc["Speed"] = String(model->speed, 4);
+		printedModel->speed = model->speed;
+  }
+
+  if (forceFullPresentation || (sendThrottledData && round(printedModel->distanceTravelled * 10000) != round(model->distanceTravelled * 10000))) {
+    doc["Distance"] = String(model->distanceTravelled, 4);
+		printedModel->distanceTravelled = model->distanceTravelled;
+  }
+
   if (forceFullPresentation || printedModel->LeftMotorSpeed != model->LeftMotorSpeed) {
     doc["LeftMotorSpeed"] = model->LeftMotorSpeed;
 		printedModel->LeftMotorSpeed = model->LeftMotorSpeed;

@@ -6,6 +6,9 @@ struct MowerModel {
         int CurrentOpModeId;
         float Tilt;
         float Heading;
+        float Acceleration;
+        float speed;
+        float distanceTravelled;
         int LeftMotorSpeed;
         int LeftMotorLoad;
         int RightMotorSpeed;

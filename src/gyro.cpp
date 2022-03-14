@@ -28,17 +28,44 @@ void GYRO::setup() {
 void GYRO::loop() {
 
     now = micros();
-    mpu->update();
-    
-    // if (lastReadTime != 0) {
 
-    //     unsigned long delta =  now - lastReadTime;
-    // }
 
-    filteredY = (filteredY * (1-ANGLE_FILTER)) + (getAngleY() * ANGLE_FILTER);
-    
-    
-    lastReadTime = now;
+    if (lastReadTime == 0) {
+        mpu->update();
+        lastReadTime = now;
+        return;
+    }
+
+    unsigned long delta =  (now - lastReadTime) ;
+
+    if (delta > 2000) {
+        mpu->update();
+        lastReadTime = now;
+        //Serial.printf("Delta: %lu, Accx: %f\n", delta, mpu->getAccX());
+        acceleration = mpu->getAccX() * 10;
+        speed = speed + ((acceleration * delta) / 1000000);
+        distanceTravelled = distanceTravelled + ((speed * delta) / 1000000);
+        filteredY = (filteredY * (1-ANGLE_FILTER)) + (getAngleY() * ANGLE_FILTER);
+    }
+}
+
+float GYRO::getAcceleration() {
+    return acceleration;
+}
+
+float GYRO::getSpeed() {
+    return speed;
+}
+
+float GYRO::getTravelledDistance() {
+    return distanceTravelled;
+}
+
+void  GYRO::resetOdometer() {
+    Serial.println("Reset odometer");
+    speed = 0;
+    lastReadTime = 0;
+    distanceTravelled = 0;
 }
 
 float GYRO::getHeading() {

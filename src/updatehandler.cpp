@@ -15,7 +15,7 @@ void UPDATEHANDLER::setup() {
   // ArduinoOTA.setPort(3232);
 
   // Hostname defaults to esp3232-[MAC]
-   ArduinoOTA.setHostname("liang");
+  ArduinoOTA.setHostname("liang");
 
   // No authentication by default
   // ArduinoOTA.setPassword("admin");
