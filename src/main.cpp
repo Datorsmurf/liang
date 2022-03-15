@@ -46,6 +46,12 @@
 #include "utils.h"
 
 
+//#define INTERRUPT_ATTR DRAM_ATTR 
+#define BUFFER_LENGTH 32
+#define __arm__
+#define __PGMSPACE_H_
+
+
 unsigned long lastPrint= 0;
 int expectedMode = 0;
 int expectedBehavior = 0;
