@@ -34,7 +34,11 @@ body { background-color: #43aa59; font-family: Arial, Helvetica, Sans-Serif; Col
   margin-bottom: 10px;
 }
 
-
+.setting-group{
+  background-color: wheat;
+  width: fit-content;
+  padding: 10px;
+}
 .stats-group{
   margin-bottom: 5px;
   /*margin-right: 10px;*/

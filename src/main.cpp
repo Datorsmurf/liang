@@ -252,7 +252,7 @@ void setupWifi() {
       IPAddress gateway(10, 0, 2, 1);
       IPAddress NMask(255, 255, 255, 0);
       WiFi.softAPConfig(IP, gateway, NMask);
-      WiFi.softAP("Liang");
+      WiFi.softAP(String("Liang. "+ WiFi.softAPIP().toString() + "/settings.html").c_str());
       logger.log("Connect to WiFi Liang and use http://" + WiFi.softAPIP().toString() + "/settings.html to edit wifi settings");
       delay(5000);
       logger.log("IP: " + WiFi.softAPIP().toString());

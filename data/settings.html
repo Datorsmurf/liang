@@ -1,126 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <link href="bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <!-- <link href="bootstrap.min.css" > -->
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Liang</title>
 <link rel="stylesheet" href="style.css">
-<script src="jquery-3.6.0.slim.js" integrity="sha256-HwWONEZrpuoh951cQD1ov2HUK5zA5DwJ1DNUXaM6FsY=" crossorigin="anonymous"></script>
-<script type='text/javascript'>
-var websock;
-function start()
-{
-/*  if (websock) {
-    websock.close();
-  }*/
-
-  websock = new WebSocket('ws://' + window.location.hostname + '/ws');
-  websock.onopen = function(evt) { console.log('websock open'); };
-  websock.onclose = function(e) {
-    console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
-    websock = undefined;
-    setTimeout(function() {
-      start();
-    }, 1000);
-  };
-
-  websock.onerror = function(err) {
-    console.error('Socket encountered error: ', err.message, 'Closing socket');
-    websock.close();
-  };  
-  websock.onmessage = function(evt) {
-    let d = JSON.parse(evt.data)
-
-    if (d.type === "model") {
-      for (const [key, value] of Object.entries(d)) {
-        $(`#${key}`).text(value);
-      }
-    }
-
-    if (d.type === "log") {
-      addLog(d);
-    }
-
-    if (d.type === "logs") {
-      d.logs.forEach(log => {
-        addLog(log);  
-      });
-    }
-  };
-}
-
-function addLog(log) {
-  if (log && log.time) {
-    let el = $("#log")
-    el.prepend(`<div class='log-row'><div class='log-time'>${log.time}</div> <div class='log-msg'>${log.msg}</div></div>`);
-    el[0].scrollTop = el[0].scrollHeight;
-  }
-}
-
-function buttonclick(e)
-{
-  websock.send(e.id);
-}
-
-var isLogHidden = true;
-
-function toggleLog() {
-
-  $("#log").toggleClass("log-hidden")
-  if (isLogHidden) {
-    sendCommand("log", "start")
-  } else {
-    sendCommand("log", "stop");
-    $("#log").empty();
-  }
-
-  isLogHidden = !isLogHidden;
-}
-
-function sendCommand(component, value) {
-  /*if (!websock) {
-    start();
-  }*/
-  let msg = {};
-  msg.component = component;
-  msg.value = value;
-
-  let s = JSON.stringify(msg);
-  websock.send(s);
-}
-
-function safeWifi() {
-  /*if (!websock) {
-    start();
-  }*/
-  let msg = {};
-  msg.component = "wifi";
-  msg.ssid = $("#ssid").val();
-  msg.pwd = $("#pwd").val();
-
-  let s = JSON.stringify(msg);
-  websock.send(s);
-}
-
-</script>
 </head>
-<body onload='javascript:start();'>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+<body >
+  <!-- <script src="bootstrap.bundle.min.js"></script> -->
   <div class='container'> 
     <h1>Liang settings</h1>
-    <div class="row g-2">
-      <div class="col-12">
-        <div class="px-3 py-2  stats-group">
-          <h5 class="card-title">Wifi</h5>
-          <form>
-            <input type="text" name="ssid" id="ssid"/>
-            <input type="password" name="pwd" id="pwd"/>
-            <input type="button" value="Save" onclick="safeWifi();"/>
+    <div class="setting-group">
+          <h2>Wifi</h2>
+          <form action="settings.html" method="post">
+            <div>SSID <input type="text" name="ssid" id="ssid"/></div>
+            <div>PWD <input type="password" name="pwd" id="pwd"/></div>
+            <input type="submit" value="Save"/>
           </form>
         </div>
       </div>
-    </div>
-  </div>
 </body>
 </html>
