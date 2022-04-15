@@ -53,9 +53,11 @@
 
 
 unsigned long lastPrint= 0;
+unsigned long bootButtonPressMillis = 0;
 int expectedMode = 0;
 int expectedBehavior = 0;
 int manualMode = -1;
+
 volatile bool updateInProgress = false;
 volatile bool pollTaskInitDone = false;
 bool fullModelResendRequired = true;
@@ -64,9 +66,6 @@ TaskHandle_t pollTask;
 
 MowerModel mowerModel;
 
-void setManualMode(int manualMode_) {
-  manualMode = manualMode_;
-}
 
 void updateEvent(int percentDone_) {
   Serial.println("Update started");
@@ -76,6 +75,9 @@ detachInterrupt(RIGHT_SENSOR_PIN);
   updateInProgress = true;
 }
 
+void setManualMode(int manualMode_) {
+  manualMode = manualMode_;
+}
 MPU6050 mpu(Wire);
 AsyncWebServer webServer(80);
 AsyncWebSocket webSocket("/ws");
@@ -181,6 +183,21 @@ void pollPollables(void * parameter) {
         presenters[i]->PresentMowerModel(&mowerModel, useFullResend);
       }
     }
+
+  //Some wonky debounce stuff. I wonder how the pros do it.
+  if (digitalRead(SWITCH_BOOT_PIN) == LOW) {
+      if (bootButtonPressMillis == 0) {
+        bootButtonPressMillis = millis();
+      }
+  } else{
+      if (bootButtonPressMillis!= 0 && hasTimeout(bootButtonPressMillis, 20)) {
+        int baseMode = manualMode >= 0 ? manualMode : currentMode->id();  
+        int newMode = (baseMode + 1) % MAX_MANUAL_OPMODE;
+        setManualMode(newMode);
+        logger.log("New mode: " + String(newMode));
+      }
+      bootButtonPressMillis = 0;
+  }
 
     bumper.doLoop();
     if (bumper.IsStuck()) {
@@ -349,6 +366,9 @@ void loop() {
   //Handle
   uh.doLoop();
   webUi.doLoop();
+
+
+
 
   if (controller.IsFlipped()) {
     controller.SetError(ERROR_FLIPPED);

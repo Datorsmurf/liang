@@ -8,6 +8,10 @@
 #define OP_MODE_UPGRADE 4
 #define OP_MODE_ERROR 5
 
+//OP_MODE_MOW_ONCE + 1
+#define MAX_MANUAL_OPMODE  4
+
+
 #include "behaviors/behavior.h"
 #include "Arduino.h"
 
