@@ -10,7 +10,11 @@ The code is prepared for development in VSCode/PlatformIO, but will work in othe
 
 You need to:
 1. Compile and upload the program
+
 2. Upload the files in /data to the SPFISS area.
-3. Connect to the temporary Wifi accesspoint provided by LiaNG.
+
+3. Connect to the temporary wifi accesspoint provided by LiaNG.
+
 4. Surf to http://10.0.2.1/settings.html and enter your Wifi connection details.
+
 5. After successful connection to the wifi LiaNG will report its IP in the serial and on the display if you have one connected.
