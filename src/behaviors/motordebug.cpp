@@ -17,6 +17,10 @@ void MotorDebug::start() {
     while(checkStart + OPTION_STEP_TIME > millis() && digitalRead(SWITCH_3_PIN) == LOW) {
         delay(1);
     }   
+    stepStart = millis();
+    currentStep = 0;
+    turnAngle = 90;
+    turnCount = 0;
 }
 
 int MotorDebug::loop() {
@@ -24,21 +28,38 @@ int MotorDebug::loop() {
         return BEHAVIOR_IDLE;
     }
 
-    unsigned long s = (millis() / 1000) % 8;
-
-
-
-    if (s > 5) {
-        controller->TurnAngle(90);
-        return id();
-    }
-
-    if (s > 4) {
+    switch (currentStep)
+    {
+    case 0:
+        controller->TurnAngle(turnAngle);
+        turnCount = (turnCount+1) % 4;
+        if (turnCount == 0) {
+            turnAngle = -turnAngle;
+        }
+        currentStep = 1;
+        stepStart = millis();
+        break;
+    
+    case 1:
         controller->StopMovement();;
-        return id();
-    }
+        if (hasTimeout(stepStart, 500)) {
+            currentStep = 2;
+            stepStart = millis();
+        }
+        break;
+    case 2:
+        controller->RunAsync(FULL_SPEED, FULL_SPEED, NORMAL_ACCELERATION_TIME);
+        if (hasTimeout(stepStart, 4000)) {
+            controller->StopMovement();;
+            currentStep = 0;
+            stepStart = millis();
 
-    controller->RunAsync(FULL_SPEED, FULL_SPEED, NORMAL_ACCELERATION_TIME);
+        }
+        break;
+    
+    default:
+        break;
+    }
 
     return id();
 }

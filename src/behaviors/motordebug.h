@@ -23,6 +23,9 @@ class MotorDebug : public BEHAVIOR {
         SENSOR *leftSensor;
         SENSOR *rightSensor;
         int currentStep = 0;
+        unsigned long stepStart = 0;
+        int turnAngle;
+        int turnCount = 0;
 };
 
 #endif
