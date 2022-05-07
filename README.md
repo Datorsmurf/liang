@@ -20,9 +20,12 @@ The code is prepared for development in VSCode/PlatformIO, but will work in othe
 5. After successful connection to the wifi LiaNG will report its IP in the serial and on the display if you have one connected.
 
 ## Modes
-Liang is using modes to select the overall goal for the mower at any given time. A move implies the use of different behaviors to achieve that goal. The modes are *Idle*, *Charge*, *Mow* and *Mow Once*
+Liang is using modes to select the overall goal for the mower at any given time. A mode implies the use of different behaviors to achieve that goal. The modes are *Idle*, *Charge*, *Mow* and *Mow Once*
+
+Modes can be changed from the web UI or by pressing the center button on the board marked *boot*.
 ### Idle
 The mower is passive and only a few debug and testing behaviors are available
+Two debug behaviors are available in Idle mode. *Sensor debug* and *motor test*. Press the button on the board marked *SW3* to cycle through them.
 ### Charge
 The goal is to be charging and stay in charging until told otherwise.
 ### Mow
