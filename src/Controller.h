@@ -12,7 +12,7 @@ class Controller {
     public:
         Controller(MOTOR* leftMotor_, MOTOR* rightMotor_, MOTOR* cutterMotor_, GYRO* gyro_, BUMPER* bumper_, SENSOR* leftSensor_, SENSOR* rightSensor_, LOGGER* logger_);
         void TurnAngle(int degrees);
-        void TurnAsync(bool isLeftTurn);
+        void TurnAsync(int turnSpeed, bool isLeftTurn);
         bool RunAsync(int leftSpeed, int rightSpeed, int actionTime);
         void Move(int distanceInCm);
         void StopMovement();

@@ -31,30 +31,31 @@ int MotorDebug::loop() {
     switch (currentStep)
     {
     case 0:
-        controller->TurnAngle(turnAngle);
-        turnCount = (turnCount+1) % 4;
-        if (turnCount == 0) {
-            turnAngle = -turnAngle;
+        controller->RunAsync(FULL_SPEED, FULL_SPEED, NORMAL_ACCELERATION_TIME);
+        if (hasTimeout(stepStart, 3000)) {
+            controller->StopMovement();;
+            currentStep++;
+            stepStart = millis();
+
         }
-        currentStep = 1;
-        stepStart = millis();
         break;
     
     case 1:
         controller->StopMovement();;
         if (hasTimeout(stepStart, 500)) {
-            currentStep = 2;
+            currentStep++;
             stepStart = millis();
         }
         break;
     case 2:
-        controller->RunAsync(FULL_SPEED, FULL_SPEED, NORMAL_ACCELERATION_TIME);
-        if (hasTimeout(stepStart, 4000)) {
-            controller->StopMovement();;
-            currentStep = 0;
-            stepStart = millis();
-
+        controller->TurnAngle(turnAngle);
+        turnCount = turnCount+1;
+        if (turnCount >= 4) {
+            turnAngle = -turnAngle;
+            turnCount = 0;
         }
+        currentStep = 0;
+        stepStart = millis();
         break;
     
     default:

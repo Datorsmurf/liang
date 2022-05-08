@@ -18,9 +18,15 @@ void Controller::TurnAngle(int degrees){
     logger->log("TurnAngle " + String(degrees) + " start " + String(Heading()) + " target: " + String(targetHeading));
     unsigned long t = millis();
 
-    while (abs(targetHeading - Heading()) > 3)
+    while (true)
     {
-        TurnAsync(degrees < 0);
+        int angleDiff = abs(targetHeading - Heading());
+        if (angleDiff < 3) {
+            break;
+        }
+
+
+        TurnAsync(angleDiff > 35 ? FULL_SPEED : LOW_SPEED, degrees < 0);
         if (hasTimeout(t, 2500)) {
             logger->log("TurnAngle " + String(degrees) + "timed out. Now at: " + String(Heading()));
             StopMovement();
@@ -31,9 +37,9 @@ void Controller::TurnAngle(int degrees){
     StopMovement();
 }
 
-void Controller::TurnAsync(bool isLeftTurn){
-    leftMotor->setSpeed(FULL_SPEED * (isLeftTurn ? -1 : 1) , SHORT_ACCELERATION_TIME);
-    rightMotor->setSpeed(FULL_SPEED * (isLeftTurn ? 1 : -1), SHORT_ACCELERATION_TIME);
+void Controller::TurnAsync(int turnSpeed, bool isLeftTurn){
+    leftMotor->setSpeed(turnSpeed * (isLeftTurn ? -1 : 1) , SHORT_ACCELERATION_TIME);
+    rightMotor->setSpeed(turnSpeed * (isLeftTurn ? 1 : -1), SHORT_ACCELERATION_TIME);
 }
 
 bool Controller::RunAsync(int leftSpeed, int rightSpeed, int actionTime){
