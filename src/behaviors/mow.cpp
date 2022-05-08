@@ -28,7 +28,7 @@ int Mow::loop() {
         logger->log("Left out");
         controller->StopMovement();
         t = millis();
-        while (true)
+        while (!controller->IsFlipped())
         {
             if (!controller->IsLeftOutOfBounds()) {
                 logger->log("Back inside!");
@@ -49,7 +49,7 @@ int Mow::loop() {
         logger->log("Right out");
         controller->StopMovement();
         t = millis();
-        while (true)
+        while (!controller->IsFlipped())
         {
             if (!controller->IsRightOutOfBounds()) {
                 logger->log("Back inside!");

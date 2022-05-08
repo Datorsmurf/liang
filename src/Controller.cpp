@@ -21,6 +21,10 @@ void Controller::TurnAngle(int degrees){
     while (true)
     {
         int angleDiff = abs(targetHeading - Heading());
+        if (IsFlipped()) {
+            logger->log("Flipped, turn aborted");
+            return;
+        }
         if (angleDiff < 3) {
             break;
         }
@@ -54,7 +58,10 @@ void Controller::Move(int distanceInCm){
         {
             leftMotor->setSpeed(FULL_SPEED, NORMAL_ACCELERATION_TIME);
             rightMotor->setSpeed(FULL_SPEED, NORMAL_ACCELERATION_TIME);
-            
+            if (IsFlipped()) {
+                logger->log("Flipped, aborting move");
+                break;
+            }
         }
     }
 
@@ -63,6 +70,10 @@ void Controller::Move(int distanceInCm){
         {
             leftMotor->setSpeed(-FULL_SPEED, NORMAL_ACCELERATION_TIME);
             rightMotor->setSpeed(-FULL_SPEED, NORMAL_ACCELERATION_TIME);
+            if (IsFlipped()) {
+                logger->log("Flipped, aborting move");
+                break;
+            }
         }
     }   
     StopMovement();
@@ -85,7 +96,7 @@ void Controller::StopMovement(){
         }
         delay(1);
     }    
-    delay(3000);
+    //delay(3000);
     gyro->resetOdometer();
 }
 
