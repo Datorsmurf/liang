@@ -57,6 +57,8 @@ unsigned long bootButtonPressMillis = 0;
 int expectedMode = 0;
 int expectedBehavior = 0;
 int manualMode = -1;
+bool rebootIsNeeded = false;
+unsigned long rebootIsNeededSince;
 
 volatile bool updateInProgress = false;
 volatile bool pollTaskInitDone = false;
@@ -78,12 +80,20 @@ detachInterrupt(RIGHT_SENSOR_PIN);
 void setManualMode(int manualMode_) {
   manualMode = manualMode_;
 }
+
+void setRebootNeeded() {
+  rebootIsNeeded = true;
+  rebootIsNeededSince = millis();
+  manualMode = OP_MODE_UPGRADE;
+}
+
+
 MPU6050 mpu(Wire);
 AsyncWebServer webServer(80);
 AsyncWebSocket webSocket("/ws");
 MOWERDISPLAY display;
 SERIALUI serialUi(*setManualMode);
-WEBUI webUi(&webServer, &webSocket, *setManualMode);
+WEBUI webUi(&webServer, &webSocket, *setManualMode, *setRebootNeeded);
 
 
 
@@ -192,7 +202,10 @@ void pollPollables(void * parameter) {
   } else{
       if (bootButtonPressMillis!= 0 && hasTimeout(bootButtonPressMillis, 20)) {
         int baseMode = manualMode >= 0 ? manualMode : currentMode->id();  
-        int newMode = (baseMode + 1) % MAX_MANUAL_OPMODE;
+        int newMode = baseMode + 1;
+        if (newMode > MAX_MANUAL_OPMODE) {
+          newMode = 0;
+        }
         setManualMode(newMode);
         logger.log("New mode: " + String(newMode));
       }
@@ -339,7 +352,7 @@ void setup() {
 
   delay(1000);
 
-  expectedMode = currentMode->id();
+  expectedMode = EEPROM.readInt(EEPROM_ADR_INIT_MODE);;
   expectedBehavior = currentMode->start();
   currentBehavior = availableBehaviors[0]; //Just something
   mowerModel.OpMode = currentMode->desc();
@@ -357,6 +370,11 @@ void loop() {
   //digitalWrite(LED_PIN, bumper.IsBumped());
   //digitalWrite(LED_PIN, (digitalRead(SWITCH_3_PIN) == LOW));
   //digitalWrite(LED_PIN, battery.isBeingCharged());
+
+  if (rebootIsNeeded && hasTimeout(rebootIsNeededSince, 2000)) {
+    ESP.restart();
+  }
+  
   digitalWrite(LED_PIN, 
     (digitalRead(SWITCH_3_PIN) == LOW) 
     || (digitalRead(SWITCH_BOOT_PIN) == LOW)

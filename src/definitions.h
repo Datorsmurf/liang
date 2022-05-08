@@ -4,7 +4,7 @@
 #include "functional"
 typedef std::function<void(int newMode)> ModeSelectEvent;
 typedef std::function<void(int percentDone)> UpdateEvent;
-
+typedef std::function<void()> RebootNeededEvent;
 
 // BWF Code for inside and outside
 #define INSIDE_BWF          86
@@ -95,6 +95,7 @@ typedef std::function<void(int percentDone)> UpdateEvent;
 
 #define EEPROM_ADR_WIFI_SSID 0
 #define EEPROM_ADR_WIFI_PWD 33
+#define EEPROM_ADR_INIT_MODE 53
 
 #endif
 

@@ -16,6 +16,13 @@
           <form action="settings.html" method="post">
             <div>SSID <input type="text" name="ssid" id="ssid"/></div>
             <div>PWD <input type="password" name="pwd" id="pwd"/></div>
+            <div>Initial mode <select name="initmode">
+              <option value="0">Idle</option>
+              <option value="1">Charge</option>
+              <option value="2">Mow</option>
+              <option value="3">Mow once</option>
+            </select>
+            </div>
             <input type="submit" value="Save"/>
           </form>
         </div>

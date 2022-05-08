@@ -22,7 +22,6 @@ class Error : public BEHAVIOR {
         MowerModel *mowerModel;
 
         String getErrorDesc(int error);
-        unsigned long t = 0;
 };
 
 #endif

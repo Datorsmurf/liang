@@ -9,7 +9,7 @@
 #define OP_MODE_ERROR 5
 
 //OP_MODE_MOW_ONCE + 1
-#define MAX_MANUAL_OPMODE  4
+#define MAX_MANUAL_OPMODE  3
 
 
 #include "behaviors/behavior.h"

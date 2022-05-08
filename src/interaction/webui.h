@@ -18,7 +18,7 @@
 class WEBUI : public PRESENTER { 
     public:
 
-        WEBUI(AsyncWebServer* server_, AsyncWebSocket* webSocketServer_, ModeSelectEvent modeSelectEvent_);
+        WEBUI(AsyncWebServer* server_, AsyncWebSocket* webSocketServer_, ModeSelectEvent modeSelectEvent_, RebootNeededEvent rebootNeededEvent_);
         void setup();
         void doLoop();
         void SetLogger(LOGGER* logger_);
@@ -36,6 +36,7 @@ class WEBUI : public PRESENTER {
         bool hasPrefixSilentTimePassed(String prefix, String data, unsigned int minSilentTime);
         ModeSelectEvent modeSelectEvent;
         AsyncWebSocket* webSocketServer;
+        RebootNeededEvent rebootNeededEvent;
         AsyncWebServer* server;
         MowerModel *printedModel;
         std::map<String, unsigned long> prefixSendTimes = std::map<String, unsigned long>();

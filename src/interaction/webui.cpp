@@ -1,9 +1,10 @@
 #include "webui.h"
 
-WEBUI::WEBUI(AsyncWebServer* server_, AsyncWebSocket* webSocketServer_, ModeSelectEvent modeSelectEvent_){
+WEBUI::WEBUI(AsyncWebServer* server_, AsyncWebSocket* webSocketServer_, ModeSelectEvent modeSelectEvent_, RebootNeededEvent rebootNeededEvent_){
     webSocketServer = webSocketServer_;
     server = server_;
     modeSelectEvent = modeSelectEvent_;
+    rebootNeededEvent = rebootNeededEvent_;
     printedModel = new MowerModel();
     loggingClients = std::vector<uint32_t>();
 }
@@ -295,10 +296,12 @@ void WEBUI::handleNotFound(AsyncWebServerRequest *request) {
 
 void WEBUI::setup() {
   server->addHandler(webSocketServer);
-  server->on("/settings.html", HTTP_POST, [](AsyncWebServerRequest * request){
+  
+  server->on("/settings.html", HTTP_POST, [this](AsyncWebServerRequest * request){
     int params = request->params();
     String ssid = "";
     String pwd = "";
+    int initmode = 0;
     for(int i=0;i<params;i++){
       AsyncWebParameter* p = request->getParam(i);
       if(p->isFile()){ //p->isPost() is also true
@@ -309,6 +312,8 @@ void WEBUI::setup() {
           ssid = p->value();
         } else if (p->name() == "pwd") {
           pwd = p->value();
+        } else if (p->name() == "initmode") {
+          initmode = p->value().toInt();
         }
       } else {
         Serial.printf("GET[%s]: %s\n", p->name().c_str(), p->value().c_str());
@@ -316,14 +321,17 @@ void WEBUI::setup() {
     } // for(int i=0;i<params;i++)
 
     //logger->log("Settings received...");
-    EEPROM.writeString(EEPROM_ADR_WIFI_SSID, ssid);
-    EEPROM.writeString(EEPROM_ADR_WIFI_PWD, pwd);
+    if (ssid.length() > 0) {
+      EEPROM.writeString(EEPROM_ADR_WIFI_SSID, ssid);
+      EEPROM.writeString(EEPROM_ADR_WIFI_PWD, pwd);
+    }
+    EEPROM.writeInt(EEPROM_ADR_INIT_MODE, initmode);
     EEPROM.commit();
     //logger->log("WifiSettings saved, restarting...");
-    delay(500);
-    ESP.restart();
 
-    request -> send(200);
+    request->redirect("/");
+    rebootNeededEvent();
+
   }); // server.on
   server->serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
  

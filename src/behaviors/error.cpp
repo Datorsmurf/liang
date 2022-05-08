@@ -44,14 +44,6 @@ int Error::loop() {
     if (digitalRead(SWITCH_3_PIN) == LOW) {
         return BEHAVIOR_SENSOR_DEBUG;
     }
-    
-    if (hasTimeout(t, 5000)) {
-        controller->StopCutter();
-    }
-     else {
-        controller->RunCutterAsync();
-    }
-
 
     return id();
 }
