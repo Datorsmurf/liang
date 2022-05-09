@@ -30,7 +30,7 @@ void Controller::TurnAngle(int degrees){
         }
 
 
-        TurnAsync(angleDiff > 35 ? FULL_SPEED : LOW_SPEED, degrees < 0);
+        TurnAsync(degrees < 50 || angleDiff > 35 ? FULL_SPEED : LOW_SPEED, degrees < 0);
         if (hasTimeout(t, 2500)) {
             logger->log("TurnAngle " + String(degrees) + "timed out. Now at: " + String(Heading()));
             StopMovement();
@@ -52,7 +52,7 @@ bool Controller::RunAsync(int leftSpeed, int rightSpeed, int actionTime){
 
 void Controller::Move(int distanceInCm){
     logger->log("Move " + String(distanceInCm));
-    unsigned long moveEnd = millis() + abs(distanceInCm) * 40;
+    unsigned long moveEnd = millis() + abs(distanceInCm) * 50;
     if (distanceInCm > 0){
         while (moveEnd > millis())
         {

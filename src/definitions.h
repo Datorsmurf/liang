@@ -68,7 +68,7 @@ typedef std::function<void()> RebootNeededEvent;
 
 #define BUMPER_PIN 19
 
-#define LOW_SPEED 170
+#define LOW_SPEED 190
 #define FULL_SPEED 255
 #define NORMAL_ACCELERATION_TIME 400
 #define SHORT_ACCELERATION_TIME 100

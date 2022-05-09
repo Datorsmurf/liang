@@ -74,10 +74,16 @@ int FollowBWF::loop() {
 
     if (controller->IsLeftOutOfBounds()) {
         leftMotor->setSpeed(DOCKING_WHEEL_HIGH_SPEED, DOCKING_TIME_TO_HIGH_SPEED);
-        rightMotor->setSpeed(DOCKING_WHEEL_LOW_SPEED, DOCKING_TIME_TO_SLOW_SPEED);
+        if (rightMotor->getSpeed() < DOCKING_WHEEL_LOW_SPEED)
+            rightMotor->setSpeed(DOCKING_WHEEL_HIGH_SPEED, DOCKING_TIME_TO_HIGH_SPEED);
+        else 
+            rightMotor->setSpeed(DOCKING_WHEEL_LOW_SPEED, DOCKING_TIME_TO_SLOW_SPEED);
     } else {
-        leftMotor->setSpeed(DOCKING_WHEEL_LOW_SPEED, DOCKING_TIME_TO_SLOW_SPEED);
         rightMotor->setSpeed(DOCKING_WHEEL_HIGH_SPEED, DOCKING_TIME_TO_HIGH_SPEED);
+        if (leftMotor->getSpeed() < DOCKING_WHEEL_LOW_SPEED)
+            leftMotor->setSpeed(DOCKING_WHEEL_HIGH_SPEED, DOCKING_TIME_TO_HIGH_SPEED);
+        else 
+            leftMotor->setSpeed(DOCKING_WHEEL_LOW_SPEED, DOCKING_TIME_TO_SLOW_SPEED);
 
     }
 
