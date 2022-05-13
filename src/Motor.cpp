@@ -59,7 +59,7 @@ int MOTOR::setSpeed(int targetSpeed, int actionTime) {
       ot_actionTime = actionTime;
 			ot_setTime = _now;
 
-      //Serial.println("New speed " + String(ot_currentTargetValue));
+      //logger->log("New speed " + String(ot_currentTargetValue));
 		}
 
 	if (ot_currentTargetValue == ot_currentValue) {

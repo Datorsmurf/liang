@@ -5,24 +5,19 @@
 
 
 
-LookForBWF::LookForBWF(Controller *controller_, LOGGER *logger_, BATTERY *battery_, ModeSelectEvent modeSelectEvent_, OPERATIONALMODE *currentMode_) {
+LookForBWF::LookForBWF(Controller *controller_, LOGGER *logger_, BATTERY *battery_) {
     controller = controller_;
     logger = logger_;
     battery = battery_;
-    modeSelectEvent = modeSelectEvent_;
-    currentMode = currentMode_;
 }
 
 void LookForBWF::start() {
     controller->StopCutter();
-
-    if (currentMode->id() == OP_MODE_MOW_ONCE){
-        modeSelectEvent(OP_MODE_CHARGE);
-    }   
 }
 
 int LookForBWF::loop() {
-    
+    if (controller->OutOfBoundsTimoutHasOccurred()) return id();
+
     if (controller->IsLeftOutOfBounds() || controller->IsRightOutOfBounds()) {
         return BEHAVIOR_FOLLOW_BWF;
     }

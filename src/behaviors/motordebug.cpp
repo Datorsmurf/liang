@@ -21,6 +21,7 @@ void MotorDebug::start() {
     currentStep = 0;
     turnAngle = 90;
     turnCount = 0;
+    controller->FreezeTargetHeading();
 }
 
 int MotorDebug::loop() {

@@ -5,24 +5,35 @@
 
 
 
-Mow::Mow(Controller *controller_, LOGGER *logger_, BATTERY *battery_) {
+Mow::Mow(Controller *controller_, LOGGER *logger_, BATTERY *battery_, MowerModel* mowerModel_, ModeSelectEvent modeSelectEvent_) {
     controller = controller_;
     logger = logger_;
     battery = battery_;
+    mowermodel = mowerModel_;
+    modeSelectEvent = modeSelectEvent_;
 }
 
-void Mow::start() {
+void Mow::start() { 
+    controller->FreezeTargetHeading();
+    
 }
 
 int Mow::loop() {
+
+    if (controller->OutOfBoundsTimoutHasOccurred()) return id();
+    
     if (battery->mustCharge()) {
-        logger->log("Must charge");
+        if (mowermodel->CurrentOpModeId == OP_MODE_MOW_ONCE){
+            modeSelectEvent(OP_MODE_IDLE);
+        }
         return BEHAVIOR_LOOK_FOR_BWF;
     }
 
     if (controller->HandleObsticle()) {
         return id();
     }
+
+
 
     if(controller->IsLeftOutOfBounds()) {
         logger->log("Left out");
@@ -65,6 +76,7 @@ int Mow::loop() {
         controller->TurnAngle(-120);
         return id();
     }
+
 
     controller->RunCutterAsync();
     controller->RunAsync(FULL_SPEED, FULL_SPEED, NORMAL_ACCELERATION_TIME);

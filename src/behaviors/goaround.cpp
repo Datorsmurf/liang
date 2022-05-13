@@ -16,6 +16,7 @@ void GoAround::start() {
     logger->log("Start GoAround");
     controller->StopMovement();
     controller->Move(-30);
+
     controller->TurnAngle(90);
     startingHeading = controller->Heading();
     startingTime = millis();
@@ -23,7 +24,8 @@ void GoAround::start() {
 }
 
 int GoAround::loop() {
-    
+    if (controller->OutOfBoundsTimoutHasOccurred()) return id();
+
     //Found BWF
     if (leftSensor->IsOut() || rightSensor->IsOut()) {
         return BEHAVIOR_FOLLOW_BWF;

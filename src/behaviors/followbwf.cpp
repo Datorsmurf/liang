@@ -22,6 +22,8 @@ void FollowBWF::start() {
 }
 
 int FollowBWF::loop() {
+    if (controller->OutOfBoundsTimoutHasOccurred()) return id();
+
     if (hasTimeout(lastObsticle, 10000)) {
         obsticleCount = 0;
     }

@@ -77,9 +77,7 @@ detachInterrupt(RIGHT_SENSOR_PIN);
   updateInProgress = true;
 }
 
-void setManualMode(int manualMode_) {
-  manualMode = manualMode_;
-}
+void setManualMode(int manualMode_);
 
 void setRebootNeeded() {
   rebootIsNeeded = true;
@@ -110,6 +108,11 @@ SENSOR leftSensor(LEFT_SENSOR_PIN, false, &logger);
 SENSOR rightSensor(RIGHT_SENSOR_PIN, false, &logger);
 BATTERY battery(BATTERY_SENSOR_PIN, BATTERY_CHARGE_PIN);
 BUMPER bumper(BUMPER_PIN);
+
+void setManualMode(int manualMode_) {
+  manualMode = manualMode_;
+}
+
 
 MOTOR leftMotor(LEFT_MOTOR_SENSE_PIN, LEFT_MOTOR_FORWARD_PWM_PIN, LEFT_MOTOR_BACKWARDS_PWM_PIN, LEFT_MOTOR_PWM_CHANNEL_FORWARD, LEFT_MOTOR_PWM_CHANNEL_BACKWARDS, LOAD_LIMIT_WHEEL, LOAD_START_IGNORE_TIME, &logger, "Left");
 MOTOR rightMotor(RIGHT_MOTOR_SENSE_PIN, RIGHT_MOTOR_FORWARD_PWM_PIN, RIGHT_MOTOR_BACKWARDS_PWM_PIN, RIGHT_MOTOR_PWM_CHANNEL_FORWARD, RIGHT_MOTOR_PWM_CHANNEL_BACKWARDS, LOAD_LIMIT_WHEEL, LOAD_START_IGNORE_TIME, &logger, "Right");
@@ -145,8 +148,8 @@ Error error(&controller, &logger, &battery, &mowerModel);
 SensorDebug sensorDebug(&controller, &logger, &battery, &leftSensor, &rightSensor);
 MotorDebug motorDebug(&controller, &logger, &battery, &leftSensor, &rightSensor);
 Launch launch(&controller, &logger, &battery);
-LookForBWF lookForBwf(&controller, &logger, &battery, *setManualMode, currentMode);
-Mow mow(&controller, &logger, &battery);
+LookForBWF lookForBwf(&controller, &logger, &battery);
+Mow mow(&controller, &logger, &battery, &mowerModel, *setManualMode);
 
 
 BEHAVIOR* currentBehavior;
@@ -356,6 +359,7 @@ void setup() {
   expectedBehavior = currentMode->start();
   currentBehavior = availableBehaviors[0]; //Just something
   mowerModel.OpMode = currentMode->desc();
+  mowerModel.CurrentOpModeId = currentMode->id();
   mowerModel.Behavior = currentBehavior->desc();
 
   pinMode(LED_PIN, OUTPUT);
@@ -410,7 +414,10 @@ void loop() {
         currentMode = availableOpModes[i];
         logger.log("Enter mode: " + currentMode->desc());
         mowerModel.OpMode = currentMode->desc();
+        mowerModel.CurrentOpModeId = currentMode->id();
         expectedBehavior = currentMode->start();
+        controller.FreezeTargetHeading();
+        controller.ResetOutOfBoundsTimout();
         break;
       }
     }

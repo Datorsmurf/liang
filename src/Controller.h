@@ -30,6 +30,10 @@ class Controller {
         bool IsLeftOutOfBounds();
         bool IsRightOutOfBounds();
         int Heading();
+        void FreezeTargetHeading();
+        int GetTargetHeadingDiff();
+        bool OutOfBoundsTimoutHasOccurred();
+        void ResetOutOfBoundsTimout();
 
         void DoEvadeObsticle();
     private:
@@ -43,7 +47,10 @@ class Controller {
         LOGGER* logger;
 
         int error = 0;
+        int overallTargetHeading = 0;
+        unsigned long lastTimeInside = 0;
 
+        int loggedSpeed = 1;
 };
 
 #endif

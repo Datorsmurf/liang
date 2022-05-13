@@ -75,8 +75,8 @@ typedef std::function<void()> RebootNeededEvent;
 
 #define CUTTER_SPEED 255
 
-#define TILT_ANGLE 40;
-#define FLIP_ANGLE 80;
+#define TILT_ANGLE 35;
+#define FLIP_ANGLE 110;
 
 #define OPTION_STEP_TIME 750
 

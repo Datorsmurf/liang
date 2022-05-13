@@ -34,10 +34,12 @@ void Controller::TurnAngle(int degrees){
         if (hasTimeout(t, 2500)) {
             logger->log("TurnAngle " + String(degrees) + "timed out. Now at: " + String(Heading()));
             StopMovement();
+            FreezeTargetHeading();
             return;
         }
     }
     logger->log("TurnAngle " + String(degrees) + "ok. Now at: " + String(Heading()));
+    FreezeTargetHeading();
     StopMovement();
 }
 
@@ -47,12 +49,28 @@ void Controller::TurnAsync(int turnSpeed, bool isLeftTurn){
 }
 
 bool Controller::RunAsync(int leftSpeed, int rightSpeed, int actionTime){
-    return leftMotor->setSpeed(leftSpeed, actionTime) + rightMotor->setSpeed(rightSpeed, actionTime) == 0;
+        int headingDiff = GetTargetHeadingDiff();
+        if (headingDiff > 3) {
+            leftSpeed = leftSpeed * 0.8;
+            //logger->log("Drifted right. Diff:" + String(headingDiff) + "Leftspeed: " + String(leftSpeed));
+        } else if (headingDiff < -5) {
+            rightSpeed = rightSpeed * 0.8;
+            //logger->log("Drifted left.  Diff:" + String(headingDiff));
+        } else {
+            //logger->log("No target diff.");
+        }
+    
+    // if (leftSpeed != loggedSpeed) {
+    //     logger->log("Left speed: " + String(leftSpeed) + " Heading:" + String(Heading()) + " Headingdiff:" + String(headingDiff));
+    //     loggedSpeed = leftSpeed;
+    // }
+    return abs(leftMotor->setSpeed(leftSpeed, actionTime)) + abs(rightMotor->setSpeed(rightSpeed, actionTime)) == 0;
 }
+
 
 void Controller::Move(int distanceInCm){
     logger->log("Move " + String(distanceInCm));
-    unsigned long moveEnd = millis() + abs(distanceInCm) * 50;
+    unsigned long moveEnd = millis() + abs(distanceInCm) * 60;
     if (distanceInCm > 0){
         while (moveEnd > millis())
         {
@@ -143,6 +161,22 @@ bool Controller::IsRightOutOfBounds() {
     return rightSensor->IsOutOfBounds();
 }
 
+void Controller::ResetOutOfBoundsTimout(){
+    lastTimeInside = millis();
+}
+
+bool Controller::OutOfBoundsTimoutHasOccurred(){
+    if(IsLeftOutOfBounds() && IsRightOutOfBounds()) {
+        if (hasTimeout(lastTimeInside, 16000)) {
+            SetError(ERROR_OUT);
+            return true;
+        } 
+        return false;
+    } else {
+        lastTimeInside = millis();
+        return false;
+    }
+}
 bool Controller::IsWheelOverload() {
     return leftMotor->isOverload() || rightMotor->isOverload();
 }
@@ -159,6 +193,16 @@ bool Controller::IsFlipped() {
 int Controller::Heading() {
     return gyro->getHeading();
 }
+
+void Controller::FreezeTargetHeading() {
+    overallTargetHeading = Heading();
+    logger->log("New target heading: " + String(overallTargetHeading));
+}
+
+int Controller::GetTargetHeadingDiff() {
+    return Heading() - overallTargetHeading;
+}
+
 
 void Controller::SetError(int error_) {
     if (error == error_) return;

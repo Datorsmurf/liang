@@ -19,7 +19,7 @@
 #define BATTERY_EMPTY      10.400
 
 // Running average sample size
-#define FILTER        200
+#define FILTER        1000
 
 #define VOLTDIVATOR   4.33
 
