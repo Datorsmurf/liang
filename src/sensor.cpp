@@ -10,8 +10,8 @@
 #define PULSE_UNIT_LENGTH 100
 
 
-int SENSOR::outside_code[] = {OUTSIDE_BWF, INSIDE_BWF - OUTSIDE_BWF};
-int SENSOR::inside_code[] = {INSIDE_BWF, INSIDE_BWF};
+int SENSOR::outside_code[] = {OUTSIDE_BWF};
+int SENSOR::inside_code[] = {INSIDE_BWF};
 
 SENSOR::SENSOR(int pin_, bool missingSignalIsOut_, LOGGER *logger_){
     pin = pin_;

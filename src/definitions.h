@@ -7,8 +7,8 @@ typedef std::function<void(int percentDone)> UpdateEvent;
 typedef std::function<void()> RebootNeededEvent;
 
 // BWF Code for inside and outside
-#define INSIDE_BWF          86
-#define OUTSIDE_BWF         5
+#define INSIDE_BWF          86, 86
+#define OUTSIDE_BWF         5, 81
 
 #define LED_PIN 17
 #define SWITCH_3_PIN 13
