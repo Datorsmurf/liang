@@ -15,7 +15,7 @@ Mow::Mow(Controller *controller_, LOGGER *logger_, BATTERY *battery_, MowerModel
 
 void Mow::start() { 
     controller->FreezeTargetHeading();
-    
+    boostModeSince = 0;
 }
 
 int Mow::loop() {
@@ -24,7 +24,7 @@ int Mow::loop() {
     
     if (battery->mustCharge()) {
         if (mowermodel->CurrentOpModeId == OP_MODE_MOW_ONCE){
-            modeSelectEvent(OP_MODE_IDLE);
+            controller->SetError(ERROR_OUT_OF_BATTERY);
         }
         return BEHAVIOR_LOOK_FOR_BWF;
     }
@@ -36,7 +36,6 @@ int Mow::loop() {
 
 
     if(controller->IsLeftOutOfBounds()) {
-        logger->log("Left out");
         controller->StopMovement();
         t = millis();
         while (!controller->IsFlipped())
@@ -57,7 +56,7 @@ int Mow::loop() {
     }
 
     if(controller->IsRightOutOfBounds()) {
-        logger->log("Right out");
+       
         controller->StopMovement();
         t = millis();
         while (!controller->IsFlipped())
@@ -77,10 +76,23 @@ int Mow::loop() {
         return id();
     }
 
+    if (boostModeSince == 0 && controller->IsCutterHighLoad() ) {
+        boostModeSince = millis();
+    }
 
-    controller->RunCutterAsync();
+    if (boostModeSince > 0) {
+        if (hasTimeout(boostModeSince, 10000)) {
+            boostModeSince = 0;
+        }
+        
+        controller->RunCutterAsync(CUTTER_SPEED_BOOST);
+        //controller->RunAsync(LOW_SPEED, LOW_SPEED, NORMAL_ACCELERATION_TIME);
+
+    } else {
+        controller->RunCutterAsync(CUTTER_SPEED);
+        //controller->RunAsync(FULL_SPEED, FULL_SPEED, NORMAL_ACCELERATION_TIME);
+    }
     controller->RunAsync(FULL_SPEED, FULL_SPEED, NORMAL_ACCELERATION_TIME);
-    
 
     return id();
 }

@@ -56,7 +56,7 @@ typedef std::function<void()> RebootNeededEvent;
 
 #define LOAD_START_IGNORE_TIME 500
 #define LOAD_LIMIT_WHEEL 150
-#define LOAD_LIMIT_CUTTER 110
+#define LOAD_LIMIT_CUTTER 700
 #define LOAD_FILTER 0.01
 #define LOAD_LIMIT_AUX 200
 
@@ -73,9 +73,10 @@ typedef std::function<void()> RebootNeededEvent;
 #define NORMAL_ACCELERATION_TIME 400
 #define SHORT_ACCELERATION_TIME 100
 
-#define CUTTER_SPEED 255
+#define CUTTER_SPEED 200
+#define CUTTER_SPEED_BOOST 255
 
-#define TILT_ANGLE 35;
+#define TILT_ANGLE 30;
 #define FLIP_ANGLE 110;
 
 #define OPTION_STEP_TIME 750
@@ -90,6 +91,7 @@ typedef std::function<void()> RebootNeededEvent;
 #define ERROR_BUMPER_STUCK 4
 #define ERROR_INVALID_OP_MODE 5
 #define ERROR_INVALID_BAHAVIOR 6
+#define ERROR_OUT_OF_BATTERY 7
 
 #define LOG_BUFFER_SIZE 100
 

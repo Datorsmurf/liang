@@ -23,6 +23,7 @@ class Mow : public BEHAVIOR {
         ModeSelectEvent modeSelectEvent;
         MowerModel* mowermodel;
         unsigned long t;
+        unsigned long boostModeSince;
 };
 
 #endif

@@ -13,7 +13,8 @@
 int SENSOR::outside_code[] = {OUTSIDE_BWF};
 int SENSOR::inside_code[] = {INSIDE_BWF};
 
-SENSOR::SENSOR(int pin_, bool missingSignalIsOut_, LOGGER *logger_){
+SENSOR::SENSOR(String name_, int pin_, bool missingSignalIsOut_, LOGGER *logger_){
+    name = name_;
     pin = pin_;
     missingSignalIsOut = missingSignalIsOut_;
     pulseHistoryPos = 0;
@@ -28,6 +29,8 @@ SENSOR::SENSOR(int pin_, bool missingSignalIsOut_, LOGGER *logger_){
 void SENSOR::setup() {
   pinMode(pin, INPUT);
 //  logger->log("Sensor setup for pin: " + String(pin));
+  lastInTime = micros();
+  lastOutTime = micros();
 }
 
 void SENSOR::handleInterrupt() {
@@ -63,7 +66,6 @@ void SENSOR::handleInterrupt() {
     }
   } else {
     pulse_count_outside=0;
-
   }
   
    pulseHistoryPos++;
@@ -84,7 +86,12 @@ bool SENSOR::IsOut() {
 }
 
 bool SENSOR::IsOutOfBounds() {
-    return missingSignalIsOut ? !IsIn() : IsOut();
+    bool result = missingSignalIsOut ? !IsIn() : IsOut();
+    if (lastResultWasOutOfBounds != result) {
+      lastResultWasOutOfBounds = result;
+      logger->log(name +  (result ? " OUT" : " IN ") + GetPulseHistoryS());
+    }
+    return result;
 }
 
 bool SENSOR::IsSignalMissing() {

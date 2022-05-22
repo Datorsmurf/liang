@@ -118,8 +118,12 @@ void Controller::StopMovement(){
     gyro->resetOdometer();
 }
 
-void Controller::RunCutterAsync(){
-    cutterMotor->setSpeed(CUTTER_SPEED, 2000);
+void Controller::RunCutterAsync(int speed){
+    cutterMotor->setSpeed(speed, 2000);
+}
+
+bool Controller::IsCutterHighLoad() {
+    return cutterMotor->getSpeed() == CUTTER_SPEED && cutterMotor->isOverload();
 }
 
 void Controller::StopCutter(){

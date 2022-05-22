@@ -16,7 +16,8 @@ class Controller {
         bool RunAsync(int leftSpeed, int rightSpeed, int actionTime);
         void Move(int distanceInCm);
         void StopMovement();
-        void RunCutterAsync();
+        void RunCutterAsync(int speed);
+        bool IsCutterHighLoad();
         void StopCutter();
         bool HandleObsticle();
 

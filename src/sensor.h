@@ -8,7 +8,7 @@
 
 class SENSOR { 
     public:
-        SENSOR(int pin_, bool missingSignalIsOut_, LOGGER *logger_);
+        SENSOR(String name_, int pin_, bool missingSignalIsOut_, LOGGER *logger_);
         void setup();
         bool IsIn();
         bool IsOut();
@@ -23,6 +23,7 @@ class SENSOR {
         static int outside_code[];
 
         LOGGER *logger;
+        String name;
 
         int pin;
         bool missingSignalIsOut;
@@ -35,6 +36,7 @@ class SENSOR {
         int pulsehistory[PULSE_HISTORY_COUNT];
         int pulseHistoryPos = 0;
         unsigned long pulseCount = 0;
+        bool lastResultWasOutOfBounds = false;
 };
 
 #endif

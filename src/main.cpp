@@ -104,8 +104,8 @@ std::vector<PRESENTER*> presenters = {
 
 LOGGER logger(presenters);
 GYRO gyro(&logger, &mpu);
-SENSOR leftSensor(LEFT_SENSOR_PIN, false, &logger);
-SENSOR rightSensor(RIGHT_SENSOR_PIN, false, &logger);
+SENSOR leftSensor("LEFT", LEFT_SENSOR_PIN, false, &logger);
+SENSOR rightSensor("RIGHT", RIGHT_SENSOR_PIN, false, &logger);
 BATTERY battery(BATTERY_SENSOR_PIN, BATTERY_CHARGE_PIN);
 BUMPER bumper(BUMPER_PIN);
 
@@ -244,7 +244,7 @@ void pollPollables(void * parameter) {
 
     mowerModel.LeftSensorIsOutOfBounds = leftSensor.IsOutOfBounds();
     mowerModel.RightSensorIsOutOfBounds = rightSensor.IsOutOfBounds();
-
+    
     yield();
   }
 

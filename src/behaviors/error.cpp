@@ -34,6 +34,8 @@ String Error::getErrorDesc(int error) {
         return "Mower is stuck";
     case ERROR_BUMPER_STUCK:
         return "Bumper is stuck";
+    case ERROR_OUT_OF_BATTERY:
+        return "Out of battery";
     default:
         return "ERROR " + String(error);
     }
