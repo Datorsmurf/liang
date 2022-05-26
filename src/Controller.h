@@ -32,6 +32,7 @@ class Controller {
         bool IsRightOutOfBounds();
         int Heading();
         void FreezeTargetHeading();
+        void SetTargetHeading(int heading);
         int GetTargetHeadingDiff();
         bool OutOfBoundsTimoutHasOccurred();
         void ResetOutOfBoundsTimout();

@@ -52,18 +52,9 @@ bool Controller::RunAsync(int leftSpeed, int rightSpeed, int actionTime){
         int headingDiff = GetTargetHeadingDiff();
         if (headingDiff > 3) {
             leftSpeed = leftSpeed * 0.8;
-            //logger->log("Drifted right. Diff:" + String(headingDiff) + "Leftspeed: " + String(leftSpeed));
         } else if (headingDiff < -5) {
             rightSpeed = rightSpeed * 0.8;
-            //logger->log("Drifted left.  Diff:" + String(headingDiff));
-        } else {
-            //logger->log("No target diff.");
         }
-    
-    // if (leftSpeed != loggedSpeed) {
-    //     logger->log("Left speed: " + String(leftSpeed) + " Heading:" + String(Heading()) + " Headingdiff:" + String(headingDiff));
-    //     loggedSpeed = leftSpeed;
-    // }
     return abs(leftMotor->setSpeed(leftSpeed, actionTime)) + abs(rightMotor->setSpeed(rightSpeed, actionTime)) == 0;
 }
 
@@ -199,6 +190,10 @@ int Controller::Heading() {
 }
 
 void Controller::FreezeTargetHeading() {
+    SetTargetHeading(Heading());
+}
+
+void Controller::SetTargetHeading(int heading) {
     overallTargetHeading = Heading();
     logger->log("New target heading: " + String(overallTargetHeading));
 }
