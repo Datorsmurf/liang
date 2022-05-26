@@ -24,13 +24,14 @@ SENSOR::SENSOR(String name_, int pin_, bool missingSignalIsOut_, LOGGER *logger_
     {
       pulsehistory[i] = 0;
     }
+    lastResultWasOutOfBounds = false;
 }
 
 void SENSOR::setup() {
   pinMode(pin, INPUT);
 //  logger->log("Sensor setup for pin: " + String(pin));
   lastInTime = micros();
-  lastOutTime = micros();
+  lastOutTime = lastInTime;
 }
 
 void SENSOR::handleInterrupt() {
