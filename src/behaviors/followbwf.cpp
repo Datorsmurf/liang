@@ -19,6 +19,7 @@ void FollowBWF::start() {
     controller->StopCutter();
     obsticleCount = 0;
     lastObsticle = 0;
+    lastOutside = millis();
 }
 
 int FollowBWF::loop() {
@@ -30,6 +31,11 @@ int FollowBWF::loop() {
 
     if (battery->isBeingCharged()) {
         return BEHAVIOR_CHARGE;
+    }
+
+    
+    if (hasTimeout(lastOutside, 10000)) {
+        return BEHAVIOR_LOOK_FOR_BWF;
     }
 
     if (controller->IsBumped() || controller->IsTilted() || controller->IsWheelOverload()) {
@@ -55,6 +61,7 @@ int FollowBWF::loop() {
     }
 
     if (controller->IsRightOutOfBounds()) {
+        lastOutside = millis();
         controller->StopMovement();
 
         unsigned long t = millis();
@@ -75,6 +82,7 @@ int FollowBWF::loop() {
     }
 
     if (controller->IsLeftOutOfBounds()) {
+        lastOutside = millis();
         leftMotor->setSpeed(DOCKING_WHEEL_HIGH_SPEED, DOCKING_TIME_TO_HIGH_SPEED);
         if (rightMotor->getSpeed() < DOCKING_WHEEL_LOW_SPEED)
             rightMotor->setSpeed(DOCKING_WHEEL_HIGH_SPEED, DOCKING_TIME_TO_HIGH_SPEED);

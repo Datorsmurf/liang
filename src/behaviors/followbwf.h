@@ -33,6 +33,7 @@ class FollowBWF : public BEHAVIOR {
         int obsticleCount;
         int obsticleCountBeforeEvade;
         unsigned long lastObsticle;
+        unsigned long lastOutside;
 };
 
 #endif

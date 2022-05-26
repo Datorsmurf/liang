@@ -13,6 +13,7 @@ LookForBWF::LookForBWF(Controller *controller_, LOGGER *logger_, BATTERY *batter
 
 void LookForBWF::start() {
     controller->StopCutter();
+    controller->FreezeTargetHeading();
 }
 
 int LookForBWF::loop() {
