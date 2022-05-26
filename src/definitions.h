@@ -8,7 +8,7 @@ typedef std::function<void()> RebootNeededEvent;
 
 // BWF Code for inside and outside
 #define INSIDE_BWF          86, 86
-#define OUTSIDE_BWF         5, 81
+#define OUTSIDE_BWF         5, 81, 5, 81
 
 #define LED_PIN 17
 #define SWITCH_3_PIN 13
@@ -55,8 +55,8 @@ typedef std::function<void()> RebootNeededEvent;
 #define AUX_MOTOR_SENSE_PIN 39
 
 #define LOAD_START_IGNORE_TIME 500
-#define LOAD_LIMIT_WHEEL 150
-#define LOAD_LIMIT_CUTTER 700
+#define LOAD_LIMIT_WHEEL 160
+#define LOAD_LIMIT_CUTTER 940
 #define LOAD_FILTER 0.01
 #define LOAD_LIMIT_AUX 200
 
@@ -68,12 +68,12 @@ typedef std::function<void()> RebootNeededEvent;
 
 #define BUMPER_PIN 19
 
-#define LOW_SPEED 190
+#define LOW_SPEED 215
 #define FULL_SPEED 255
 #define NORMAL_ACCELERATION_TIME 400
 #define SHORT_ACCELERATION_TIME 100
 
-#define CUTTER_SPEED 200
+#define CUTTER_SPEED 255
 #define CUTTER_SPEED_BOOST 255
 
 #define TILT_ANGLE 30;
