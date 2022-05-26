@@ -18,7 +18,7 @@ void Launch::start() {
 }
 
 int Launch::loop() {
-    controller->Move(-70);
+    controller->Move(-30);
     controller->TurnAngle(90);
   
 

@@ -18,6 +18,10 @@ void LookForBWF::start() {
 int LookForBWF::loop() {
     if (controller->OutOfBoundsTimoutHasOccurred()) return id();
 
+    if (battery->isBeingCharged()) {
+        return BEHAVIOR_CHARGE;
+    }
+    
     if (controller->IsLeftOutOfBounds() || controller->IsRightOutOfBounds()) {
         return BEHAVIOR_FOLLOW_BWF;
     }

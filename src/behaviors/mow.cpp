@@ -86,13 +86,12 @@ int Mow::loop() {
         }
         
         controller->RunCutterAsync(CUTTER_SPEED_BOOST);
-        //controller->RunAsync(LOW_SPEED, LOW_SPEED, NORMAL_ACCELERATION_TIME);
+        controller->RunAsync(LOW_SPEED, LOW_SPEED, NORMAL_ACCELERATION_TIME);
 
     } else {
         controller->RunCutterAsync(CUTTER_SPEED);
-        //controller->RunAsync(FULL_SPEED, FULL_SPEED, NORMAL_ACCELERATION_TIME);
+        controller->RunAsync(FULL_SPEED, FULL_SPEED, NORMAL_ACCELERATION_TIME);
     }
-    controller->RunAsync(FULL_SPEED, FULL_SPEED, NORMAL_ACCELERATION_TIME);
 
     return id();
 }
