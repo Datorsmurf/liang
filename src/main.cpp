@@ -104,8 +104,8 @@ std::vector<PRESENTER*> presenters = {
 
 LOGGER logger(presenters);
 GYRO gyro(&logger, &mpu);
-SENSOR leftSensor("LEFT", LEFT_SENSOR_PIN, false, &logger);
-SENSOR rightSensor("RIGHT", RIGHT_SENSOR_PIN, false, &logger);
+SENSOR leftSensor("Left", LEFT_SENSOR_PIN, false, &logger);
+SENSOR rightSensor("Right", RIGHT_SENSOR_PIN, false, &logger);
 BATTERY battery(BATTERY_SENSOR_PIN, BATTERY_CHARGE_PIN);
 BUMPER bumper(BUMPER_PIN);
 

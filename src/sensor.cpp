@@ -90,7 +90,7 @@ bool SENSOR::IsOutOfBounds() {
     bool result = missingSignalIsOut ? !IsIn() : IsOut();
     if (lastResultWasOutOfBounds != result) {
       lastResultWasOutOfBounds = result;
-      logger->log(name +  (result ? " OUT" : " IN ") + GetPulseHistoryS());
+      logger->log(name +  (result ? " Out" : " In ") + GetPulseHistoryS());
     }
     return result;
 }
