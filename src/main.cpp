@@ -140,7 +140,7 @@ OPERATIONALMODE* availableOpModes[] = {
 OPERATIONALMODE* currentMode = availableOpModes[0];
 
 
-Charge charge(&controller, &logger, &battery, currentMode);
+Charge charge(&controller, &logger, &battery, &mowerModel);
 FollowBWF followBWF(&controller, &logger, &battery, &leftMotor, &rightMotor);
 GoAround goAround(&controller, &logger, &battery, &leftSensor, &rightSensor);
 Idle idle(&controller, &logger, &battery);

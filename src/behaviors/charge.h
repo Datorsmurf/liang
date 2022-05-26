@@ -11,7 +11,7 @@
 
 class Charge : public BEHAVIOR { 
     public:
-        Charge(Controller *controller_, LOGGER *logger_, BATTERY *battery_, OPERATIONALMODE *currentMode_);
+        Charge(Controller *controller_, LOGGER *logger_, BATTERY *battery_, MowerModel* mowerModel_);
         void start();
         int loop();
         int id();
@@ -20,7 +20,9 @@ class Charge : public BEHAVIOR {
         Controller *controller;
         LOGGER *logger;
         BATTERY *battery;
-        OPERATIONALMODE *currentMode;
+        MowerModel* mowerModel;
+        unsigned long lastCharge;
+        unsigned long wiggleStart;
 };
 
 #endif
