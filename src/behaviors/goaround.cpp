@@ -15,10 +15,10 @@ GoAround::GoAround(Controller *controller_, LOGGER *logger_, BATTERY *battery_, 
 void GoAround::start() {
     logger->log("Start GoAround");
     controller->StopMovement();
+    startingHeading = controller->Heading() - 30;
     controller->Move(-30);
 
     controller->TurnAngle(90);
-    startingHeading = controller->Heading();
     startingTime = millis();
     newHeadingIsSet = false;
 
@@ -33,13 +33,13 @@ int GoAround::loop() {
     }
 
 
-    if (!newHeadingIsSet && hasTimeout(startingTime, 2000)) {
-        controller->SetTargetHeading(startingHeading - 30);
+    if (!newHeadingIsSet && hasTimeout(startingTime, 1000)) {
+        controller->SetTargetHeading(startingHeading);
         newHeadingIsSet = true;
     }
 
     //Reached new heading
-    if (newHeadingIsSet && abs(controller->GetTargetHeadingDiff()) <5) {
+    if (newHeadingIsSet && (abs(controller->GetTargetHeadingDiff()) <5)) {
         logger->log("Reached target heading.");
         return BEHAVIOR_LOOK_FOR_BWF;
     }

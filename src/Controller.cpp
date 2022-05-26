@@ -194,7 +194,7 @@ void Controller::FreezeTargetHeading() {
 }
 
 void Controller::SetTargetHeading(int heading) {
-    overallTargetHeading = Heading();
+    overallTargetHeading = heading;
     logger->log("New target heading: " + String(overallTargetHeading));
 }
 
