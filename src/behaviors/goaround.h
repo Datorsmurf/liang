@@ -24,6 +24,7 @@ class GoAround : public BEHAVIOR {
         SENSOR *rightSensor;
         int startingHeading;
         int unsigned long startingTime;
+        bool newHeadingIsSet;
 };
 
 #endif

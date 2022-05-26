@@ -20,6 +20,7 @@ void GoAround::start() {
     controller->TurnAngle(90);
     startingHeading = controller->Heading();
     startingTime = millis();
+    newHeadingIsSet = false;
 
 }
 
@@ -31,15 +32,29 @@ int GoAround::loop() {
         return BEHAVIOR_FOLLOW_BWF;
     }
 
-    //Timeout or turned too far
-    if (startingTime + 30000 < millis() || absDiff(startingHeading, controller->Heading()) > 100) {
-      return BEHAVIOR_LOOK_FOR_BWF;
+
+    if (!newHeadingIsSet && hasTimeout(startingTime, 2000)) {
+        controller->SetTargetHeading(startingHeading - 30);
+        newHeadingIsSet = true;
+    }
+
+    //Reached new heading
+    if (newHeadingIsSet && abs(controller->GetTargetHeadingDiff()) <5) {
+        logger->log("Reached target heading.");
+        return BEHAVIOR_LOOK_FOR_BWF;
+    }
+
+    //Timeout or turned reached new heading
+    if (hasTimeout(startingTime, 30000)) {
+        logger->log("Timeout for going around.");
+        return BEHAVIOR_LOOK_FOR_BWF;
     }
 
     if (controller->HandleObsticle()){
         return BEHAVIOR_LOOK_FOR_BWF;
     }
-    controller->RunAsync(FULL_SPEED * 0.8, FULL_SPEED, NORMAL_ACCELERATION_TIME);
+
+    controller->RunAsync(FULL_SPEED, FULL_SPEED, NORMAL_ACCELERATION_TIME);
 
     return id();
 }
