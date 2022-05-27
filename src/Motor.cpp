@@ -41,11 +41,11 @@ bool MOTOR::isOverload() {
   
 
   //Handle cut off that in some situations gives zero load. Might trigger 
-  if (filteredLoad < 10 && (getSpeed() > 110) && isAtTargetSpeed()) {
+  if (filteredLoad < 5 && (getSpeed() > 110) && isAtTargetSpeed()) {
     if (_unexpectedLowLoadSince == 0) {
       _unexpectedLowLoadSince = millis();
     } else {
-      if (hasTimeout(_unexpectedLowLoadSince, 10000)) {
+      if (hasTimeout(_unexpectedLowLoadSince, 20000)) {
         _unexpectedLowLoadSince = 0;
         logger->log(logName +  ": Unexpected low load: " + String(filteredLoad) + " Speed: " + String(getSpeed()));
         return true;
