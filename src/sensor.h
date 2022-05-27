@@ -5,6 +5,7 @@
 #define PULSE_HISTORY_COUNT 10
 
 #include "Logger.h"
+#include "utils.h"
 
 class SENSOR { 
     public:
@@ -27,8 +28,8 @@ class SENSOR {
 
         int pin;
         bool missingSignalIsOut;
-        unsigned long lastInTime;
-        unsigned long lastOutTime;
+        unsigned long lastSignalTime;
+        bool isIn ;
         unsigned long last_pulse;
         int signel_status;
         int pulse_count_inside;

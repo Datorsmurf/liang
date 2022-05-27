@@ -30,8 +30,8 @@ SENSOR::SENSOR(String name_, int pin_, bool missingSignalIsOut_, LOGGER *logger_
 void SENSOR::setup() {
   pinMode(pin, INPUT);
 //  logger->log("Sensor setup for pin: " + String(pin));
-  lastInTime = micros();
-  lastOutTime = lastInTime;
+  lastSignalTime = millis();
+  isIn = !missingSignalIsOut;
 }
 
 void SENSOR::handleInterrupt() {
@@ -45,14 +45,19 @@ void SENSOR::handleInterrupt() {
   // Convert to pulse units (rounding up)
   int pulse_length = (time_since_pulse+(PULSE_UNIT_LENGTH/2)) / PULSE_UNIT_LENGTH;
 
+   pulseHistoryPos++;
+   pulseHistoryPos = pulseHistoryPos % PULSE_HISTORY_COUNT;
+   pulsehistory[pulseHistoryPos] = pulse_length;
+
   // Check if the latest pulse fits the code for inside
   if (abs(pulse_length-inside_code[pulse_count_inside]) < 2) {
     pulse_count_inside++;
 
     // Check if the entire pulse train has been batched
     if (pulse_count_inside >= sizeof(inside_code)/sizeof(inside_code[0])) {
-      lastInTime = now;
-      pulse_count_inside=0;
+      lastSignalTime = millis();
+      isIn = true;
+      pulse_count_outside=0;
     }
   } else {
     pulse_count_inside=0;
@@ -62,16 +67,15 @@ void SENSOR::handleInterrupt() {
   if (abs(pulse_length-outside_code[pulse_count_outside]) < 2) {
     pulse_count_outside++;
     if (pulse_count_outside >= sizeof(outside_code)/sizeof(outside_code[0])) {
-      lastOutTime = now;
-      pulse_count_outside=0;
+      lastSignalTime = millis();
+      isIn = false;
+      pulse_count_inside=0;
     }
   } else {
     pulse_count_outside=0;
   }
   
-   pulseHistoryPos++;
-   pulseHistoryPos = pulseHistoryPos % PULSE_HISTORY_COUNT;
-   pulsehistory[pulseHistoryPos] = pulse_length;
+
 
   // Store the received code for debug output
   // arr[arr_count++] = pulse_length;
@@ -79,15 +83,16 @@ void SENSOR::handleInterrupt() {
 }
 
 bool SENSOR::IsIn() {
-    return lastInTime > lastOutTime;
+    return isIn;
 }
 
 bool SENSOR::IsOut() {
-    return lastOutTime > lastInTime;
+    return !isIn;
 }
 
 bool SENSOR::IsOutOfBounds() {
-    bool result = missingSignalIsOut ? !IsIn() : IsOut();
+    
+    bool result = IsSignalMissing() ? missingSignalIsOut : IsOut();
     if (lastResultWasOutOfBounds != result) {
       lastResultWasOutOfBounds = result;
       logger->log(name +  (result ? " Out" : " In ") + GetPulseHistoryS());
@@ -96,7 +101,7 @@ bool SENSOR::IsOutOfBounds() {
 }
 
 bool SENSOR::IsSignalMissing() {
-  return millis() - max(lastInTime, lastOutTime) > PULSE_SIGNAL_VALID_MS;
+  return hasTimeout(lastSignalTime, SIGNAL_VALIDITY_TIME_MS);
 }
 
 String SENSOR::GetPulseHistoryS() {
