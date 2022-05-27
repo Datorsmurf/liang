@@ -7,11 +7,12 @@
 #include "battery.h"
 #include "sensor.h"
 #include "definitions.h"
+#include "interaction/hardwarebutton.h"
 
 
 class SensorDebug : public BEHAVIOR { 
     public:
-        SensorDebug(Controller *controller_, LOGGER *logger_, BATTERY *battery_, SENSOR *leftSensor_, SENSOR *rightSensor_);
+        SensorDebug(Controller *controller_, LOGGER *logger_, BATTERY *battery_, SENSOR *leftSensor_, SENSOR *rightSensor_, HardwareButton *button_);
         void start();
         int loop();
         int id();
@@ -22,6 +23,7 @@ class SensorDebug : public BEHAVIOR {
         BATTERY *battery;
         SENSOR *leftSensor;
         SENSOR *rightSensor;
+        HardwareButton *button;
         unsigned long lastPrint = 0;
 };
 

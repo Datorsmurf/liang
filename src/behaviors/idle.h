@@ -6,11 +6,11 @@
 #include "Logger.h"
 #include "battery.h"
 #include "sensor.h"
-
+#include "interaction/hardwarebutton.h"
 
 class Idle : public BEHAVIOR { 
     public:
-        Idle(Controller *controller_, LOGGER *logger_, BATTERY *battery_);
+        Idle(Controller *controller_, LOGGER *logger_, BATTERY *battery_, HardwareButton *button_);
         void start();
         int loop();
         int id();
@@ -19,6 +19,7 @@ class Idle : public BEHAVIOR {
         Controller *controller;
         LOGGER *logger;
         BATTERY *battery;
+        HardwareButton *button;
         unsigned long t = 0;
 };
 

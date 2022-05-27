@@ -2,21 +2,18 @@
 
 
 
-MotorDebug::MotorDebug(Controller *controller_, LOGGER *logger_, BATTERY *battery_, SENSOR *leftSensor_, SENSOR *rightSensor_) {
+MotorDebug::MotorDebug(Controller *controller_, LOGGER *logger_, BATTERY *battery_, SENSOR *leftSensor_, SENSOR *rightSensor_, HardwareButton *button_) {
     controller = controller_;
     logger = logger_;
     battery = battery_;
     leftSensor = leftSensor_;
     rightSensor = rightSensor_;
+    button = button_;
 }
 
 void MotorDebug::start() {
     controller->StopCutter();
     controller->StopMovement();
-    int checkStart = millis();
-    while(checkStart + OPTION_STEP_TIME > millis() && digitalRead(SWITCH_3_PIN) == LOW) {
-        delay(1);
-    }   
     stepStart = millis();
     currentStep = 0;
     turnAngle = 90;
@@ -25,7 +22,7 @@ void MotorDebug::start() {
 }
 
 int MotorDebug::loop() {
-    if (digitalRead(SWITCH_3_PIN) == LOW) {
+    if (button->GetConsumablePress()) {
         return BEHAVIOR_IDLE;
     }
 

@@ -2,26 +2,23 @@
 
 
 
-SensorDebug::SensorDebug(Controller *controller_, LOGGER *logger_, BATTERY *battery_, SENSOR *leftSensor_, SENSOR *rightSensor_) {
+SensorDebug::SensorDebug(Controller *controller_, LOGGER *logger_, BATTERY *battery_, SENSOR *leftSensor_, SENSOR *rightSensor_, HardwareButton *button_) {
     controller = controller_;
     logger = logger_;
     battery = battery_;
     leftSensor = leftSensor_;
     rightSensor = rightSensor_;
+    button = button_;
 }
 
 void SensorDebug::start() {
     controller->StopCutter();
     controller->StopMovement();
-    int checkStart = millis();
-    while(checkStart + OPTION_STEP_TIME > millis() && digitalRead(SWITCH_3_PIN) == LOW) {
-        delay(1);
-    }
     lastPrint = millis();
 }
 
 int SensorDebug::loop() {
-    if (digitalRead(SWITCH_3_PIN) == LOW) {
+    if (button->GetConsumablePress()) {
         return BEHAVIOR_MOTOR_DEBUG;
     }
 

@@ -3,23 +3,21 @@
 
 
 
-Idle::Idle(Controller *controller_, LOGGER *logger_, BATTERY *battery_) {
+Idle::Idle(Controller *controller_, LOGGER *logger_, BATTERY *battery_, HardwareButton *button_) {
     controller = controller_;
     logger = logger_;
     battery = battery_;
+    button = button_;
 }
 
 void Idle::start() {
     controller->StopCutter();
     controller->StopMovement();
-    int checkStart = millis();
-    while(checkStart + OPTION_STEP_TIME > millis() && digitalRead(SWITCH_3_PIN) == LOW) {
-        delay(1);
-    }
+
 }
 
 int Idle::loop() {
-    if (digitalRead(SWITCH_3_PIN) == LOW) {
+    if (button->GetConsumablePress()) {
         return BEHAVIOR_SENSOR_DEBUG;
     }
     

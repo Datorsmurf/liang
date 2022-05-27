@@ -35,6 +35,7 @@
 #include "interaction/display.h"
 #include "interaction/webui.h"
 #include "interaction/serialui.h"
+#include "interaction/hardwarebutton.h"
 
 #include "Controller.h"
 #include "definitions.h"
@@ -53,7 +54,6 @@
 
 
 unsigned long lastPrint= 0;
-unsigned long bootButtonPressMillis = 0;
 int expectedMode = 0;
 int expectedBehavior = 0;
 int manualMode = -1;
@@ -108,6 +108,8 @@ SENSOR leftSensor("Left", LEFT_SENSOR_PIN, false, &logger);
 SENSOR rightSensor("Right", RIGHT_SENSOR_PIN, false, &logger);
 BATTERY battery(BATTERY_SENSOR_PIN, BATTERY_CHARGE_PIN);
 BUMPER bumper(BUMPER_PIN);
+HardwareButton bootButton(SWITCH_BOOT_PIN, &logger);
+HardwareButton sw3Button(SWITCH_3_PIN, &logger);
 
 void setManualMode(int manualMode_) {
   manualMode = manualMode_;
@@ -143,10 +145,10 @@ OPERATIONALMODE* currentMode = availableOpModes[0];
 Charge charge(&controller, &logger, &battery, &mowerModel);
 FollowBWF followBWF(&controller, &logger, &battery, &leftMotor, &rightMotor);
 GoAround goAround(&controller, &logger, &battery, &leftSensor, &rightSensor);
-Idle idle(&controller, &logger, &battery);
+Idle idle(&controller, &logger, &battery, &sw3Button);
 Error error(&controller, &logger, &battery, &mowerModel);
-SensorDebug sensorDebug(&controller, &logger, &battery, &leftSensor, &rightSensor);
-MotorDebug motorDebug(&controller, &logger, &battery, &leftSensor, &rightSensor);
+SensorDebug sensorDebug(&controller, &logger, &battery, &leftSensor, &rightSensor, &sw3Button);
+MotorDebug motorDebug(&controller, &logger, &battery, &leftSensor, &rightSensor, &sw3Button);
 Launch launch(&controller, &logger, &battery);
 LookForBWF lookForBwf(&controller, &logger, &battery);
 Mow mow(&controller, &logger, &battery, &mowerModel, *setManualMode);
@@ -196,14 +198,11 @@ void pollPollables(void * parameter) {
         presenters[i]->PresentMowerModel(&mowerModel, useFullResend);
       }
     }
+    bootButton.check();
+    sw3Button.check();
 
-  //Some wonky debounce stuff. I wonder how the pros do it.
-  if (digitalRead(SWITCH_BOOT_PIN) == LOW) {
-      if (bootButtonPressMillis == 0) {
-        bootButtonPressMillis = millis();
-      }
-  } else{
-      if (bootButtonPressMillis!= 0 && hasTimeout(bootButtonPressMillis, 20)) {
+    
+    if (bootButton.GetConsumablePress()) {
         int baseMode = manualMode >= 0 ? manualMode : currentMode->id();  
         int newMode = baseMode + 1;
         if (newMode > MAX_MANUAL_OPMODE) {
@@ -211,9 +210,8 @@ void pollPollables(void * parameter) {
         }
         setManualMode(newMode);
         logger.log("New mode: " + String(newMode));
-      }
-      bootButtonPressMillis = 0;
-  }
+    
+    }
 
     bumper.doLoop();
     if (bumper.IsStuck()) {
@@ -380,8 +378,8 @@ void loop() {
   }
   
   digitalWrite(LED_PIN, 
-    (digitalRead(SWITCH_3_PIN) == LOW) 
-    || (digitalRead(SWITCH_BOOT_PIN) == LOW)
+    bootButton.IsPressed()
+    || sw3Button.IsPressed()
     || bumper.IsBumped());
 
 
