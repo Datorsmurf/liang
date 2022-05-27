@@ -14,7 +14,6 @@ Mow::Mow(Controller *controller_, LOGGER *logger_, BATTERY *battery_, MowerModel
 }
 
 void Mow::start() { 
-    controller->FreezeTargetHeading();
     boostModeSince = 0;
 }
 
@@ -24,7 +23,8 @@ int Mow::loop() {
     
     if (battery->mustCharge()) {
         if (mowermodel->CurrentOpModeId == OP_MODE_MOW_ONCE){
-            controller->SetError(ERROR_OUT_OF_BATTERY);
+            modeSelectEvent(OP_MODE_CHARGE);
+            //controller->SetError(ERROR_OUT_OF_BATTERY);
         }
         return BEHAVIOR_LOOK_FOR_BWF;
     }

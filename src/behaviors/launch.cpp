@@ -13,14 +13,17 @@ Launch::Launch(Controller *controller_, LOGGER *logger_, BATTERY *battery_) {
 
 void Launch::start() {
     logger->log("Start Launch");
+    int finalTargetHeading = controller->Heading() + 130;
     controller->StopCutter();
     controller->StopMovement();
+    controller->Move(-30);
+    controller->TurnAngle(90);
+    controller->Move(40);
+    controller->SetTargetHeading(finalTargetHeading);
+
 }
 
 int Launch::loop() {
-    controller->Move(-30);
-    controller->TurnAngle(90);
-  
 
     return BEHAVIOR_MOW;
 }
