@@ -7,6 +7,8 @@
 #include "Logger.h"
 #include "utils.h"
 
+#define LOG_SENSOR_CHANGE false
+
 class SENSOR { 
     public:
         SENSOR(String name_, int pin_, bool missingSignalIsOut_, LOGGER *logger_);
