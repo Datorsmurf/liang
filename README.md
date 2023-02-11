@@ -2,6 +2,8 @@
 
 This is a software for the next generation of Liam, called LiaNG. 
 
+The used hardware is LiamNG_V1.2 and you can find it [here](https://oshwlab.com/jonasforssell/Liam5_Shield-moUbtnFzR_copy_copy_copy)
+
 Take care, this software is still in an early stage and is incomplete, buggy and... well... pre-alpha.
 
 Fork it at you own risk, major refactoring is likely :)
