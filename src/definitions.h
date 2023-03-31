@@ -97,7 +97,7 @@ typedef std::function<void()> RebootNeededEvent;
 
 #define EEPROM_ADR_WIFI_SSID 0
 #define EEPROM_ADR_WIFI_PWD 33
-#define EEPROM_ADR_INIT_MODE 53
+#define EEPROM_ADR_INIT_MODE 64
 
 #endif
 
