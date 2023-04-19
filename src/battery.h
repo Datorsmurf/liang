@@ -15,13 +15,15 @@
 #include "utils.h"
 
 // Voltages should be specified in V
-#define BATTERY_FULL       12.560
-#define BATTERY_EMPTY      10.400
+#define BATTERY_FULL       15.000 //TODO: Change when changing to new battery!
+#define BATTERY_EMPTY      13.600 //TODO: Change when changing to new battery!
 
 // Running average sample size
 #define FILTER        2000
 
-#define VOLTDIVATOR   4.33
+// Voltage divider resistors (Same for both battery and charge connections)
+#define R_IN    330000  // Resistance in ohm of resistor connected between battery+ and analog input pin.
+#define R_GND   82000   // Resistance in ohm of resistor connected between GND and analog input pin.
 
 class BATTERY {
   public:
