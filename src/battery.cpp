@@ -66,7 +66,7 @@ float BATTERY::readBatteryAndCalcValue(){
   #if BOARD_VERSION == 10
     float reading = 1.1 +  (readValue * (13.3 / ANALOG_RESOLUTION_MAX_VALUE));
   #elif BOARD_VERSION == 11
-    float reading = 0.85 +  (readValue * (16.5 / ANALOG_RESOLUTION_MAX_VALUE));
+    float reading = VOLT_DIV * (readValue * (ADC_LINEAR_MAX_V-ADC_DETECTION_V)/ADC_LINEAR_MAX_READING + ADC_DETECTION_V);
   #endif
   return reading;
 }
