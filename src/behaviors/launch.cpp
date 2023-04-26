@@ -11,14 +11,18 @@ Launch::Launch(Controller *controller_, LOGGER *logger_, BATTERY *battery_) {
     battery = battery_;
 }
 
+bool Launch::logSensorChange() {
+    return true;
+}
+
 void Launch::start() {
     logger->log("Start Launch");
-    int finalTargetHeading = controller->Heading() + 130;
+    int finalTargetHeading = controller->Heading() + 170;
     controller->StopCutter();
     controller->StopMovement();
     controller->Move(-30);
-    controller->TurnAngle(90);
-    controller->Move(40);
+    controller->TurnAngle(130);
+    controller->Move(20);
     controller->SetTargetHeading(finalTargetHeading);
 
 }

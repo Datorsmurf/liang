@@ -15,7 +15,7 @@
 #include "utils.h"
 
 // Voltages should be specified in V
-#define BATTERY_FULL       12.560
+#define BATTERY_FULL       13.000 //12.560
 #define BATTERY_EMPTY      10.400
 
 // Running average sample size

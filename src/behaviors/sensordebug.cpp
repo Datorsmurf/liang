@@ -11,20 +11,32 @@ SensorDebug::SensorDebug(Controller *controller_, LOGGER *logger_, BATTERY *batt
     button = button_;
 }
 
+bool SensorDebug::logSensorChange() {
+    return false;
+}
+
 void SensorDebug::start() {
     controller->StopCutter();
     controller->StopMovement();
     lastPrint = millis();
+    debugLeft = true;
+    logger->log("Left sensor");
 }
 
 int SensorDebug::loop() {
     if (button->GetConsumablePress()) {
-        return BEHAVIOR_MOTOR_DEBUG;
+        if (debugLeft) {
+            debugLeft = false;
+            logger->log("Right sensor");
+        }
+        else {
+            return BEHAVIOR_MOTOR_DEBUG;
+        }   
     }
 
 
-    if (millis() - lastPrint > 500) {
-        if (millis() / 1000 % 4 > 2) {
+    if (hasTimeout(lastPrint, 2000)) {
+        if (debugLeft) {
             logger->log("L: " + leftSensor->GetPulseHistoryS());
         } else {
             logger->log("R: " + rightSensor->GetPulseHistoryS());

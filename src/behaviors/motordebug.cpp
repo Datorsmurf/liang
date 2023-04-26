@@ -11,6 +11,11 @@ MotorDebug::MotorDebug(Controller *controller_, LOGGER *logger_, BATTERY *batter
     button = button_;
 }
 
+bool MotorDebug::logSensorChange() {
+    return false;
+}
+
+
 void MotorDebug::start() {
     controller->StopCutter();
     controller->StopMovement();

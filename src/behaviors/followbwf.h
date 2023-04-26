@@ -23,6 +23,7 @@ class FollowBWF : public BEHAVIOR {
         int loop();
         int id();
         String desc();
+        bool logSensorChange();
     private:
         Controller *controller;
         LOGGER *logger;
@@ -34,6 +35,8 @@ class FollowBWF : public BEHAVIOR {
         int obsticleCountBeforeEvade;
         unsigned long lastObsticle;
         unsigned long lastOutside;
+        unsigned long lastInside;
+        
 };
 
 #endif

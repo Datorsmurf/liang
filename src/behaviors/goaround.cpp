@@ -11,6 +11,9 @@ GoAround::GoAround(Controller *controller_, LOGGER *logger_, BATTERY *battery_, 
     leftSensor = leftSensor_;
     rightSensor = rightSensor_;
 }
+bool GoAround::logSensorChange() {
+    return true;
+}
 
 void GoAround::start() {
     logger->log("Start GoAround");
@@ -21,6 +24,7 @@ void GoAround::start() {
     controller->TurnAngle(90);
     startingTime = millis();
     newHeadingIsSet = false;
+
 
 }
 
@@ -50,7 +54,7 @@ int GoAround::loop() {
         return BEHAVIOR_LOOK_FOR_BWF;
     }
 
-    if (controller->HandleObsticle()){
+    if (controller->HandleObsticle(false)){
         return BEHAVIOR_LOOK_FOR_BWF;
     }
 

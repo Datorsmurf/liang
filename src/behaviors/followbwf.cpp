@@ -13,6 +13,9 @@ FollowBWF::FollowBWF(Controller *controller_, LOGGER *logger_, BATTERY *battery_
     rightMotor = rightMotor_;
     obsticleCountBeforeEvade = 3;
 }
+bool FollowBWF::logSensorChange() {
+    return true;
+}
 
 void FollowBWF::start() {
     logger->log("Start FollowBwf");
@@ -20,6 +23,7 @@ void FollowBWF::start() {
     obsticleCount = 0;
     lastObsticle = 0;
     lastOutside = millis();
+
 }
 
 int FollowBWF::loop() {
@@ -34,11 +38,11 @@ int FollowBWF::loop() {
     }
 
     
-    if (hasTimeout(lastOutside, 10000)) {
+    if (hasTimeout(lastOutside, 15000)) {
         return BEHAVIOR_LOOK_FOR_BWF;
     }
 
-    if (controller->IsBumped() || controller->IsTilted() || controller->IsWheelOverload()) {
+    if (controller->IsBumped() || controller->IsTilted() || controller->IsWheelOverload(true) || hasTimeout(lastInside, 15000)) {
 
         controller->StopMovement();
 
@@ -58,6 +62,7 @@ int FollowBWF::loop() {
         }
 
         controller->Move(-30);
+        lastInside = millis();//Not really inside, but reset anyways.
     }
 
     if (controller->IsRightOutOfBounds()) {
@@ -89,13 +94,15 @@ int FollowBWF::loop() {
         else 
             rightMotor->setSpeed(DOCKING_WHEEL_LOW_SPEED, DOCKING_TIME_TO_SLOW_SPEED);
     } else {
+        lastInside = millis();
+
         rightMotor->setSpeed(DOCKING_WHEEL_HIGH_SPEED, DOCKING_TIME_TO_HIGH_SPEED);
         if (leftMotor->getSpeed() < DOCKING_WHEEL_LOW_SPEED)
             leftMotor->setSpeed(DOCKING_WHEEL_HIGH_SPEED, DOCKING_TIME_TO_HIGH_SPEED);
         else 
             leftMotor->setSpeed(DOCKING_WHEEL_LOW_SPEED, DOCKING_TIME_TO_SLOW_SPEED);
 
-    }
+    } 
 
     return id();
 }

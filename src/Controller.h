@@ -19,13 +19,14 @@ class Controller {
         void RunCutterAsync(int speed);
         bool IsCutterHighLoad();
         void StopCutter();
-        bool HandleObsticle();
+        bool HandleObsticle(bool toughMode);
+        void ResetNavigation();
 
         int GetError();
         void SetError(int error);
 
         bool IsBumped();
-        bool IsWheelOverload();
+        bool IsWheelOverload(bool toughMode);
         bool IsTilted();
         bool IsFlipped();
         bool IsLeftOutOfBounds();
@@ -36,8 +37,9 @@ class Controller {
         int GetTargetHeadingDiff();
         bool OutOfBoundsTimoutHasOccurred();
         void ResetOutOfBoundsTimout();
+        void ResetFailedTurnsCount();
 
-        void DoEvadeObsticle();
+        void DoEvadeObsticle(bool smallMovement);
     private:
         MOTOR* leftMotor;
         MOTOR* rightMotor;
@@ -53,6 +55,7 @@ class Controller {
         unsigned long lastTimeInside = 0;
 
         int loggedSpeed = 1;
+        int failedTurnsCount = 0;
 };
 
 #endif

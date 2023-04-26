@@ -2,19 +2,19 @@
 
 
 
-MOTOR::MOTOR(int loadPin_, int pwmpin_forward_, int pwmpin_backwards_, int forward_channelNo_, int backwards_channelNo_, int loadLimit_, int ignoreStartLoadsFor_, LOGGER *logger_, const String &logName_) {
+MOTOR::MOTOR(int loadPin_, int pwmpin_forward_, int pwmpin_backwards_, int forward_channelNo_, int backwards_channelNo_, int ignoreStartLoadsFor_, LOGGER *logger_, const String &logName_) {
   loadPin = loadPin_;
   pwmpin_forward = pwmpin_forward_;
   pwmpin_backwards = pwmpin_backwards_;
   forward_channelNo = forward_channelNo_;
   backwards_channelNo = backwards_channelNo_;
-  loadLimit = loadLimit_;
   logger = logger_;
   ignoreStartLoadsFor = ignoreStartLoadsFor_;
   logName = logName_;
 }
 
-void MOTOR::setup() {
+void MOTOR::setup(int loadLimit_) {
+  loadLimit = loadLimit_;
   pinMode(pwmpin_forward, OUTPUT);
   ledcAttachPin(pwmpin_forward, forward_channelNo);
   ledcSetup(forward_channelNo, freq, resolution);
@@ -32,7 +32,7 @@ int MOTOR::getLoad() {
   return filteredLoad;
 }
 
-bool MOTOR::isOverload() {
+bool MOTOR::isOverload(bool toughMode) {
   if(!isAtTargetSpeed()) return false;
 
   if (!hasTimeout(_atTargetSpeedSince, ignoreStartLoadsFor)) return false;
@@ -55,7 +55,7 @@ bool MOTOR::isOverload() {
     _unexpectedLowLoadSince = 0;
   }
 
-  if(filteredLoad > loadLimit) {
+  if(filteredLoad > loadLimit + (toughMode ? 30 : 0)) {
     logger->log(logName +  ": Overload: " + String(filteredLoad) + " Speed: " + String(getSpeed()));
     return true;
   };

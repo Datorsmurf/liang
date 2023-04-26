@@ -7,6 +7,7 @@
 #include "interaction/presenter.h"
 #include "operational_modes/operationalmode.h"
 #include "logevent.h"
+#include "settings.h"
 
 #include "utils.h"
 #include "definitions.h"
@@ -18,7 +19,7 @@
 class WEBUI : public PRESENTER { 
     public:
 
-        WEBUI(AsyncWebServer* server_, AsyncWebSocket* webSocketServer_, ModeSelectEvent modeSelectEvent_, RebootNeededEvent rebootNeededEvent_);
+        WEBUI(AsyncWebServer* server_, AsyncWebSocket* webSocketServer_, ModeSelectEvent modeSelectEvent_, RebootNeededEvent rebootNeededEvent_, SETTINGS *settings_);
         void setup();
         void doLoop();
         void SetLogger(LOGGER* logger_);
@@ -32,6 +33,7 @@ class WEBUI : public PRESENTER {
         void sendDoc(DynamicJsonDocument doc, uint32_t clientId);
         void wsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len);
         void handleNotFound(AsyncWebServerRequest *request);
+        String processSettings(const String& var);
         //bool enqueueMessage(uint32_t clientId, const String& msg);
         bool hasPrefixSilentTimePassed(String prefix, String data, unsigned int minSilentTime);
         ModeSelectEvent modeSelectEvent;
@@ -39,6 +41,7 @@ class WEBUI : public PRESENTER {
         RebootNeededEvent rebootNeededEvent;
         AsyncWebServer* server;
         MowerModel *printedModel;
+        SETTINGS *settings;
         std::map<String, unsigned long> prefixSendTimes = std::map<String, unsigned long>();
         bool forceFullPrint = true;
         unsigned long dataThrottleTime = 1000; //Time to wait before sending everchanging data such as voltage or motorloads.

@@ -17,6 +17,7 @@ class SensorDebug : public BEHAVIOR {
         int loop();
         int id();
         String desc();
+        bool logSensorChange();
     private:
         Controller *controller;
         LOGGER *logger;
@@ -25,6 +26,7 @@ class SensorDebug : public BEHAVIOR {
         SENSOR *rightSensor;
         HardwareButton *button;
         unsigned long lastPrint = 0;
+        bool debugLeft;
 };
 
 #endif

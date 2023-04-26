@@ -6,19 +6,20 @@
 #define NOSIGNAL  0
 #define OUTSIDE   -1
 
-#define SIGNAL_VALIDITY_TIME_MS 300
+#define SIGNAL_VALIDITY_TIME_MS 120000
 #define PULSE_UNIT_LENGTH 100
 
 
 int SENSOR::outside_code[] = {OUTSIDE_BWF};
 int SENSOR::inside_code[] = {INSIDE_BWF};
 
-SENSOR::SENSOR(String name_, int pin_, bool missingSignalIsOut_, LOGGER *logger_){
+SENSOR::SENSOR(String name_, int pin_, bool missingSignalIsOut_, int signalValidityTimeMs_, LOGGER *logger_){
     name = name_;
     pin = pin_;
     missingSignalIsOut = missingSignalIsOut_;
     pulseHistoryPos = 0;
     pulseCount = 0;
+    signalValidityTimeMs = signalValidityTimeMs_;
     logger = logger_;
     for (size_t i = 0; i < PULSE_HISTORY_COUNT; i++)
     {
@@ -83,7 +84,7 @@ void SENSOR::handleInterrupt() {
 }
 
 bool SENSOR::IsIn() {
-    return isIn;
+    return isIn && !IsSignalMissing();
 }
 
 bool SENSOR::IsOut() {
@@ -91,27 +92,45 @@ bool SENSOR::IsOut() {
 }
 
 bool SENSOR::IsOutOfBounds() {
-    
-    bool result = IsSignalMissing() ? missingSignalIsOut : IsOut();
+    bool isSigMiss = IsSignalMissing();
+    bool result = isSigMiss ? missingSignalIsOut : IsOut();
     if (lastResultWasOutOfBounds != result) {
       lastResultWasOutOfBounds = result;
-      if (LOG_SENSOR_CHANGE){
-        logger->log(name +  (result ? " Out" : " In ") + GetPulseHistoryS());
+      if (logSensorChanges){
+        String s = isSigMiss ? " Missing signal. Last ok: " + String(lastSignalTime)  : "";
+        //logger->log("a");
+        logger->log(name +  (result ? " Out" : " In ") + s);
+        //logger->log("b");
       }      
     }
     return result;
 }
 
 bool SENSOR::IsSignalMissing() {
-  return hasTimeout(lastSignalTime, SIGNAL_VALIDITY_TIME_MS);
+  if (signalValidityTimeMs <= 0) return false;
+  return hasTimeout(lastSignalTime, signalValidityTimeMs);
+}
+
+void SENSOR::SetLogSensorChanges(bool logChanges) {
+  logSensorChanges = logChanges;
 }
 
 String SENSOR::GetPulseHistoryS() {
   String result = "";
+  try
+  {
+    
   for (size_t i = 0; i < PULSE_HISTORY_COUNT; i++)
     {
       result = result + " " + String(pulsehistory[i]);
     }
-
-    return result;
+    result = result + " Last ok: " + String(lastSignalTime);
+     
+  }
+  catch(const std::exception& e)
+  { 
+    result = e.what();
+  }
+  
+   return result;
 }

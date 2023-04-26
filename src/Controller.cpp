@@ -15,7 +15,7 @@ Controller::Controller(MOTOR* leftMotor_, MOTOR* rightMotor_, MOTOR* cutterMotor
 void Controller::TurnAngle(int degrees){
     degrees = (degrees % 360);
     float targetHeading = Heading() + degrees;
-    logger->log("TurnAngle " + String(degrees) + " start " + String(Heading()) + " target: " + String(targetHeading));
+    //logger->log("TurnAngle " + String(degrees) + " start " + String(Heading()) + " target: " + String(targetHeading));
     unsigned long t = millis();
 
     while (true)
@@ -32,13 +32,18 @@ void Controller::TurnAngle(int degrees){
 
         TurnAsync(degrees < 50 || angleDiff > 35 ? FULL_SPEED : LOW_SPEED, degrees < 0);
         if (hasTimeout(t, 2500)) {
-            logger->log("TurnAngle " + String(degrees) + "timed out. Now at: " + String(Heading()));
+            failedTurnsCount++;
+            logger->log("TurnAngle " + String(degrees) + " timed out. Fails in sequence: " + String(failedTurnsCount));
             StopMovement();
             FreezeTargetHeading();
+            if (failedTurnsCount > 10) {
+                SetError(ERROR_STUCK);
+            }
             return;
         }
     }
-    logger->log("TurnAngle " + String(degrees) + "ok. Now at: " + String(Heading()));
+    failedTurnsCount = 0;
+    logger->log("TurnAngle " + String(degrees) + " ok.");
     FreezeTargetHeading();
     StopMovement();
 }
@@ -114,30 +119,38 @@ void Controller::RunCutterAsync(int speed){
 }
 
 bool Controller::IsCutterHighLoad() {
-    return cutterMotor->getSpeed() == CUTTER_SPEED && cutterMotor->isOverload();
+
+    if (!cutterMotor->isOverload(false)) return false;
+
+    if (cutterMotor->getSpeed() < CUTTER_SPEED) return false;
+
+    if (cutterMotor->getLoad() < 10) {
+        SetError(ERROR_CUTTER_STUCK);
+    }
+
+    return true;
 }
 
 void Controller::StopCutter(){
     cutterMotor->setSpeed(0,0);
 }
 
-bool Controller::HandleObsticle(){
+bool Controller::HandleObsticle(bool toughMode){
     if (IsBumped()) {
         logger->log("Bumped");
-        DoEvadeObsticle();
+        DoEvadeObsticle(false);
         return true;
     }
 
     if (IsTilted()) {
         logger->log("Tilted");
-        DoEvadeObsticle();
+        DoEvadeObsticle(true);
         return true;
     }
 
     
-    if (IsWheelOverload()) {
-        logger->log("Wheel overload");
-        DoEvadeObsticle();
+    if (IsWheelOverload(toughMode)) {
+        DoEvadeObsticle(false);
         return true;
     }
 
@@ -160,20 +173,25 @@ void Controller::ResetOutOfBoundsTimout(){
     lastTimeInside = millis();
 }
 
+void Controller::ResetFailedTurnsCount(){
+    failedTurnsCount = 0;
+}
+
+
 bool Controller::OutOfBoundsTimoutHasOccurred(){
-    if(IsLeftOutOfBounds() && IsRightOutOfBounds()) {
+    if(!leftSensor->IsOutOfBounds() || rightSensor->IsOutOfBounds()) {
+        lastTimeInside = millis();
+        return false;
+    } else {
         if (hasTimeout(lastTimeInside, 16000)) {
             SetError(ERROR_OUT);
             return true;
         } 
         return false;
-    } else {
-        lastTimeInside = millis();
-        return false;
     }
 }
-bool Controller::IsWheelOverload() {
-    return leftMotor->isOverload() || rightMotor->isOverload();
+bool Controller::IsWheelOverload(bool toughMode) {
+    return leftMotor->isOverload(toughMode) || rightMotor->isOverload(toughMode);
 }
 
 bool Controller::IsTilted() {
@@ -185,6 +203,9 @@ bool Controller::IsFlipped() {
     return max(abs(gyro->getAngleX()), abs(gyro->getAngleY())) > FLIP_ANGLE;
 }
 
+void Controller::ResetNavigation(){
+    gyro->setup();
+}
 int Controller::Heading() {
     return gyro->getHeading();
 }
@@ -215,10 +236,10 @@ int Controller::GetError() {
 
 
 
-void Controller::DoEvadeObsticle(){
+void Controller::DoEvadeObsticle(bool smallMovement){
     StopMovement();
     Move(-20);
-    int turnAngle = random(90, 160);;
+    int turnAngle = smallMovement ? random(20, 70) : random(90, 160);;
     if (random(0, 100) % 2 == 0) {
         turnAngle = -turnAngle;
     }

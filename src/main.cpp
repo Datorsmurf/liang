@@ -7,7 +7,6 @@
 #include <ESPAsyncWebServer.h>
 #include "SPIFFS.h"
 #include "MPU6050_light.h"
-#include "EEPROM.h"
 
 #include "operational_modes/operationalmode.h"
 #include "operational_modes/OpModeCharge.h"
@@ -45,6 +44,7 @@
 #include "gyro.h"
 
 #include "utils.h"
+#include "settings.h"
 
 
 //#define INTERRUPT_ATTR DRAM_ATTR 
@@ -85,13 +85,13 @@ void setRebootNeeded() {
   manualMode = OP_MODE_UPGRADE;
 }
 
-
+SETTINGS settings;
 MPU6050 mpu(Wire);
 AsyncWebServer webServer(80);
 AsyncWebSocket webSocket("/ws");
 MOWERDISPLAY display;
 SERIALUI serialUi(*setManualMode);
-WEBUI webUi(&webServer, &webSocket, *setManualMode, *setRebootNeeded);
+WEBUI webUi(&webServer, &webSocket, *setManualMode, *setRebootNeeded, &settings);
 
 
 
@@ -104,8 +104,8 @@ std::vector<PRESENTER*> presenters = {
 
 LOGGER logger(presenters);
 GYRO gyro(&logger, &mpu);
-SENSOR leftSensor("Left", LEFT_SENSOR_PIN, false, &logger);
-SENSOR rightSensor("Right", RIGHT_SENSOR_PIN, false, &logger);
+SENSOR leftSensor("Left", LEFT_SENSOR_PIN, MISSING_SIGNAL_IS_OUT, PULSE_SIGNAL_VALID_MS, &logger);
+SENSOR rightSensor("Right", RIGHT_SENSOR_PIN, MISSING_SIGNAL_IS_OUT, PULSE_SIGNAL_VALID_MS, &logger);
 BATTERY battery(BATTERY_SENSOR_PIN, BATTERY_CHARGE_PIN);
 BUMPER bumper(BUMPER_PIN);
 HardwareButton bootButton(SWITCH_BOOT_PIN, &logger);
@@ -116,9 +116,9 @@ void setManualMode(int manualMode_) {
 }
 
 
-MOTOR leftMotor(LEFT_MOTOR_SENSE_PIN, LEFT_MOTOR_FORWARD_PWM_PIN, LEFT_MOTOR_BACKWARDS_PWM_PIN, LEFT_MOTOR_PWM_CHANNEL_FORWARD, LEFT_MOTOR_PWM_CHANNEL_BACKWARDS, LOAD_LIMIT_WHEEL, LOAD_START_IGNORE_TIME, &logger, "Left");
-MOTOR rightMotor(RIGHT_MOTOR_SENSE_PIN, RIGHT_MOTOR_FORWARD_PWM_PIN, RIGHT_MOTOR_BACKWARDS_PWM_PIN, RIGHT_MOTOR_PWM_CHANNEL_FORWARD, RIGHT_MOTOR_PWM_CHANNEL_BACKWARDS, LOAD_LIMIT_WHEEL, LOAD_START_IGNORE_TIME, &logger, "Right");
-MOTOR cutterMotor(CUTTER_MOTOR_SENSE_PIN, CUTTER_MOTOR_FORWARD_PWM_PIN, CUTTER_MOTOR_BACKWARDS_PWM_PIN, CUTTER_MOTOR_PWM_CHANNEL_FORWARD, CUTTER_MOTOR_PWM_CHANNEL_BACKWARDS, LOAD_LIMIT_CUTTER, LOAD_START_IGNORE_TIME, &logger, "Cutter");
+MOTOR leftMotor(LEFT_MOTOR_SENSE_PIN, LEFT_MOTOR_FORWARD_PWM_PIN, LEFT_MOTOR_BACKWARDS_PWM_PIN, LEFT_MOTOR_PWM_CHANNEL_FORWARD, LEFT_MOTOR_PWM_CHANNEL_BACKWARDS, LOAD_START_IGNORE_TIME, &logger, "Left");
+MOTOR rightMotor(RIGHT_MOTOR_SENSE_PIN, RIGHT_MOTOR_FORWARD_PWM_PIN, RIGHT_MOTOR_BACKWARDS_PWM_PIN, RIGHT_MOTOR_PWM_CHANNEL_FORWARD, RIGHT_MOTOR_PWM_CHANNEL_BACKWARDS, LOAD_START_IGNORE_TIME, &logger, "Right");
+MOTOR cutterMotor(CUTTER_MOTOR_SENSE_PIN, CUTTER_MOTOR_FORWARD_PWM_PIN, CUTTER_MOTOR_BACKWARDS_PWM_PIN, CUTTER_MOTOR_PWM_CHANNEL_FORWARD, CUTTER_MOTOR_PWM_CHANNEL_BACKWARDS, LOAD_START_IGNORE_TIME, &logger, "Cutter");
 
 Controller controller(&leftMotor, &rightMotor, &cutterMotor, &gyro, &bumper, &leftSensor, &rightSensor, &logger);
 
@@ -264,8 +264,8 @@ void pollPollables(void * parameter) {
 void setupWifi() {
   mowerModel.Behavior = "WIFI";
 
-  String ssid = EEPROM.readString(EEPROM_ADR_WIFI_SSID);
-  String pwd = EEPROM.readString(EEPROM_ADR_WIFI_PWD);
+  String ssid =  settings.readWifiSid();
+  String pwd = settings.readWifiPwd();
 
   logger.log("SSID: " + ssid);
 
@@ -295,7 +295,7 @@ void setupWifi() {
 
 void setup() {
   Serial.begin(115200);
-
+  settings.setup(&logger);
 
   analogReadResolution(ANALOG_RESOLUTION);
   analogSetAttenuation(ADC_11db);  
@@ -345,9 +345,9 @@ void setup() {
   rightSensor.setup();
   attachInterrupt(RIGHT_SENSOR_PIN, handleInterruptRight, RISING);
 
-  leftMotor.setup();
-  rightMotor.setup();
-  cutterMotor.setup();
+  leftMotor.setup(settings.readWheelMotorLoadLimit());
+  rightMotor.setup(settings.readWheelMotorLoadLimit());
+  cutterMotor.setup(settings.readCutterLoadLimit());
 
   mowerModel.Behavior = "Starting";
 
@@ -416,6 +416,7 @@ void loop() {
         expectedBehavior = currentMode->start();
         controller.FreezeTargetHeading();
         controller.ResetOutOfBoundsTimout();
+        controller.ResetFailedTurnsCount();
         break;
       }
     }
@@ -438,6 +439,8 @@ void loop() {
         logger.log("Enter behavior: " + currentBehavior->desc());
         mowerModel.Behavior = currentBehavior->desc();
         currentBehavior->start();
+        leftSensor.SetLogSensorChanges(currentBehavior->logSensorChange());
+        rightSensor.SetLogSensorChanges(currentBehavior->logSensorChange());
         break;
       }
     }

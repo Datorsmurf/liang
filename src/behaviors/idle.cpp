@@ -9,11 +9,13 @@ Idle::Idle(Controller *controller_, LOGGER *logger_, BATTERY *battery_, Hardware
     battery = battery_;
     button = button_;
 }
+bool Idle::logSensorChange() {
+    return true;
+}
 
 void Idle::start() {
     controller->StopCutter();
     controller->StopMovement();
-
 }
 
 int Idle::loop() {

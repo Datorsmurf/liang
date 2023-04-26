@@ -1,12 +1,13 @@
 #include "webui.h"
 
-WEBUI::WEBUI(AsyncWebServer* server_, AsyncWebSocket* webSocketServer_, ModeSelectEvent modeSelectEvent_, RebootNeededEvent rebootNeededEvent_){
+WEBUI::WEBUI(AsyncWebServer* server_, AsyncWebSocket* webSocketServer_, ModeSelectEvent modeSelectEvent_, RebootNeededEvent rebootNeededEvent_, SETTINGS *settings_){
     webSocketServer = webSocketServer_;
     server = server_;
     modeSelectEvent = modeSelectEvent_;
     rebootNeededEvent = rebootNeededEvent_;
     printedModel = new MowerModel();
     loggingClients = std::vector<uint32_t>();
+    settings = settings_;
 }
 
 void WEBUI::SetLogger(LOGGER* logger_) {
@@ -294,9 +295,19 @@ void WEBUI::handleNotFound(AsyncWebServerRequest *request) {
   request->send(404);
 }
 
+String WEBUI::processSettings(const String& var){
+  return var;
+}
+
 void WEBUI::setup() {
   server->addHandler(webSocketServer);
   
+  // server->on("/settings.html", HTTP_GET, [this](AsyncWebServerRequest * request){
+  //   File f = SPIFFS.open("settings.html");
+  //   String s = f.readString();
+  //   request->send_P(200, "text/html", s, std::function<String(String&)>(&WEBUI::processSettings, std::placeholders::_1));
+  // });
+
   server->on("/settings.html", HTTP_POST, [this](AsyncWebServerRequest * request){
     int params = request->params();
     String ssid = "";
@@ -322,17 +333,19 @@ void WEBUI::setup() {
 
     //logger->log("Settings received...");
     if (ssid.length() > 0) {
-      EEPROM.writeString(EEPROM_ADR_WIFI_SSID, ssid);
-      EEPROM.writeString(EEPROM_ADR_WIFI_PWD, pwd);
+      settings->writeWifiSid(ssid);
+      settings->writeWifiPwd(pwd);
     }
-    EEPROM.writeInt(EEPROM_ADR_INIT_MODE, initmode);
-    EEPROM.commit();
+    settings->writeInitialMode(initmode);
+    settings->commit();
     //logger->log("WifiSettings saved, restarting...");
 
     request->redirect("/");
     rebootNeededEvent();
 
   }); // server.on
+
+
   server->serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
  
   server->onNotFound(std::bind(&WEBUI::handleNotFound, this, std::placeholders::_1));

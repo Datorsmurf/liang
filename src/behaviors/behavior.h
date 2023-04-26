@@ -19,6 +19,7 @@ class BEHAVIOR {
     virtual void start();
     virtual int loop();
     virtual int id();
+    virtual bool logSensorChange();
     virtual String desc();
 };
 

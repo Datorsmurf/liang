@@ -10,11 +10,14 @@ Error::Error(Controller *controller_, LOGGER *logger_, BATTERY *battery_, MowerM
     mowerModel = mowerModel_;
 }
 
+bool Error::logSensorChange() {
+    return true;
+}
+
 void Error::start() {
     controller->StopCutter();
     controller->StopMovement();
     int checkStart = millis();
-
     mowerModel->Behavior = getErrorDesc(controller->GetError());
 }
 
@@ -36,6 +39,8 @@ String Error::getErrorDesc(int error) {
         return "Bumper is stuck";
     case ERROR_OUT_OF_BATTERY:
         return "Out of battery";
+    case ERROR_CUTTER_STUCK:
+        return "Cutter stuck";
     default:
         return "ERROR " + String(error);
     }

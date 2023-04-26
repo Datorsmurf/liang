@@ -11,6 +11,11 @@ LookForBWF::LookForBWF(Controller *controller_, LOGGER *logger_, BATTERY *batter
     battery = battery_;
 }
 
+bool LookForBWF::logSensorChange() {
+    return true;
+}
+
+
 void LookForBWF::start() {
     controller->StopCutter();
     controller->FreezeTargetHeading();
@@ -27,7 +32,7 @@ int LookForBWF::loop() {
         return BEHAVIOR_FOLLOW_BWF;
     }
     
-    if (controller->HandleObsticle()) {
+    if (controller->HandleObsticle(false)) {
         return id();
     }
 

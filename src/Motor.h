@@ -8,16 +8,16 @@
 
 class MOTOR {
   public:
-    MOTOR(int loadPin_, int pwmpin_forward_, int pwmpin_backwards_, int forward_channelNo_, int backwards_channelNo_, int loadLimit_, int ignoreStartLoadsFor_, LOGGER *logger_, const String &logName_);
+    MOTOR(int loadPin_, int pwmpin_forward_, int pwmpin_backwards_, int forward_channelNo_, int backwards_channelNo_, int ignoreStartLoadsFor_, LOGGER *logger_, const String &logName_);
 
 	  int setSpeed(int speed, int actionTime);
     int getSpeed();
 
     int getLoad();
-    bool isOverload();
+    bool isOverload(bool toughMode);
 
     void doLoop();
-    void setup();
+    void setup(int loadLimit_);
 
     bool isAtTargetSpeed();
 

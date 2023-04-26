@@ -12,6 +12,9 @@ Mow::Mow(Controller *controller_, LOGGER *logger_, BATTERY *battery_, MowerModel
     mowermodel = mowerModel_;
     modeSelectEvent = modeSelectEvent_;
 }
+bool Mow::logSensorChange() {
+    return true;
+}
 
 void Mow::start() { 
     boostModeSince = 0;
@@ -29,7 +32,7 @@ int Mow::loop() {
         return BEHAVIOR_LOOK_FOR_BWF;
     }
 
-    if (controller->HandleObsticle()) {
+    if (controller->HandleObsticle(false)) {
         return id();
     }
 
@@ -41,7 +44,6 @@ int Mow::loop() {
         while (!controller->IsFlipped())
         {
             if (!controller->IsLeftOutOfBounds()) {
-                logger->log("Back inside!");
                 break;
             }
             if (hasTimeout(t, 5000)) {
@@ -62,7 +64,6 @@ int Mow::loop() {
         while (!controller->IsFlipped())
         {
             if (!controller->IsRightOutOfBounds()) {
-                logger->log("Back inside!");
                 break;
             }
             if (hasTimeout(t, 5000)) {
@@ -78,6 +79,7 @@ int Mow::loop() {
 
     if (boostModeSince == 0 && controller->IsCutterHighLoad() ) {
         boostModeSince = millis();
+        logger->log("High cutter load");
     }
 
     if (boostModeSince > 0) {

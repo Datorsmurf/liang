@@ -11,6 +11,9 @@ Charge::Charge(Controller *controller_, LOGGER *logger_, BATTERY *battery_, Mowe
     battery = battery_;
     mowerModel = mowerModel_;
 }
+bool Charge::logSensorChange() {
+    return false;
+}
 
 void Charge::start() {
     controller->StopMovement();

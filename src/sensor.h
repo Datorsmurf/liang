@@ -1,8 +1,9 @@
 #ifndef _SENSOR_H_
 #define _SENSOR_H_
 
-#define PULSE_SIGNAL_VALID_MS 3000;
+#define PULSE_SIGNAL_VALID_MS 20000
 #define PULSE_HISTORY_COUNT 10
+#define MISSING_SIGNAL_IS_OUT true
 
 #include "Logger.h"
 #include "utils.h"
@@ -11,13 +12,14 @@
 
 class SENSOR { 
     public:
-        SENSOR(String name_, int pin_, bool missingSignalIsOut_, LOGGER *logger_);
+        SENSOR(String name_, int pin_, bool missingSignalIsOut_,int signalValidityTimeMs_, LOGGER *logger_);
         void setup();
         bool IsIn();
         bool IsOut();
         bool IsOutOfBounds();
         bool IsSignalMissing();
         void IRAM_ATTR handleInterrupt();
+        void SetLogSensorChanges(bool logChanges);
         String GetPulseHistoryS();
         
 
@@ -30,8 +32,8 @@ class SENSOR {
 
         int pin;
         bool missingSignalIsOut;
-        unsigned long lastSignalTime;
-        bool isIn ;
+        volatile unsigned long lastSignalTime;
+        volatile bool isIn ;
         unsigned long last_pulse;
         int signel_status;
         int pulse_count_inside;
@@ -39,7 +41,9 @@ class SENSOR {
         int pulsehistory[PULSE_HISTORY_COUNT];
         int pulseHistoryPos = 0;
         unsigned long pulseCount = 0;
+        int signalValidityTimeMs;
         bool lastResultWasOutOfBounds = false;
+        bool logSensorChanges = false;
 };
 
 #endif

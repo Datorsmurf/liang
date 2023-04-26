@@ -16,6 +16,7 @@ class LookForBWF : public BEHAVIOR {
         int loop();
         int id();
         String desc();
+        bool logSensorChange();
     private:
         Controller *controller;
         LOGGER *logger;

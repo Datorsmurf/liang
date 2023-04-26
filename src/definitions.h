@@ -8,7 +8,7 @@ typedef std::function<void()> RebootNeededEvent;
 
 // BWF Code for inside and outside
 #define INSIDE_BWF          86, 86
-#define OUTSIDE_BWF         5, 81, 5, 81
+#define OUTSIDE_BWF         5, 81
 
 #define LED_PIN 17
 #define SWITCH_3_PIN 13
@@ -55,8 +55,8 @@ typedef std::function<void()> RebootNeededEvent;
 #define AUX_MOTOR_SENSE_PIN 39
 
 #define LOAD_START_IGNORE_TIME 500
-#define LOAD_LIMIT_WHEEL 160
-#define LOAD_LIMIT_CUTTER 940
+#define LOAD_LIMIT_WHEEL 175
+#define LOAD_LIMIT_CUTTER 900
 #define LOAD_FILTER 0.01
 #define LOAD_LIMIT_AUX 200
 
@@ -76,7 +76,7 @@ typedef std::function<void()> RebootNeededEvent;
 #define CUTTER_SPEED 255
 #define CUTTER_SPEED_BOOST 255
 
-#define TILT_ANGLE 30;
+#define TILT_ANGLE 35;
 #define FLIP_ANGLE 110;
 
 #define OPTION_STEP_TIME 750
@@ -92,12 +92,14 @@ typedef std::function<void()> RebootNeededEvent;
 #define ERROR_INVALID_OP_MODE 5
 #define ERROR_INVALID_BAHAVIOR 6
 #define ERROR_OUT_OF_BATTERY 7
+#define ERROR_CUTTER_STUCK 8
 
 #define LOG_BUFFER_SIZE 100
 
 #define EEPROM_ADR_WIFI_SSID 0
 #define EEPROM_ADR_WIFI_PWD 33
 #define EEPROM_ADR_INIT_MODE 53
-
+#define EEPROM_ADR_WHEEL_LOAD_LIMIT 55
+#define EEPROM_ADR_CUTTER_LOAD_LIMIT 57
 #endif
 
