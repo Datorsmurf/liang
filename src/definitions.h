@@ -54,11 +54,13 @@ typedef std::function<void()> RebootNeededEvent;
 #define AUX_MOTOR_PWM_CHANNEL_BACKWARDS 6
 #define AUX_MOTOR_SENSE_PIN 39
 
-#define LOAD_START_IGNORE_TIME 500
 #define LOAD_LIMIT_WHEEL 175
+// Load Limit unit conversion:
+// 0.1ohm shunt, 16 Gain Op-Amp, 11 bit (nonlinear) adc setting =>  1 mA ~= 1 load limit value
 #define LOAD_LIMIT_CUTTER 900
-#define LOAD_FILTER 0.01
 #define LOAD_LIMIT_AUX 200
+#define LOAD_START_IGNORE_TIME 500
+#define LOAD_FILTER 0.01
 
 #define LEFT_SENSOR_PIN 26
 #define RIGHT_SENSOR_PIN 25
@@ -98,7 +100,7 @@ typedef std::function<void()> RebootNeededEvent;
 
 #define EEPROM_ADR_WIFI_SSID 0
 #define EEPROM_ADR_WIFI_PWD 33
-#define EEPROM_ADR_INIT_MODE 53
+#define EEPROM_ADR_INIT_MODE 64
 #define EEPROM_ADR_WHEEL_LOAD_LIMIT 55
 #define EEPROM_ADR_CUTTER_LOAD_LIMIT 57
 #endif
