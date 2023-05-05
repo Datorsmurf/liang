@@ -101,7 +101,7 @@ typedef std::function<void()> RebootNeededEvent;
 #define EEPROM_ADR_WIFI_SSID 0
 #define EEPROM_ADR_WIFI_PWD 33
 #define EEPROM_ADR_INIT_MODE 64
-#define EEPROM_ADR_WHEEL_LOAD_LIMIT 55
-#define EEPROM_ADR_CUTTER_LOAD_LIMIT 57
+#define EEPROM_ADR_WHEEL_LOAD_LIMIT 66
+#define EEPROM_ADR_CUTTER_LOAD_LIMIT 68
 #endif
 
