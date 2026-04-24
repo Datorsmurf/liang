@@ -30,6 +30,8 @@ class FollowBWF : public BEHAVIOR {
         BATTERY *battery;
         MOTOR *leftMotor;
         MOTOR *rightMotor;
+        MOTOR *insideMotor;
+        MOTOR *outsideMotor;
 
         int obsticleCount;
         int obsticleCountBeforeEvade;

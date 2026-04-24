@@ -31,6 +31,8 @@ class Controller {
         bool IsFlipped();
         bool IsLeftOutOfBounds();
         bool IsRightOutOfBounds();
+        bool IsOutsideOutOfBounds();
+        bool IsInsideOutOfBounds();
         int Heading();
         void FreezeTargetHeading();
         void SetTargetHeading(int heading);

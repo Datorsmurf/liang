@@ -169,6 +169,22 @@ bool Controller::IsRightOutOfBounds() {
     return rightSensor->IsOutOfBounds();
 }
 
+bool Controller::IsOutsideOutOfBounds() {
+    if (BWF_CLOCKWISE) {
+        return IsLeftOutOfBounds();
+    } else {
+        return IsRightOutOfBounds();
+    }
+}
+
+bool Controller::IsInsideOutOfBounds() {
+    if (BWF_CLOCKWISE) {
+        return IsRightOutOfBounds();
+    } else {
+        return IsLeftOutOfBounds();
+    }
+}
+
 void Controller::ResetOutOfBoundsTimout(){
     lastTimeInside = millis();
 }

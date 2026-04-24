@@ -297,6 +297,10 @@ void setup() {
   Serial.begin(115200);
   settings.setup(&logger);
 
+  pinMode(LED_PIN, OUTPUT);
+  pinMode(SWITCH_3_PIN, INPUT_PULLUP);
+  pinMode(SWITCH_BOOT_PIN, INPUT_PULLUP);
+
   analogReadResolution(ANALOG_RESOLUTION);
   analogSetAttenuation(ADC_11db);  
 
@@ -360,9 +364,6 @@ void setup() {
   mowerModel.CurrentOpModeId = currentMode->id();
   mowerModel.Behavior = currentBehavior->desc();
 
-  pinMode(LED_PIN, OUTPUT);
-  pinMode(SWITCH_3_PIN, INPUT_PULLUP);
-  pinMode(SWITCH_BOOT_PIN, INPUT_PULLUP);
 }
 
 

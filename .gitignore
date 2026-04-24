@@ -6,3 +6,7 @@
 
 /.vscode
 .fake
+.cache/*
+
+# helper for platformio:
+compile_commands.json

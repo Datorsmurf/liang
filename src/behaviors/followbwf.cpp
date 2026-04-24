@@ -12,6 +12,13 @@ FollowBWF::FollowBWF(Controller *controller_, LOGGER *logger_, BATTERY *battery_
     leftMotor = leftMotor_;
     rightMotor = rightMotor_;
     obsticleCountBeforeEvade = 3;
+    if (BWF_CLOCKWISE) {
+        insideMotor = rightMotor;
+        outsideMotor = leftMotor;
+    } else {
+        insideMotor = leftMotor;
+        outsideMotor = rightMotor;
+    }
 }
 bool FollowBWF::logSensorChange() {
     return true;
@@ -65,14 +72,14 @@ int FollowBWF::loop() {
         lastInside = millis();//Not really inside, but reset anyways.
     }
 
-    if (controller->IsRightOutOfBounds()) {
+    if (controller->IsInsideOutOfBounds()) {
         lastOutside = millis();
         controller->StopMovement();
 
         unsigned long t = millis();
         while (true)
         {
-            if (!controller->IsRightOutOfBounds()) {
+            if (!controller->IsInsideOutOfBounds()) {
                 logger->log("Back inside!");
                 break;
             }
@@ -86,21 +93,21 @@ int FollowBWF::loop() {
         return id();
     }
 
-    if (controller->IsLeftOutOfBounds()) {
+    if (controller->IsOutsideOutOfBounds()) {
         lastOutside = millis();
-        leftMotor->setSpeed(DOCKING_WHEEL_HIGH_SPEED, DOCKING_TIME_TO_HIGH_SPEED);
-        if (rightMotor->getSpeed() < DOCKING_WHEEL_LOW_SPEED)
-            rightMotor->setSpeed(DOCKING_WHEEL_HIGH_SPEED, DOCKING_TIME_TO_HIGH_SPEED);
+        outsideMotor->setSpeed(DOCKING_WHEEL_HIGH_SPEED, DOCKING_TIME_TO_HIGH_SPEED);
+        if (insideMotor->getSpeed() < DOCKING_WHEEL_LOW_SPEED)
+            insideMotor->setSpeed(DOCKING_WHEEL_HIGH_SPEED, DOCKING_TIME_TO_HIGH_SPEED);
         else 
-            rightMotor->setSpeed(DOCKING_WHEEL_LOW_SPEED, DOCKING_TIME_TO_SLOW_SPEED);
+            insideMotor->setSpeed(DOCKING_WHEEL_LOW_SPEED, DOCKING_TIME_TO_SLOW_SPEED);
     } else {
         lastInside = millis();
 
-        rightMotor->setSpeed(DOCKING_WHEEL_HIGH_SPEED, DOCKING_TIME_TO_HIGH_SPEED);
-        if (leftMotor->getSpeed() < DOCKING_WHEEL_LOW_SPEED)
-            leftMotor->setSpeed(DOCKING_WHEEL_HIGH_SPEED, DOCKING_TIME_TO_HIGH_SPEED);
+        insideMotor->setSpeed(DOCKING_WHEEL_HIGH_SPEED, DOCKING_TIME_TO_HIGH_SPEED);
+        if (outsideMotor->getSpeed() < DOCKING_WHEEL_LOW_SPEED)
+            outsideMotor->setSpeed(DOCKING_WHEEL_HIGH_SPEED, DOCKING_TIME_TO_HIGH_SPEED);
         else 
-            leftMotor->setSpeed(DOCKING_WHEEL_LOW_SPEED, DOCKING_TIME_TO_SLOW_SPEED);
+            outsideMotor->setSpeed(DOCKING_WHEEL_LOW_SPEED, DOCKING_TIME_TO_SLOW_SPEED);
 
     } 
 
