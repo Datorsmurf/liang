@@ -30,6 +30,7 @@ void FollowBWF::start() {
     obsticleCount = 0;
     lastObsticle = 0;
     lastOutside = millis();
+    lastInside = millis();
 
 }
 
@@ -89,7 +90,9 @@ int FollowBWF::loop() {
             }
             controller->RunAsync(-FULL_SPEED, -FULL_SPEED, NORMAL_ACCELERATION_TIME);
         }
-        controller->TurnAngle(DOCKING_TURN_ANGLE_AFTER_BACK_UP);
+        // Turn toward the wire: CW = right turn, CCW = left turn
+        int turnAngle = BWF_CLOCKWISE ? DOCKING_TURN_ANGLE_AFTER_BACK_UP : -DOCKING_TURN_ANGLE_AFTER_BACK_UP;
+        controller->TurnAngle(turnAngle);
         return id();
     }
 
